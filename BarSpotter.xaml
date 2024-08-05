@@ -1,0 +1,51 @@
+﻿<Window x:Name="barSpotterWindow" x:Class="SharpOverlay.BarSpotter"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SharpOverlay" xmlns:models="clr-namespace:SharpOverlay.Models"
+        mc:Ignorable="d"
+        Title="BarSpotter" Height="{Binding BarLength, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  Width="800" WindowStyle="None" ResizeMode="CanResizeWithGrip" AllowsTransparency="True" Topmost="True" MouseDown="Window_MouseDown" Background="{x:Null}"  d:DataContext="{d:DesignInstance Type=models:BarSpotterSettings}" >
+    <Grid x:Name="grid">
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+
+        </Grid.ColumnDefinitions>
+
+        <Canvas Grid.Column="0" Width="{Binding Path=ActualWidth,ElementName=leftFill}">
+            <Rectangle x:Name="leftFill" Height="{Binding Path=ActualHeight, ElementName=barSpotterWindow}" Width="{Binding BarWidth, Mode=OneWay}" Fill="{Binding BarColor, Mode=OneWay}" HorizontalAlignment="Center" VerticalAlignment="Top">
+                <Rectangle.RenderTransform>
+                    <TransformGroup>
+                        <ScaleTransform x:Name="leftFillScaleTransform" ScaleY="1"/>
+                        <SkewTransform/>
+                        <RotateTransform/>
+                        <TranslateTransform/>
+                    </TransformGroup>
+                </Rectangle.RenderTransform>
+            </Rectangle>
+        </Canvas>
+        <Border Grid.Column="1"></Border>
+
+        <Canvas Grid.Column="2" Width="{Binding Path=ActualWidth, ElementName=rightFill}">
+            <Rectangle x:Name="rightFill" Height="{Binding Path=ActualHeight,ElementName=barSpotterWindow}" Width="{Binding BarWidth, Mode=OneWay}" Fill="{Binding BarColor, Mode=OneWay}" HorizontalAlignment="Center" VerticalAlignment="Top" Canvas.Top="0">
+                <Rectangle.RenderTransform>
+                    <TransformGroup>
+                        <ScaleTransform x:Name="rightFillScaleTransform" ScaleY="1"/>
+                        <SkewTransform/>
+                        <RotateTransform/>
+                        <TranslateTransform/>
+                    </TransformGroup>
+                </Rectangle.RenderTransform>
+            </Rectangle>
+        </Canvas>
+
+
+
+    </Grid>
+</Window>
