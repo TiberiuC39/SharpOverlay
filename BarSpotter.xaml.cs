@@ -182,11 +182,11 @@ namespace SharpOverlay
             }
             if (!App.appSettings.BarSpotterSettings.TestMode)
             {
+                leftFill.Visibility = Visibility.Hidden;
+                rightFill.Visibility = Visibility.Hidden;
                 carLeftRight = (Enums.CarLeftRight)iracingWrapper.GetData("CarLeftRight");
                 if (carLeftRight == Enums.CarLeftRight.irsdk_LRClear)
                 {
-                    leftFill.Visibility = Visibility.Hidden;
-                    rightFill.Visibility = Visibility.Hidden;
                 }
                 if (carLeftRight == Enums.CarLeftRight.irsdk_LRCarLeft)
                 {
@@ -196,7 +196,6 @@ namespace SharpOverlay
                 }
                 if (carLeftRight == Enums.CarLeftRight.irsdk_LRCarRight)
                 {
-
                     var normalizedDistance = Math.Max(-1, Math.Min(1, closestCar / (5 / trackLen)));
                     UpdateBar(rightFill, normalizedDistance, App.appSettings.BarSpotterSettings.BarColor);
 
@@ -204,18 +203,18 @@ namespace SharpOverlay
 
                 if (carLeftRight == Enums.CarLeftRight.irsdk_LRCarLeftRight)
                 {
-                    UpdateBar(rightFill, 0.6f, App.appSettings.BarSpotterSettings.ThreeWideBarColor);
-                    UpdateBar(leftFill, 0.6f, App.appSettings.BarSpotterSettings.ThreeWideBarColor);
+                    UpdateBar(rightFill, 10f, App.appSettings.BarSpotterSettings.ThreeWideBarColor);
+                    UpdateBar(leftFill, 10f, App.appSettings.BarSpotterSettings.ThreeWideBarColor);
                 }
 
                 if (carLeftRight == Enums.CarLeftRight.irsdk_LR2CarsLeft)
                 {
-                    UpdateBar(leftFill, 0.6f, App.appSettings.BarSpotterSettings.ThreeWideBarColor);
+                    UpdateBar(leftFill, 10f, App.appSettings.BarSpotterSettings.ThreeWideBarColor);
                 }
 
                 if (carLeftRight == Enums.CarLeftRight.irsdk_LR2CarsRight)
                 {
-                    UpdateBar(rightFill, 0.6f, App.appSettings.BarSpotterSettings.ThreeWideBarColor);
+                    UpdateBar(rightFill, 10f, App.appSettings.BarSpotterSettings.ThreeWideBarColor);
                 }
             }
         }
@@ -235,9 +234,16 @@ namespace SharpOverlay
                 ((ScaleTransform)((TransformGroup)rect.RenderTransform).Children[0]).ScaleY = -1;
 
             }
+            if (barSize > 1)
+            {
+                rect.Height = grid.ActualHeight;
+            }
+            else {
+                rect.Height = grid.ActualHeight * (1 - Math.Abs(barSize));
 
-            rect.Height = grid.ActualHeight * (1 - Math.Abs(barSize));
+            }
             Canvas.SetTop(rect, topPos);
+
         }
 
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)

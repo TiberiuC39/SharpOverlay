@@ -52,7 +52,7 @@ namespace SharpOverlay
             SetStreamerColorAndWidth(ref brakeStreamer, App.appSettings.InputGraphSettings.BrakeColor);
             SetStreamerColorAndWidth(ref clutchStreamer, App.appSettings.InputGraphSettings.ClutchColor);
 
-            if(App.appSettings.InputGraphSettings.ShowClutch)
+            if (App.appSettings.InputGraphSettings.ShowClutch)
             {
                 clutchStreamer.IsVisible = true;
             }

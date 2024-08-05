@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SharpOverlay" xmlns:models="clr-namespace:SharpOverlay.Models"
         mc:Ignorable="d"
-        Title="BarSpotter" Height="{Binding BarLength, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  Width="800" WindowStyle="None" ResizeMode="CanResizeWithGrip" AllowsTransparency="True" Topmost="True" MouseDown="Window_MouseDown" Background="{x:Null}"  d:DataContext="{d:DesignInstance Type=models:BarSpotterSettings}" >
+        Title="BarSpotter" Height="{Binding BarLength, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  Width="800" WindowStyle="None" ResizeMode="CanResizeWithGrip" AllowsTransparency="True" Topmost="True" MouseDown="Window_MouseDown" Background="{x:Null}"  d:DataContext="{d:DesignInstance Type=models:BarSpotterSettings}">
     <Grid x:Name="grid">
         <Grid.RowDefinitions>
             <RowDefinition/>
