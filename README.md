@@ -32,7 +32,9 @@ Send any bug reports and feature requests via GitHub issues.
 ## Building locally
 For building the solution, VS 2022 with the .NET desktop development workload should suffice.
 
+## Mentions
 
+[iSimpleRadar](https://github.com/marcoscavaleiro/iSimpleRadar) - Much of the Bar Spotter code is based on this project.
 
 
 
