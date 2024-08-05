@@ -20,7 +20,7 @@ https://github.com/user-attachments/assets/5c3325ea-c5ea-44e9-9ca9-cda07f0411b7
 
 Use the bottom right corner to resize the windows.
 
-## Downlad
+## Download
 
 Download the latest installer [here](https://github.com/TiberiuC39/SharpOverlay/releases/latest/download/SharpOverlay-win-Setup.exe), or portable version [here](https://github.com/TiberiuC39/SharpOverlay/releases/latest/download/SharpOverlay-win-Portable.zip). 
 Installation is straight forward, double-click the setup exe or unzip the archive and start the app with SharpOverlay.exe
