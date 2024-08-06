@@ -40,11 +40,18 @@ namespace SharpOverlay
 
             iracingWrapper.SessionInfoUpdated += iracingWrapper_SessionInfoUpdated;
             iracingWrapper.TelemetryUpdated += iracingWrapper_TelemetryUpdated;
-            App.appSettings.BarSpotterSettings.PropertyChanged += settings_TestMode;
+            iracingWrapper.Connected += iracingWrapper_Connected;
+            iracingWrapper.Disconnected += iracingWrapper_Disconnected;
+
             barSpotterWindow.SizeChanged += window_SetBarEqualToWindow;
 
-        }
+            if (iracingWrapper.IsConnected)
+            {
+                iracingWrapper.RequestSessionInfoUpdate();
+            }
 
+            App.appSettings.BarSpotterSettings.PropertyChanged += settings_TestMode;
+        }
         private void HandleTestMode(bool test)
         {
             if (test)
@@ -89,7 +96,6 @@ namespace SharpOverlay
             this.ParseDrivers(e.SessionInfo);
             isUpdatingDrivers = false;
         }
-
 
         private void iracingWrapper_TelemetryUpdated(object sender, SdkWrapper.TelemetryUpdatedEventArgs e)
         {
@@ -250,6 +256,18 @@ namespace SharpOverlay
         {
             if (e.ChangedButton == MouseButton.Left)
                 DragMove();
+        }
+
+        private void iracingWrapper_Disconnected(object sender, EventArgs e)
+        {
+            leftFill.Height = 0;
+            rightFill.Height = 0;
+        }
+
+        private void iracingWrapper_Connected(object sender, EventArgs e)
+        {
+            drivers.Clear();
+            relatives.Clear();
         }
     }
 }

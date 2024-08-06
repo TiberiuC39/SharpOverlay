@@ -22,7 +22,7 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <TabControl FontSize="25" Grid.ColumnSpan="2">
+            <TabControl FontSize="25" Grid.ColumnSpan="2" TabStripPlacement="Left">
                 <TabItem Header="Bar Spotter" FontFamily="Bahnschrift SemiBold">
                     <Grid DataContext="{Binding BarSpotterSettings}">
                         <Grid.ColumnDefinitions>
@@ -44,7 +44,7 @@
                         <Button x:Name="threeWideColorButton"  HorizontalAlignment="Left" Margin="210,77,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.013,-0.073" Click="showColorPicker" Width="74" Grid.ColumnSpan="2" Background="{Binding ThreeWideBarColor, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsEnabled, Mode=OneWay}"/>
                         <ToggleButton x:Name="barSpotterToggleButton"
                       Style="{StaticResource MaterialDesignSwitchToggleButton}"
-                      Grid.Column="1" Margin="248,2,18,382" IsChecked="{Binding IsEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Checked="windowToggle" Unchecked="windowToggle">
+                      Grid.Column="1" Margin="204,-22,10,406" IsChecked="{Binding IsEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Checked="windowToggle" Unchecked="windowToggle">
                             <materialDesign:ToggleButtonAssist.SwitchTrackOnBackground>
                                 <SolidColorBrush Color="Green" />
                             </materialDesign:ToggleButtonAssist.SwitchTrackOnBackground>
@@ -53,12 +53,12 @@
                                 <SolidColorBrush Color="Red" />
                             </materialDesign:ToggleButtonAssist.SwitchTrackOffBackground>
                         </ToggleButton>
-                        <Label Grid.Column="1" Content="Active" HorizontalAlignment="Left" Margin="158,17,0,0" VerticalAlignment="Top"/>
-                        <Label Content="Positioning mode" HorizontalAlignment="Left" Margin="115,389,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.044,-0.259" Height="40" Width="132" Grid.Column="1"/>
+                        <Label Grid.Column="1" Content="Active" HorizontalAlignment="Left" Margin="123,18,0,0" VerticalAlignment="Top"/>
+                        <Label Content="Positioning mode" HorizontalAlignment="Left" Margin="67,446,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.044,-0.259" Height="40" Width="132" Grid.Column="1"/>
                         <ToggleButton x:Name="testModeToggle"
              ToolTip="Toggle to render the bars and position them"
             Style="{StaticResource MaterialDesignSwitchToggleButton}"
-            Margin="252,375,14,9" IsChecked="{Binding TestMode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" materialDesign:ToggleButtonAssist.SwitchTrackOnBackground="DarkGreen" materialDesign:ToggleButtonAssist.SwitchTrackOffBackground="Red" Grid.Column="1"/>
+            Margin="204,408,10,-24" IsChecked="{Binding TestMode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" materialDesign:ToggleButtonAssist.SwitchTrackOnBackground="DarkGreen" materialDesign:ToggleButtonAssist.SwitchTrackOffBackground="Red" Grid.Column="1"/>
 
                     </Grid>
                 </TabItem>
@@ -70,13 +70,13 @@
                         </Grid.ColumnDefinitions>
                         <ToggleButton x:Name="inputGraphToggleButton"
                             Style="{StaticResource MaterialDesignSwitchToggleButton}"
-                           Grid.Column="1" Margin="248,2,18,382" materialDesign:ToggleButtonAssist.SwitchTrackOnBackground="DarkGreen" materialDesign:ToggleButtonAssist.SwitchTrackOffBackground="Red" IsChecked="{Binding IsEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Click="windowToggle"/>
-                        <Label Grid.Column="1" Content="Active" HorizontalAlignment="Left" Margin="158,17,0,0" VerticalAlignment="Top"/>
-                        <Button x:Name="throttleColorPickerButton"  HorizontalAlignment="Left" Margin="186,17,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.013,-0.073" Click="showColorPicker" Width="74"  Background="{Binding ThrottleColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  IsEnabled="{Binding IsEnabled, Mode=OneWay}"/>
+                           Grid.Column="1" Margin="204,-22,10,406"  materialDesign:ToggleButtonAssist.SwitchTrackOnBackground="DarkGreen" materialDesign:ToggleButtonAssist.SwitchTrackOffBackground="Red" IsChecked="{Binding IsEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Click="windowToggle"/>
+                        <Label Grid.Column="1" Content="Active" HorizontalAlignment="Left" Margin="123,18,0,0" VerticalAlignment="Top"/>
+                        <Button x:Name="throttleColorPickerButton"  HorizontalAlignment="Left" Margin="186,23,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.013,-0.073" Click="showColorPicker" Width="74"  Background="{Binding ThrottleColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  IsEnabled="{Binding IsEnabled, Mode=OneWay}" Grid.ColumnSpan="2"/>
                         <Label Content="Throttle Color" HorizontalAlignment="Left" Margin="10,14,0,0" VerticalAlignment="Top"/>
-                        <Button x:Name="brakeColorPickerButton"  HorizontalAlignment="Left" Margin="186,60,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.013,-0.073" Click="showColorPicker" Width="74"  Background="{Binding BrakeColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  IsEnabled="{Binding IsEnabled, Mode=OneWay}"/>
+                        <Button x:Name="brakeColorPickerButton"  HorizontalAlignment="Left" Margin="186,63,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.013,-0.073" Click="showColorPicker" Width="74"  Background="{Binding BrakeColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  IsEnabled="{Binding IsEnabled, Mode=OneWay}" Grid.ColumnSpan="2"/>
                         <Label Content="Brake Color" HorizontalAlignment="Left" Margin="10,57,0,0" VerticalAlignment="Top"/>
-                        <Button x:Name="clutchColorPickerButton"  HorizontalAlignment="Left" Margin="186,103,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.013,-0.073" Click="showColorPicker" Width="74"  Background="{Binding ClutchColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  IsEnabled="{Binding IsEnabled, Mode=OneWay}"/>
+                        <Button x:Name="clutchColorPickerButton"  HorizontalAlignment="Left" Margin="186,103,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.013,-0.073" Click="showColorPicker" Width="74"  Background="{Binding ClutchColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  IsEnabled="{Binding IsEnabled, Mode=OneWay}" Grid.ColumnSpan="2"/>
                         <Label Content="Clutch Color" HorizontalAlignment="Left" Margin="10,95,0,0" VerticalAlignment="Top"/>
                         <Slider x:Name="inputGraph_lineWidthSlider" Maximum="10" 
                             Minimum="1"
@@ -100,11 +100,21 @@
         <Image Grid.Column="1" HorizontalAlignment="Center" Height="314" Margin="0,10,0,0" VerticalAlignment="Top" Width="384" Source="/Media/sharpoverlaylogo.png"/>
         <Button x:Name="updateButton" Grid.Column="1" Content="CLICK TO UPDATE!" HorizontalAlignment="Left" Margin="415,450,0,0" VerticalAlignment="Top" Background="LightGreen" Visibility="Hidden" Click="updateButton_Click"/>
         <TextBlock Grid.Column="1" HorizontalAlignment="Left" Margin="26,84,0,0" TextWrapping="Wrap" VerticalAlignment="Top">
-            Welcome to SharpOverlay! 
+            Welcome to SharpOverlay! Please leave any bugs or feature requests 
             <Hyperlink
-                NavigateUri="http://www.google.com"
+                NavigateUri="https://github.com/TiberiuC39/SharpOverlay/issues"
                 RequestNavigate="Hyperlink_RequestNavigate">
+                here
             </Hyperlink>
+           
+        </TextBlock>
+
+        <TextBlock Grid.Column="1" HorizontalAlignment="Left" Margin="26,105,0,0" TextWrapping="Wrap" VerticalAlignment="Top">
+            Changelog v0.1.1:
+            <LineBreak/>
+            - Moved tab strip to the side to accomodate future overlays
+            <LineBreak/>
+            - Fixed an issue with the bar spotter breaking when changing sessions. (Thanks /u/z4ckm0rris!)
         </TextBlock>
 
 
