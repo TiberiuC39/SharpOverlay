@@ -127,7 +127,10 @@ namespace SharpOverlay.Models
         private SolidColorBrush? _brakeColor;
 
         private SolidColorBrush? _clutchColor;
+
+        private SolidColorBrush? _ABSColor;
         public SolidColorBrush? ThrottleColor
+
         {
             get => _throttleColor;
             set
@@ -157,6 +160,16 @@ namespace SharpOverlay.Models
             }
         }
 
+        public SolidColorBrush? ABSColor
+        {
+            get => _ABSColor;
+            set
+            {
+                _ABSColor = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ABSColor)));
+            }
+        }
+
         private int _lineWidth;
 
         public int LineWidth
@@ -166,6 +179,18 @@ namespace SharpOverlay.Models
             {
                 _lineWidth = value;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(LineWidth)));
+            }
+        }
+
+        private bool _showABS;
+
+        public bool ShowABS
+        {
+            get => _showABS;
+            set
+            {
+                _showABS = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ShowABS)));
             }
         }
 
@@ -179,13 +204,55 @@ namespace SharpOverlay.Models
             UseRawValues = true;
             ShowClutch = true;
         }
+
+    }
+
+    public class WindSettings : INotifyPropertyChanged
+    {
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        private bool _isEnabled;
+
+        public bool IsEnabled
+        {
+            get => _isEnabled;
+            set
+            {
+                _isEnabled = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsEnabled)));
+            }
+        }
+
+        private bool _useMph;
+
+        public bool UseMph
+        {
+            get => _useMph;
+            set
+            {
+                _useMph = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(UseMph)));
+            }
+        }
+
+        private bool _testMode;
+        public bool TestMode
+        {
+            get => _testMode;
+            set
+            {
+                _testMode = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(TestMode)));
+            }
+        }
+
     }
 
     public class Settings : INotifyPropertyChanged
     {
         public BarSpotterSettings BarSpotterSettings { get; set; }
         public InputGraphSettings InputGraphSettings { get; set; }
-
+        public WindSettings WindSettings { get; set; }
         public bool IsUpdate { get; set; }
 
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -194,6 +261,7 @@ namespace SharpOverlay.Models
         {
             InputGraphSettings = new InputGraphSettings();
             BarSpotterSettings = new BarSpotterSettings();
+            WindSettings = new WindSettings();
         }
     }
 }

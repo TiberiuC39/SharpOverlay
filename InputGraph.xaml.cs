@@ -28,7 +28,9 @@ namespace SharpOverlay
         private DataStreamer brakeStreamer;
         private DataStreamer clutchStreamer;
         private Input input = new Input();
-        Random rnd = new Random();
+
+        private bool absActive;
+        private ScottPlot.Color currentBgColor;
 
         private SdkWrapper iracingWrapper = iRacingDataService.Wrapper;
         public InputGraph()
@@ -37,13 +39,11 @@ namespace SharpOverlay
             Services.JotService.tracker.Track(this);
             iracingWrapper.TelemetryUpdated += iracingWrapper_TelemetryUpdated;
             App.appSettings.InputGraphSettings.PropertyChanged += graph_HandleSettingUpdated;
-         
+
             HookStreamer(ref throttleStreamer, App.appSettings.InputGraphSettings.ThrottleColor, true);
             HookStreamer(ref brakeStreamer, App.appSettings.InputGraphSettings.BrakeColor, true);
             HookStreamer(ref clutchStreamer, App.appSettings.InputGraphSettings.ClutchColor, App.appSettings.InputGraphSettings.ShowClutch);
             PlotSetup();
-
-
         }
 
         private void graph_HandleSettingUpdated(object sender, EventArgs e)
@@ -58,32 +58,34 @@ namespace SharpOverlay
             }
             else if (!App.appSettings.InputGraphSettings.ShowClutch)
             {
-                clutchStreamer.IsVisible = false;   
+                clutchStreamer.IsVisible = false;
             }
-  
         }
         private void UpdateInputs(TelemetryInfo telemetryInfo)
         {
 
-                if (App.appSettings.InputGraphSettings.UseRawValues)
-                {
-                    input.Brake = iracingWrapper.GetTelemetryValue<float>("BrakeRaw").Value * 100;
-                    input.Throttle = iracingWrapper.GetTelemetryValue<float>("ThrottleRaw").Value * 100;
-                    input.Clutch = (1 - iracingWrapper.GetTelemetryValue<float>("ClutchRaw").Value) * 100;
+            if (App.appSettings.InputGraphSettings.UseRawValues)
+            {
+                input.Brake = iracingWrapper.GetTelemetryValue<float>("BrakeRaw").Value * 100;
+                input.Throttle = iracingWrapper.GetTelemetryValue<float>("ThrottleRaw").Value * 100;
+                input.Clutch = (1 - iracingWrapper.GetTelemetryValue<float>("ClutchRaw").Value) * 100;
 
-                }
-                else {
-                    input.Brake = telemetryInfo.Brake.Value * 100;
-                    input.Throttle = telemetryInfo.Throttle.Value * 100;
-                    input.Clutch = (1 - telemetryInfo.Clutch.Value) * 100;
-                }
+            }
+            else
+            {
+                input.Brake = telemetryInfo.Brake.Value * 100;
+                input.Throttle = telemetryInfo.Throttle.Value * 100;
+                input.Clutch = (1 - telemetryInfo.Clutch.Value) * 100;
+            }
         }
 
-        private void AddInputsToStreamers(Input input) {
+        private void AddInputsToStreamers(Input input)
+        {
             throttleStreamer.Add(input.Throttle);
             brakeStreamer.Add(input.Brake);
-            if (App.appSettings.InputGraphSettings.ShowClutch) { 
-            clutchStreamer.Add(input.Clutch);
+            if (App.appSettings.InputGraphSettings.ShowClutch)
+            {
+                clutchStreamer.Add(input.Clutch);
             }
         }
 
@@ -92,6 +94,12 @@ namespace SharpOverlay
             UpdateInputs(e.TelemetryInfo);
             AddInputsToStreamers(input);
             InputPlot.Refresh();
+
+            absActive = iracingWrapper.GetTelemetryValue<bool>("BrakeABSactive").Value;
+            if (App.appSettings.InputGraphSettings.ShowABS)
+            {
+                ABSFlash();
+            }
         }
 
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
@@ -119,7 +127,7 @@ namespace SharpOverlay
             ds = InputPlot.Plot.Add.DataStreamer(250);
 
             ds.Color = TransformColor(color);
-            
+
             ds.LineWidth = App.appSettings.InputGraphSettings.LineWidth;
 
             ds.ViewScrollLeft();
@@ -139,6 +147,20 @@ namespace SharpOverlay
         private ScottPlot.Color TransformColor(SolidColorBrush color)
         {
             return new ScottPlot.Color(color.Color.R, color.Color.G, color.Color.B, color.Color.A);
+        }
+
+        private void ABSFlash()
+        {
+            if (absActive && currentBgColor == ScottPlot.Colors.Black)
+            {
+                InputPlot.Plot.DataBackground.Color = TransformColor(App.appSettings.InputGraphSettings.ABSColor);
+                currentBgColor = InputPlot.Plot.DataBackground.Color;
+            }
+            else if(currentBgColor != ScottPlot.Colors.Black)
+            {
+                InputPlot.Plot.DataBackground.Color = ScottPlot.Colors.Black;
+                currentBgColor = ScottPlot.Colors.Black;
+            }
         }
     }
 }

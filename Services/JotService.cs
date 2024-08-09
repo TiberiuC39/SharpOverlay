@@ -34,9 +34,14 @@ namespace SharpOverlay.Services
                 .Property(p => p.InputGraphSettings.ThrottleColor, new SolidColorBrush(Colors.Green))
                 .Property(p => p.InputGraphSettings.BrakeColor, new SolidColorBrush(Colors.Red))
                 .Property(p => p.InputGraphSettings.ClutchColor, new SolidColorBrush(Colors.Blue))
+                .Property(p => p.InputGraphSettings.ABSColor, new SolidColorBrush(Color.FromArgb(255, 133, 133, 133)))
+                .Property(p => p.InputGraphSettings.ShowABS, false)
                 .Property(p => p.InputGraphSettings.LineWidth, 3)
+                .Property(p => p.WindSettings.IsEnabled, false)
+                .Property(p => p.WindSettings.UseMph, false)
                 .PersistOn("PropertyChanged", p => p.BarSpotterSettings)
-                .PersistOn("PropertyChanged", p => p.InputGraphSettings);
+                .PersistOn("PropertyChanged", p => p.InputGraphSettings)
+                .PersistOn("PropertyChanged", p => p.WindSettings);
                 
         }
     }
