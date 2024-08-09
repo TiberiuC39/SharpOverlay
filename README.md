@@ -38,6 +38,11 @@ For building the solution, VS 2022 with the .NET desktop development workload sh
 
 [iSimpleRadar](https://github.com/marcoscavaleiro/iSimpleRadar) - Much of the Bar Spotter code is based on this project.
 
+## Donate
+If you find the overlays useful and would like to support the project, you can do so on Ko-fi.
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/Q5Q211EKTG)
+
 
 
 
