@@ -1,13 +1,9 @@
 ﻿using SharpOverlay.Models;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SharpOverlay.Services
 {
-   public static class OverlaysService
+    public static class OverlaysService
     {
         public static IList<Overlay> overlays { get; private set; }
         static OverlaysService()

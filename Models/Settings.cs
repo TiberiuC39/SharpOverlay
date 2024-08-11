@@ -196,15 +196,6 @@ namespace SharpOverlay.Models
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        public InputGraphSettings()
-        {
-            ThrottleColor = new SolidColorBrush(Colors.Green);
-            BrakeColor = new SolidColorBrush(Colors.Red);
-            ClutchColor = new SolidColorBrush(Colors.Blue);
-            UseRawValues = true;
-            ShowClutch = true;
-        }
-
     }
 
     public class WindSettings : INotifyPropertyChanged
