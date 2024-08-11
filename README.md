@@ -9,7 +9,7 @@ SharpOverlay is a set of iRacing overlays built on .NET & WPF. It aims to provid
 ## Features
 * Input Graph
 * Bar Spotter
-  
+* Wind Direction & Speed
 
 
 https://github.com/user-attachments/assets/5c3325ea-c5ea-44e9-9ca9-cda07f0411b7
@@ -19,6 +19,8 @@ https://github.com/user-attachments/assets/5c3325ea-c5ea-44e9-9ca9-cda07f0411b7
 ⚠️ Run iRacing in borderless windowed mode to avoid any issues.
 
 Use the bottom right corner to resize the windows.
+
+VR Users: Use OpenKneeboard to render the overlays in VR.
 
 ## Download
 
@@ -35,6 +37,11 @@ For building the solution, VS 2022 with the .NET desktop development workload sh
 ## Mentions
 
 [iSimpleRadar](https://github.com/marcoscavaleiro/iSimpleRadar) - Much of the Bar Spotter code is based on this project.
+
+## Donate
+If you find the overlays useful and would like to support the project, you can do so on Ko-fi.
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/Q5Q211EKTG)
 
 
 
