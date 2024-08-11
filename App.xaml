@@ -5,17 +5,18 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              StartupUri="MainWindow.xaml"
              ShutdownMode="OnMainWindowClose"
-             xmlns:hc="https://handyorg.github.io/handycontrol">
+             xmlns:converter="clr-namespace:SharpOverlay.Converters">
 
     <Application.Resources>
         <ResourceDictionary>
             <Style TargetType="{x:Type ResizeGrip}">
                 <Setter Property="Opacity" Value="0"/>
             </Style>
+            <converter:BrushToColorConverter x:Key="BrushToColorConverter"/>
             <ResourceDictionary.MergedDictionaries>
                 <materialDesign:BundledTheme BaseTheme="Dark" PrimaryColor="BlueGrey" SecondaryColor="DeepOrange" />
-                <hc:Theme Name="HandyTheme"/>
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign2.Defaults.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/ColorPicker;component/Styles/DefaultColorPickerStyle.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

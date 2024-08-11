@@ -1,26 +1,14 @@
 ﻿
-using HandyControl.Controls;
-using HandyControl.Tools;
 using SharpOverlay.Models;
 using SharpOverlay.Services;
 using iRacingSdkWrapper;
-using MaterialDesignThemes.Wpf;
-using ScottPlot.Plottables;
 using System;
-using System.Collections.Generic;
-using System.Drawing;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media;
-using static MaterialDesignThemes.Wpf.Theme.ToolBar;
-using System.Reflection;
 using Window = System.Windows.Window;
 using Dark.Net;
 using System.Threading.Tasks;
 using Velopack;
 using Velopack.Sources;
-using System.Windows.Controls.Primitives;
-using System.Diagnostics;
 
 namespace SharpOverlay
 {
@@ -33,7 +21,6 @@ namespace SharpOverlay
         public UpdateManager mgr = new UpdateManager(new GithubSource("https://github.com/tiberiuc39/sharpoverlay", null, false));
         public MainWindow()
         {
-            ConfigHelper.Instance.SetLang("en");
             Services.JotService.tracker.Track(App.appSettings);
             Services.JotService.tracker.PersistAll();
             DarkNet.Instance.SetWindowThemeWpf(this, Dark.Net.Theme.Auto);
@@ -49,7 +36,7 @@ namespace SharpOverlay
 
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
-           await CheckForUpdate();
+          await CheckForUpdate();
         }
         private async Task CheckForUpdate()
         {
@@ -89,22 +76,6 @@ namespace SharpOverlay
                     o.IsOpen = false;
                 }
             }
-        }
-
-
-        private void showColorPicker(object sender, RoutedEventArgs e)
-        {
-            var button = sender as Button;
-            var picker = SingleOpenHelper.CreateControl<HandyControl.Controls.ColorPicker>();
-            picker.Background = new SolidColorBrush(System.Windows.Media.Color.FromArgb(95, 64, 64, 64));
-            var window = new PopupWindow
-            {
-                PopupElement = picker
-            };
-            picker.Confirmed += delegate { button.Background = picker.SelectedBrush; window.Close(); };
-            picker.Canceled += delegate { window.Close(); };
-            window.Show(button, false);
-
         }
 
         private void windowToggle(object sender, RoutedEventArgs e)

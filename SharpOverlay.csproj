@@ -6,7 +6,7 @@
 		<RootNamespace>SharpOverlay</RootNamespace>
 		<Nullable>enable</Nullable>
 		<UseWPF>true</UseWPF>
-		<AssemblyVersion>0.2.0.0</AssemblyVersion>
+		<AssemblyVersion>0.2.1.0</AssemblyVersion>
 		<Version>$(AssemblyVersion)</Version>
 		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
 		<Title>SharpOverlay</Title>
@@ -27,10 +27,9 @@
 
 	<ItemGroup>
 		<PackageReference Include="DarkNet" Version="2.3.0" />
-		<PackageReference Include="HandyControl" Version="3.5.1" />
-		<PackageReference Include="HandyControl.Lang.en" Version="3.5.1" />
 		<PackageReference Include="Jot" Version="2.1.17" />
 		<PackageReference Include="MaterialDesignThemes" Version="5.1.0" />
+		<PackageReference Include="PixiEditor.ColorPicker" Version="3.4.1" />
 		<PackageReference Include="ScottPlot.WPF" Version="5.0.37" />
 		<PackageReference Include="Velopack" Version="0.0.583" />
 		<PackageReference Include="YamlDotNet.NetCore" Version="1.0.0" />
