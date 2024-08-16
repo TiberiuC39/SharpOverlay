@@ -44,6 +44,7 @@
                                                          FontSize="12"
                                                      UseHintColor="True" HintColor="Transparent"
                                                      SelectedColor="{Binding BarColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BrushToColorConverter}}"
+                                                     SelectedColor="{Binding BarColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BrushToColorConverter}}"
                                                      ShowFractionalPart="False"
                                                      ShowAlpha="True" Margin="210,18,211,447" Grid.ColumnSpan="2" />
                         <Label x:Name="threeWideBarLabel" Content="3 Wide Bar Color" HorizontalAlignment="Left" Margin="6,73,0,0" VerticalAlignment="Top" Height="40" Width="199"/>
