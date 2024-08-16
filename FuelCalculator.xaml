@@ -1,0 +1,33 @@
+﻿<Window x:Class="SharpOverlay.FuelCalculator"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:models="clr-namespace:SharpOverlay.Models" d:DataContext="{d:DesignInstance Type=models:FuelViewModel}"
+        mc:Ignorable="d"
+        Title="Fuel Data" Height="175" Width="250">
+    <Grid Margin="10,10,0,-31">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Label Grid.Row="0" Grid.Column="0" Content="Fuel Level:" VerticalAlignment="Center" Margin="5" Background="Black"/>
+        <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding CurrentFuelLevel}" VerticalAlignment="Center" Margin="5"/>
+
+        <Label Grid.Row="1" Grid.Column="0" Content="Fuel Percentage:" VerticalAlignment="Center" Margin="5" Background="Black"/>
+        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding AverageFuelConsumption, StringFormat=N2}" VerticalAlignment="Center" Margin="5"/>
+
+        <Label Grid.Row="2" Grid.Column="0" Content="Fuel Consumed" VerticalAlignment="Center" Margin="5" Background="Black"/>
+        <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding ConsumedFuel, StringFormat=N2}" VerticalAlignment="Center" Margin="5"/>
+
+        <Label Grid.Row="3" Grid.Column="0" Content="Fuel Consumed Per Hour" VerticalAlignment="Center" Margin="5" Background="Black"/>
+        <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding FuelConsumptionPerHour, StringFormat=N2}" VerticalAlignment="Center" Margin="5"/>
+    </Grid>
+</Window>
