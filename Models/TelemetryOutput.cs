@@ -214,27 +214,39 @@ namespace SharpOverlay.Models
 
         public TelemetryValue<int> PlayerCarIdx => new TelemetryValue<int>(sdk, "PlayerCarIdx");
 
+        public TelemetryValue<bool> WeatherDeclaredWet
+            => new TelemetryValue<bool>(sdk, "WeatherDeclaredWet");
+
+        public TelemetryValue<int> TrackWetness
+            => new TelemetryValue<int>(sdk, "TrackWetness");
+
         public TelemetryOutput(iRacingSDK sdk)
         {
             this.sdk = sdk;
         }
 
+        public TelemetryOutput()
+        {
+        }
+
         public IEnumerable<TelemetryValue> GetValues()
         {
             List<TelemetryValue> list = new List<TelemetryValue>();
-            list.AddRange(new TelemetryValue[94]
+
+            list.AddRange(new TelemetryValue[99]
             {
             SessionTime, SessionNum, SessionState, SessionUniqueID, SessionFlags, DriverMarker, IsReplayPlaying, ReplayFrameNum, CarIdxLap, CarIdxLapCompleted,
             CarIdxLapDistPct, CarIdxTrackSurface, CarIdxSteer, CarIdxRPM, CarIdxGear, CarIdxF2Time, CarIdxEstTime, CarIdxOnPitRoad, CarIdxPosition, CarIdxClassPosition,
             SteeringWheelAngle, Throttle, Brake, Clutch, Gear, RPM, Lap, LapDist, LapDistPct, RaceLaps,
             LongAccel, LatAccel, VertAccel, RollRate, PitchRate, YawRate, Speed, VelocityX, VelocityY, VelocityZ,
             Yaw, Pitch, Roll, CamCarIdx, CamCameraNumber, CamCameraState, CamGroupNumber, IsOnTrack, IsInGarage, SteeringWheelTorque,
-            SteeringWheelPctTorque, ShiftIndicatorPct, EngineWarnings, FuelLevel, FuelLevelPct, ReplayPlaySpeed, ReplaySessionTime, ReplaySessionNum, WaterTemp, WaterLevel,
+            SteeringWheelPctTorque, ShiftIndicatorPct, EngineWarnings, FuelLevel, FuelLevelPct, FuelUsePerHour, IsOnPitRoad, IsPitstopActive, PitOptRepairLeft, PitRepairLeft, ReplayPlaySpeed, ReplaySessionTime, ReplaySessionNum, WaterTemp, WaterLevel,
             FuelPress, OilTemp, OilPress, OilLevel, Voltage, SessionTimeRemain, ReplayFrameNumEnd, AirDensity, AirPressure, AirTemp,
             FogLevel, Skies, TrackTemp, TrackTempCrew, RelativeHumidity, WeatherType, WindDir, WindVel, MGUKDeployAdapt, MGUKDeployFixed,
             MGUKRegenGain, EnergyBatteryToMGU, EnergyBudgetBattToMGU, EnergyERSBattery, PowerMGUH, PowerMGUK, TorqueMGUK, DrsStatus, LapCompleted, PlayerCarDriverIncidentCount,
             PlayerCarTeamIncidentCount, PlayerCarMyIncidentCount, PlayerTrackSurface, PlayerCarIdx
             });
+
             return list;
         }
     }

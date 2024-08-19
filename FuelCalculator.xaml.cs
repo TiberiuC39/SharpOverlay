@@ -19,17 +19,16 @@ namespace SharpOverlay
     /// <summary>
     /// Interaction logic for FuelCalculator.xaml
     /// </summary>
-    public partial class FuelCalculator : Window
+    public partial class FuelCalculatorWindow : Window
     {
-        private readonly iRacingTelemetryService _telemetryService;
+        private readonly FuelCalculatorService _fuelService;
 
-        public FuelCalculator()
+        public FuelCalculatorWindow()
         {
-            _telemetryService = new iRacingTelemetryService();
+            _fuelService = new FuelCalculatorService();
 
-            this.DataContext = _telemetryService.GetFuelStatistics();
             InitializeComponent();
-            _telemetryService.HookUpToTelemetryEvent(RefreshDataContext);
+            _fuelService.HookUpToSdkEvent(RefreshDataContext);
         }
 
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
@@ -38,9 +37,9 @@ namespace SharpOverlay
                 DragMove();
         }
 
-        private void RefreshDataContext(object sender, SdkWrapper.TelemetryUpdatedEventArgs e)
+        private void RefreshDataContext(object? sender, SdkWrapper.TelemetryUpdatedEventArgs e)
         {
-            this.DataContext = _telemetryService.GetFuelStatistics();
+            this.DataContext = _fuelService.GetViewModel();
         }
     }
 }
