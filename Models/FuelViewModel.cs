@@ -7,7 +7,7 @@
         public float CurrentFuelLevel { get; set; }
         public float ConsumedFuel { get; set; }
         public float AverageFuelConsumption { get; set; }
-        public float FuelConsumptionPerHour { get; set; }
-        public float RefuelRequired { get; set; }
+        public double RefuelRequired { get; set; }
+        public double LapsOfFuelRemaining { get; set; }
     }
 }

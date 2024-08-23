@@ -62,7 +62,7 @@ namespace SharpOverlay.Models
             DriverCarSLLastRPM = float.Parse(yaml[nameof(DriverCarSLLastRPM)].Value);
             DriverCarSLBlinkRPM = float.Parse(yaml[nameof(DriverCarSLBlinkRPM)].Value);
             DriverCarVersion = yaml[nameof(DriverCarVersion)].Value;
-            DriverPitTrkPct = float.Parse(yaml[nameof(DriverPitTrkPct)].Value);
+            //DriverPitTrkPct = float.Parse(yaml[nameof(DriverPitTrkPct)].Value ?? "0");                Shows only in pit
             DriverCarEstLapTime = float.Parse(yaml[nameof(DriverCarEstLapTime)].Value);
             DriverSetupName = yaml[nameof(DriverSetupName)].Value;
             DriverSetupIsModified = int.Parse(yaml[nameof(DriverSetupIsModified)].Value);

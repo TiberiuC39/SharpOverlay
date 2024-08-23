@@ -12,7 +12,7 @@ namespace SharpOverlay.Services
             overlays.Add(new Overlay(typeof(InputGraph), App.appSettings.InputGraphSettings.IsEnabled, false));
             overlays.Add(new Overlay(typeof(BarSpotter), App.appSettings.BarSpotterSettings.IsEnabled, false));
             overlays.Add(new Overlay(typeof(Wind), App.appSettings.WindSettings.IsEnabled, false));
-            overlays.Add(new Overlay(typeof(FuelCalculatorWindow), App.appSettings.WindSettings.IsEnabled, false));
+            overlays.Add(new Overlay(typeof(FuelCalculatorWindow), App.appSettings.FuelSettings.IsEnabled, false));
         }
 
         public static void UpdateEnabledStatus()

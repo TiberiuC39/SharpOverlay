@@ -28,10 +28,12 @@ namespace SharpOverlay.Models
             CarNumberDesignStr = yaml["CarNumberDesignStr"].Value;
             CarSponsor_1 = int.Parse(yaml["CarSponsor_1"].Value);
             CarSponsor_2 = int.Parse(yaml["CarSponsor_2"].Value);
-            ClubName = yaml["ClubName"].Value;
-            ClubID = int.Parse(yaml["ClubID"].Value);
-            DivisionName = yaml["DivisionName"].Value;
-            DivisionID = int.Parse(yaml["DivisionID"].Value);
+            yaml["ClubName"].TryGetValue(out string clubName);
+            ClubName = clubName ?? string.Empty;
+
+            //ClubID = int.Parse(yaml["ClubID"].Value);
+            //DivisionName = yaml["DivisionName"].Value;                <=== These dont show in Test Mode add a check down the line?
+            //DivisionID = int.Parse(yaml["DivisionID"].Value);
             CurDriverIncidentCount = int.Parse(yaml["CurDriverIncidentCount"].Value);
             TeamIncidentCount = int.Parse(yaml["TeamIncidentCount"].Value);
         }

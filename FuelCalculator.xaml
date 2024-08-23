@@ -5,9 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:models="clr-namespace:SharpOverlay.Models" d:DataContext="{d:DesignInstance Type=models:FuelViewModel}"
         mc:Ignorable="d"
-        Title="Fuel Data" Height="175" Width="250">
+        Title="Fuel Data" Height="350" Width="250">
     <Grid Margin="10,10,0,-31">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -19,7 +21,7 @@
         </Grid.ColumnDefinitions>
 
         <Label Grid.Row="0" Grid.Column="0" Content="Fuel Level:" VerticalAlignment="Center" Margin="5" Background="Black"/>
-        <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding CurrentFuelLevel}" VerticalAlignment="Center" Margin="5"/>
+        <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding CurrentFuelLevel, StringFormat=N2}" VerticalAlignment="Center" Margin="5"/>
 
         <Label Grid.Row="1" Grid.Column="0" Content="Average Consumption:" VerticalAlignment="Center" Margin="5" Background="Black"/>
         <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding AverageFuelConsumption, StringFormat=N2}" VerticalAlignment="Center" Margin="5"/>
@@ -29,5 +31,11 @@
 
         <Label Grid.Row="3" Grid.Column="0" Content="Laps Completed" VerticalAlignment="Center" Margin="5" Background="Black"/>
         <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding LapsCompleted, StringFormat=N2}" VerticalAlignment="Center" Margin="5"/>
+
+        <Label Grid.Row="4" Grid.Column="0" Content="Refuel Required" VerticalAlignment="Center" Margin="5" Background="Black"/>
+        <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding RefuelRequired, StringFormat=N2}" VerticalAlignment="Center" Margin="5"/>
+
+        <Label Grid.Row="5" Grid.Column="0" Content="Laps of Fuel" VerticalAlignment="Center" Margin="5" Background="Black"/>
+        <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding LapsOfFuelRemaining, StringFormat=N2}" VerticalAlignment="Center" Margin="5"/>
     </Grid>
 </Window>

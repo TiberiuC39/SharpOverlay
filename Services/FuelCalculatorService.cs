@@ -1,6 +1,8 @@
 ﻿using iRacingSdkWrapper;
+using iRacingSdkWrapper.Bitfields;
 using SharpOverlay.Models;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace SharpOverlay.Services
@@ -8,18 +10,22 @@ namespace SharpOverlay.Services
     public class FuelCalculatorService
     {
         private readonly iRacingTelemetryService _iRacingService;
-        private float _fuelConsumed;
-        private float _maxFuelCapacity;
-        private float _averageConsumption;
-        private int _lapsCompleted;
-        private float _fuelLevel;
-        private int _refuelRequired;
-        private double _lapsOfFuelRemaining;
+        private List<Lap> _completedLaps;
+        private Lap _currentLap;
+        private float _currentFuelLevel;
+        private double _lapsRemainingInRace;
+        private int _raceTotalLaps;
+        private bool _hasEnteredPitRoad;
+        private bool _isPitActive;
+        private bool _hasBeenServiced;
+        private bool _isRaceStart;
 
         public FuelCalculatorService()
-        { 
+        {
             _iRacingService = new iRacingTelemetryService();
             _iRacingService.HookUpToTelemetryEvent(ExecuteOnTelemetryEvent);
+
+            _completedLaps = new List<Lap>();
         }
 
         public void HookUpToSdkEvent(EventHandler<SdkWrapper.TelemetryUpdatedEventArgs> handler)
@@ -27,95 +33,129 @@ namespace SharpOverlay.Services
             _iRacingService.HookUpToTelemetryEvent(handler);
         }
 
-        public FuelViewModel GetViewModel()
-        {
-            return new FuelViewModel()
-            {
-                ConsumedFuel = _fuelConsumed,
-                LapsCompleted = _lapsCompleted,
-                CurrentFuelLevel = _fuelLevel,
-                AverageFuelConsumption = _averageConsumption
-            };
-        }
-
         private void ExecuteOnTelemetryEvent(object? sender, SdkWrapper.TelemetryUpdatedEventArgs eventArgs)
         {
-            CalculateFuelDataToDisplay();
-        }
-
-        private void CalculateFuelDataToDisplay()
-        {
             var telemetry = _iRacingService.GetTelemetry();
-            var raceData = _iRacingService.GetRaceData();
 
-            if (raceData != null && telemetry != null)
+            if (telemetry.SessionState.Value == SessionStates.Racing && telemetry.IsOnTrack.Value)
             {
-                if (_maxFuelCapacity == default)
+                bool isOnPitRoad = telemetry.IsOnPitRoad.Value;
+
+                UpdateSelfTrackedPitEntryStatus(isOnPitRoad);
+
+                bool isReceivingPitService = telemetry.IsPitstopActive.Value;
+
+                UpdatePitServiceStatus(isReceivingPitService);
+
+                int currentLapNumber = telemetry.Lap.Value;
+
+                if (_hasEnteredPitRoad && _isPitActive && !_hasBeenServiced)
                 {
-                    _maxFuelCapacity = GetMaxFuelCapacityAfterHandicap(raceData);
+                    CompleteCurrentLap(telemetry);
+
+                    _hasBeenServiced = true;
+                }
+                else if (_hasEnteredPitRoad && _isPitActive && !isReceivingPitService && _hasBeenServiced)
+                {
+                    StartNewLap(telemetry);
+                    _isPitActive = false;
+                }
+                else if (_currentLap is null)
+                {
+                    StartNewLap(telemetry);
+                }
+                else if (currentLapNumber < 0)
+                {
+                    _isRaceStart = true;
+                }
+                else if (_isRaceStart && currentLapNumber > _currentLap.Number)
+                {
+                    _isRaceStart = false;
+                }
+                else if (currentLapNumber > _currentLap.Number)
+                {
+                    CompleteCurrentLap(telemetry);
+                    StartNewLap(telemetry);
                 }
 
-                UpdateFuelConsumed(telemetry);
-                UpdateLapsCompleted(telemetry);
-                UpdateAverageConsumption();
+                _currentFuelLevel = telemetry.FuelLevel.Value;
+                _lapsRemainingInRace = telemetry.SessionLapsRemaining.Value;
+                _raceTotalLaps = telemetry.RaceLaps.Value;
             }
         }
 
-        private DriverPosition GetCurrentPosition(RaceDataOutput session)
+        private void UpdatePitServiceStatus(bool isReceivingPitService)
         {
-            var currentSession = session.Sessions.Last();
-            var playerCarIdx = session.Driver.CarIdx;
-
-            if (currentSession.ResultsPositions.Any())
+            if (isReceivingPitService && !_isPitActive)
             {
-                return currentSession.ResultsPositions.Last(p => p.CarIdx == playerCarIdx);
+                _isPitActive = true;
             }
-
-            return new DriverPosition { CarIdx = playerCarIdx };
-        }
-
-        private void UpdateLapsCompleted(TelemetryOutput telemetry)
-        {
-            _lapsCompleted = telemetry.LapCompleted.Value;
-        }
-
-        private void UpdateRefuelingRequired(RaceDataOutput session)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void UpdateAverageConsumption()
-        {
-            if (_lapsCompleted <= 0)
+            else if (_hasEnteredPitRoad && _isPitActive && !isReceivingPitService)
             {
-                _averageConsumption = _fuelConsumed;
-
-            }
-            else
-            {
-                _averageConsumption = _fuelConsumed / _lapsCompleted;
+                _isPitActive = false;
             }
         }
 
-        private void UpdateFuelConsumed(TelemetryOutput telemetry)
+        private void UpdateSelfTrackedPitEntryStatus(bool isOnPitRoad)
         {
-            float newFuelLevel = telemetry.FuelLevel.Value;
-            float difference = _fuelLevel - newFuelLevel;
-
-            _fuelLevel = newFuelLevel;
-
-            if (difference > 0)
+            if (isOnPitRoad && !_hasEnteredPitRoad)
             {
-                _fuelConsumed += difference;
+                _hasEnteredPitRoad = true;
+            }
+            else if (!isOnPitRoad && _hasEnteredPitRoad)
+            {
+                _hasEnteredPitRoad = false;
             }
         }
 
-        private float GetMaxFuelCapacityAfterHandicap(RaceDataOutput session)
+        private void StartNewLap(TelemetryOutput telemetry)
         {
-            var fuelHandicap = session.Driver.DriverCarMaxFuelPct;
-            var maxFuelCapacity = session.Driver.DriverCarFuelMaxLtr;
+            int currentLap = telemetry.Lap.Value;
+            float startingFuel = telemetry.FuelLevel.Value;
 
-            return fuelHandicap * maxFuelCapacity;
+            if (_currentLap is null)
+            {
+                currentLap++;
+            }
+
+            var newLap = new Lap()
+            {
+                Number = currentLap,
+                StartingFuel = startingFuel
+            };
+
+            _currentLap = newLap;
+        }
+
+        private void CompleteCurrentLap(TelemetryOutput telemetry)
+        {
+            _currentLap.EndingFuel = telemetry.FuelLevel.Value;
+            _currentLap.Time = TimeSpan.FromSeconds(telemetry.LapLastLapTime.Value);
+            _currentLap.FuelUsed = _currentLap.StartingFuel - _currentLap.EndingFuel;
+
+            _completedLaps.Add(_currentLap);
+        }
+
+        public FuelViewModel GetViewModel()
+        {
+            if (_completedLaps.Any())
+            {
+                var averageFuelConsumption = _completedLaps.Average(l => l.FuelUsed);
+                double refuelRequired = _lapsRemainingInRace * averageFuelConsumption;
+
+                return new FuelViewModel()
+                {
+                    ConsumedFuel = _completedLaps.Sum(l => l.FuelUsed),
+                    AverageFuelConsumption = averageFuelConsumption,
+                    LapsCompleted = _completedLaps.Count,
+                    CurrentFuelLevel = _currentFuelLevel,
+                    LapsOfFuelRemaining = _currentFuelLevel / averageFuelConsumption,
+                    TotalRaceLaps = _raceTotalLaps,
+                    RefuelRequired = refuelRequired
+                };
+            }
+
+            return new FuelViewModel();
         }
     }
 }

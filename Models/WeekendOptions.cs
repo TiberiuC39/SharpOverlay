@@ -37,7 +37,7 @@ namespace SharpOverlay.Models
         public int HardcoreLevel { get; private set; }
         public int NumJokerLaps { get; private set; }
         public string IncidentLimit { get; private set; }
-        public int FastRepairsLimit { get; private set; }
+        public string FastRepairsLimit { get; private set; }
         public int GreenWhiteCheckeredLimit { get; private set; }
 
         private void ParseWeekendOptions(YamlQuery query)
@@ -68,7 +68,7 @@ namespace SharpOverlay.Models
             HardcoreLevel = int.Parse(query[nameof(HardcoreLevel)].Value);
             NumJokerLaps = int.Parse(query[nameof(NumJokerLaps)].Value);
             IncidentLimit = query[nameof(IncidentLimit)].Value;
-            FastRepairsLimit = int.Parse(query[nameof(FastRepairsLimit)].Value);
+            FastRepairsLimit = query[nameof(FastRepairsLimit)].Value;
             GreenWhiteCheckeredLimit = int.Parse(query[nameof(GreenWhiteCheckeredLimit)].Value);
         }
     }

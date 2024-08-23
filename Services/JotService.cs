@@ -34,9 +34,11 @@ namespace SharpOverlay.Services
                 .Property(p => p.InputGraphSettings.LineWidth, 3)
                 .Property(p => p.WindSettings.IsEnabled, false)
                 .Property(p => p.WindSettings.UseMph, false)
+                .Property(p => p.FuelSettings.IsEnabled, false)
                 .PersistOn("PropertyChanged", p => p.BarSpotterSettings)
                 .PersistOn("PropertyChanged", p => p.InputGraphSettings)
-                .PersistOn("PropertyChanged", p => p.WindSettings);
+                .PersistOn("PropertyChanged", p => p.WindSettings)
+                .PersistOn("PropertyChanged", p => p.FuelSettings);
                 
         }
     }

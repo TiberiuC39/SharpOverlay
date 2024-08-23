@@ -1,12 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SharpOverlay.Models
 {
-    internal class Lap
+    public class Lap
     {
+        public int Number { get; set; }
+        public TimeSpan Time { get; set; }
+        public float StartingFuel { get; set; }
+        public float EndingFuel { get; set; }
+        public float FuelUsed { get; set; }
     }
 }

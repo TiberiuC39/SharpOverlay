@@ -10,8 +10,8 @@ namespace SharpOverlay.Services
     public class iRacingTelemetryService
     {
         private readonly SdkWrapper _sdk;
-        private TelemetryOutput _telemetryOutput;
-        private RaceDataOutput _sessionOutput;
+        private TelemetryOutput? _telemetryOutput;
+        private RaceDataOutput? _sessionOutput;
 
         public iRacingTelemetryService()
         {
@@ -20,6 +20,13 @@ namespace SharpOverlay.Services
             _sdk.TelemetryUpdated += TelemetryUpdatedEvent;
             _sdk.SessionInfoUpdated += SessionUpdatedEvent;
             _sdk.Disconnected += ExecuteOnDisconnectedEvent;
+        }
+
+        public RaceDataOutput RequestSessionUpdate()
+        {
+            _sdk.RequestSessionInfoUpdate();
+
+            return GetRaceData();
         }
 
         public TelemetryOutput GetTelemetry()
@@ -69,6 +76,12 @@ namespace SharpOverlay.Services
                     var session = new Session(query);
 
                     sessionList.Add(session);
+
+                    if (session.SessionName == "RACE"
+                        || session.SessionName == "TESTING")
+                    {
+                        break;
+                    }
                 }
                 catch
                 {
@@ -118,7 +131,7 @@ namespace SharpOverlay.Services
             //Does not retrieve the maximum drivers for session
             //I guess it's for team size?
 
-            int maxDrivers = _sessionOutput.WeekendData.WeekendOptions.NumStarters;
+            int maxDrivers = 50;
 
             for (int i = 0; i < maxDrivers; i++)
             {
