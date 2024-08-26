@@ -29,6 +29,7 @@ namespace SharpOverlay
 
             InitializeComponent();
             _fuelService.HookUpToSdkEvent(RefreshDataContext);
+            Topmost = true;
         }
 
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)

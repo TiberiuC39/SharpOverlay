@@ -47,6 +47,7 @@ namespace SharpOverlay.Services
             {
                 _sessionOutput = new RaceDataOutput();
             }
+
             await ParseWeekendInfo(sessionInfo["WeekendInfo"]);
             await ParseSessions(sessionInfo["SessionInfo"]["Sessions"]);
             await ParsePlayer(sessionInfo["DriverInfo"]);

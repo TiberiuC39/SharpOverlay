@@ -42,7 +42,7 @@ namespace SharpOverlay.Models
         public TelemetryValue<SessionFlag> SessionFlags => new TelemetryValue<SessionFlag>(sdk, "SessionFlags");
 
         public TelemetryValue<double> SessionLapsRemaining
-            => new TelemetryValue<double>(sdk, "SessionLapsRemain");
+            => new TelemetryValue<double>(sdk, "SessionLapsRemainEx");
 
         public TelemetryValue<bool> DriverMarker => new TelemetryValue<bool>(sdk, "DriverMarker");
 
