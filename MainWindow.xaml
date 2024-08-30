@@ -23,8 +23,21 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <TabControl FontSize="25" Grid.ColumnSpan="2" TabStripPlacement="Left">
-                <TabItem Header="Bar Spotter" FontFamily="Bahnschrift SemiBold">
+            <TabControl FontSize="25" Grid.ColumnSpan="2" TabStripPlacement="Left" FontFamily="Bahnschrift SemiBold">
+                <TabItem  Header="General">
+                    <Grid DataContext="{Binding GeneralSettings}">
+                        <Label HorizontalAlignment="Left" Margin="10,18,0,0" VerticalAlignment="Top">
+                            <Label Content="Use hardware acceleration" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Label>
+                        <ToggleButton
+                            Style="{StaticResource MaterialDesignSwitchToggleButton}" Margin="326,-21,135,405" IsChecked="{Binding UseHardwareAcceleration, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" materialDesign:ToggleButtonAssist.SwitchTrackOnBackground="Green" materialDesign:ToggleButtonAssist.SwitchTrackOffBackground="Red"/>
+                        <Label FontSize="13" Content="Restart SharpOverlay to apply general settings." HorizontalAlignment="Left" VerticalAlignment="Top" Margin="209,470,0,0" Width="286" Height="30" RenderTransformOrigin="0.5,0.5">
+
+                        </Label>
+
+                    </Grid>
+                </TabItem>
+                <TabItem Header="Bar Spotter">
                     <Grid DataContext="{Binding BarSpotterSettings}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
@@ -70,10 +83,13 @@
              ToolTip="Toggle to render the bars and position them"
             Style="{StaticResource MaterialDesignSwitchToggleButton}"
             Margin="204,408,10,-24" IsChecked="{Binding TestMode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" materialDesign:ToggleButtonAssist.SwitchTrackOnBackground="DarkGreen" materialDesign:ToggleButtonAssist.SwitchTrackOffBackground="Red" Grid.Column="1"/>
+                        <ToggleButton x:Name="barSpotterToggleButton_Copy"
+                            Style="{StaticResource MaterialDesignSwitchToggleButton}"
+                            Grid.Column="1" Margin="204,-22,9,406" IsChecked="{Binding IsEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Checked="windowToggle" Unchecked="windowToggle" materialDesign:ToggleButtonAssist.SwitchTrackOnBackground="Green" materialDesign:ToggleButtonAssist.SwitchTrackOffBackground="Red"/>
 
                     </Grid>
                 </TabItem>
-                <TabItem Header="Input Graph" FontFamily="Bahnschrift SemiBold">
+                <TabItem Header="Input Graph">
                     <Grid DataContext="{Binding InputGraphSettings}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
@@ -86,54 +102,55 @@
                         <colorpicker:PortableColorPicker SmallChange="5" Style="{StaticResource DefaultColorPickerStyle}"
                                                   FontSize="12"
                                               UseHintColor="True" HintColor="Transparent"
-                                              SelectedColor="{Binding ThrottleColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BrushToColorConverter}}"
+                                              SelectedColor="{Binding BackgroundColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BrushToColorConverter}}"
                                               ShowFractionalPart="False"
-                                              ShowAlpha="True" Margin="186,16,235,449" Grid.ColumnSpan="2" />
-                        <Label Content="Throttle Color" HorizontalAlignment="Left" Margin="10,14,0,0" VerticalAlignment="Top"/>
-                        <Label Content="Brake Color" HorizontalAlignment="Left" Margin="10,57,0,0" VerticalAlignment="Top"/>
+                                              ShowAlpha="True" Margin="224,18,197,447" Grid.ColumnSpan="2" RenderTransformOrigin="1.111,0.446" />
+                        <Label Content="Throttle Color" HorizontalAlignment="Left" Margin="10,56,0,0" VerticalAlignment="Top"/>
+                        <Label Content="Brake Color" HorizontalAlignment="Left" Margin="10,99,0,0" VerticalAlignment="Top"/>
                         <colorpicker:PortableColorPicker SmallChange="5" Style="{StaticResource DefaultColorPickerStyle}"
                                                   FontSize="12"
                                               UseHintColor="True" HintColor="Transparent"
                                               SelectedColor="{Binding ThrottleColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BrushToColorConverter}}"
                                               ShowFractionalPart="False"
-                                              ShowAlpha="True" Margin="186,16,235,449" Grid.ColumnSpan="2" />
-                        <Label Content="Clutch Color" HorizontalAlignment="Left" Margin="8,100,0,0" VerticalAlignment="Top"/>
+                                              ShowAlpha="True" Margin="186,58,235,407" Grid.ColumnSpan="2" />
+                        <Label Content="Clutch Color" HorizontalAlignment="Left" Margin="8,142,0,0" VerticalAlignment="Top"/>
                         <colorpicker:PortableColorPicker SmallChange="5" Style="{StaticResource DefaultColorPickerStyle}"
                                                   FontSize="12"
                                               UseHintColor="True" HintColor="Transparent"
                                               SelectedColor="{Binding ClutchColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BrushToColorConverter}}"
                                               ShowFractionalPart="False"
-                                              ShowAlpha="True" Margin="186,105,235,360" Grid.ColumnSpan="2" />
+                                              ShowAlpha="True" Margin="186,147,235,318" Grid.ColumnSpan="2" />
                         <Slider x:Name="inputGraph_lineWidthSlider" Maximum="10" 
                             Minimum="1"
-                            Value="{Binding LineWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="146,183,50,207" 
+                            Value="{Binding LineWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="146,225,50,165" 
                             TickFrequency="1.0"
                             Style="{StaticResource MaterialDesignDiscreteSlider}"
                             FontSize="10" Panel.ZIndex="1"
                             IsEnabled="{Binding IsEnabled, Mode=OneWay}"/>
-                        <Label Content="Show Clutch" HorizontalAlignment="Left" Margin="10,134,0,0" VerticalAlignment="Top"/>
-                        <CheckBox Content="" HorizontalAlignment="Left" Margin="186,140,0,0" VerticalAlignment="Top" IsChecked="{Binding ShowClutch, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  IsEnabled="{Binding IsEnabled, Mode=OneWay}"/>
-                        <Label Content="Raw Values" HorizontalAlignment="Left" Margin="10,214,0,0" VerticalAlignment="Top"/>
-                        <CheckBox Content="" HorizontalAlignment="Left" Margin="186,220,0,0" VerticalAlignment="Top" IsChecked="{Binding UseRawValues, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  IsEnabled="{Binding IsEnabled, Mode=OneWay}"/>
-                        <Label Content="Line Width" HorizontalAlignment="Left" Margin="10,175,0,0" VerticalAlignment="Top"/>
+                        <Label Content="Show Clutch" HorizontalAlignment="Left" Margin="10,176,0,0" VerticalAlignment="Top"/>
+                        <CheckBox Content="" HorizontalAlignment="Left" Margin="186,182,0,0" VerticalAlignment="Top" IsChecked="{Binding ShowClutch, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  IsEnabled="{Binding IsEnabled, Mode=OneWay}"/>
+                        <Label Content="Raw Values" HorizontalAlignment="Left" Margin="10,256,0,0" VerticalAlignment="Top"/>
+                        <CheckBox Content="" HorizontalAlignment="Left" Margin="157,260,0,0" VerticalAlignment="Top" IsChecked="{Binding UseRawValues, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  IsEnabled="{Binding IsEnabled, Mode=OneWay}"/>
+                        <Label Content="Line Width" HorizontalAlignment="Left" Margin="10,217,0,0" VerticalAlignment="Top"/>
                         <colorpicker:PortableColorPicker SmallChange="5" Style="{StaticResource DefaultColorPickerStyle}"
                                                   FontSize="12"
                                               UseHintColor="True" HintColor="Transparent"
                                               SelectedColor="{Binding ABSColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BrushToColorConverter}}"
                                               ShowFractionalPart="False"
-                                              ShowAlpha="True" Margin="186,257,235,207" Grid.ColumnSpan="2" />
-                        <Label Content="ABS Flash" HorizontalAlignment="Left" Margin="10,252,0,0" VerticalAlignment="Top"/>
-                        <Label Content="Show ABS" HorizontalAlignment="Left" Margin="10,292,0,0" VerticalAlignment="Top"/>
-                        <CheckBox Content="" HorizontalAlignment="Left" Margin="186,298,0,0" VerticalAlignment="Top" IsChecked="{Binding ShowABS, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  IsEnabled="{Binding IsEnabled, Mode=OneWay}"/>
+                                              ShowAlpha="True" Margin="186,299,235,165" Grid.ColumnSpan="2" />
+                        <Label Content="ABS Flash" HorizontalAlignment="Left" Margin="10,294,0,0" VerticalAlignment="Top"/>
+                        <Label Content="Show ABS" HorizontalAlignment="Left" Margin="10,334,0,0" VerticalAlignment="Top"/>
+                        <CheckBox Content="" HorizontalAlignment="Left" Margin="186,340,0,0" VerticalAlignment="Top" IsChecked="{Binding ShowABS, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  IsEnabled="{Binding IsEnabled, Mode=OneWay}"/>
                         <colorpicker:PortableColorPicker SmallChange="5" Style="{StaticResource DefaultColorPickerStyle}"
                             FontSize="12"
                             UseHintColor="True" HintColor="Transparent"
                             SelectedColor="{Binding BrakeColor, Converter={StaticResource BrushToColorConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                             ShowFractionalPart="False"
-                            ShowAlpha="True" Margin="186,60,235,405" Grid.ColumnSpan="2" />
+                            ShowAlpha="True" Margin="186,102,235,363" Grid.ColumnSpan="2" />
+                        <Label Content="Background Color" HorizontalAlignment="Left" Margin="10,18,0,0" VerticalAlignment="Top"/>
                     </Grid>
                 </TabItem>
-                <TabItem Header="Wind" FontFamily="Bahnschrift SemiBold">
+                <TabItem Header="Wind">
                     <Grid DataContext="{Binding WindSettings}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
@@ -160,11 +177,12 @@ Grid.Column="1" Margin="204,-22,10,406" IsChecked="{Binding IsEnabled, Mode=TwoW
             Margin="204,408,10,-24" IsChecked="{Binding TestMode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" materialDesign:ToggleButtonAssist.SwitchTrackOnBackground="DarkGreen" materialDesign:ToggleButtonAssist.SwitchTrackOffBackground="Red" Grid.Column="1"/>
                     </Grid>
                 </TabItem>
+                <Label Content="Active" HorizontalAlignment="Left" VerticalAlignment="Top"/>
             </TabControl>
 
 
         </Grid>
-        <Image Grid.Column="1" HorizontalAlignment="Center" Height="314" Margin="0,10,0,0" VerticalAlignment="Top" Width="384" Source="/Media/sharpoverlaylogo.png"/>
+        <Image Grid.Column="1" HorizontalAlignment="Center" Height="43" Margin="0,10,0,0" VerticalAlignment="Top" Width="384" Source="/Media/sharpoverlaylogo.png"/>
         <Button x:Name="updateButton" Grid.Column="1" Content="CLICK TO UPDATE!" HorizontalAlignment="Left" Margin="415,450,0,0" VerticalAlignment="Top" Background="LightGreen" Visibility="Hidden" Click="updateButton_Click"/>
         <TextBlock Grid.Column="1" HorizontalAlignment="Left" Margin="26,84,0,0" TextWrapping="Wrap" VerticalAlignment="Top">
             Welcome to SharpOverlay! Please leave any bugs or feature requests 
@@ -175,7 +193,7 @@ Grid.Column="1" Margin="204,-22,10,406" IsChecked="{Binding IsEnabled, Mode=TwoW
             </Hyperlink>
 
         </TextBlock>
-        <TextBlock Grid.Column="1" HorizontalAlignment="Left" Margin="26,105,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="340"><Run Text="Changelog "/><LineBreak/><Run Text="v0.2.1"/><LineBreak/><Run Text="- Replaced color pickers with new control, fixing issue with default selected color being set to #FFFFFF. (Thanks @rouyng!)"/><LineBreak/><Run Text="v0.2.0"/><LineBreak/><Run Text="- Added new Wind direction &amp; speed overlay"/><LineBreak/><Run Text="&#x9;- Shows wind direction relative to your car (i.e. arrow pointing down is a headwind)"/><LineBreak/><Run Text="&#x9;- Dynamic color based on wind speed (green is no wind, red is very windy)"/><LineBreak/><Run Text="- Added new ABS flash feature to input graph"/><LineBreak/><Run Text="&#x9;- Input graph now changes background color when ABS is engaged, enable this feature and change the color in the settings. "/><LineBreak/><Run Text="v0.1.1:"/><LineBreak/><Run Text="- Moved tab strip to the side to accomodate future overlays"/><LineBreak/><Run Text="- Fixed an issue with the bar spotter breaking when changing sessions. (Thanks /u/z4ckm0rris!)"/></TextBlock>
+        <TextBlock Grid.Column="1" HorizontalAlignment="Left" Margin="26,105,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="340"><Run Text="Changelog:"/><LineBreak/><Run Text="v0.2.2"/><LineBreak/><Run Text="- Added background color setting for input graph"/><LineBreak/><Run Text="- Added new setting for hardware acceleration, default is off to help with performance "/><LineBreak/><Run Text="when GPU usage is high."/><LineBreak/><Run Text="v0.2.1"/><LineBreak/><Run Text="- Replaced color pickers with new control, fixing issue with default selected color being set to #FFFFFF. (Thanks @rouyng!)"/><LineBreak/><Run Text="v0.2.0"/><LineBreak/><Run Text="- Added new Wind direction &amp; speed overlay"/><LineBreak/><Run Text="&#x9;- Shows wind direction relative to your car (i.e. arrow pointing down is a headwind)"/><LineBreak/><Run Text="&#x9;- Dynamic color based on wind speed (green is no wind, red is very windy)"/><LineBreak/><Run Text="- Added new ABS flash feature to input graph"/><LineBreak/><Run Text="&#x9;- Input graph now changes background color when ABS is engaged, enable this feature and change the color in the settings. "/><LineBreak/><Run Text="v0.1.1:"/><LineBreak/><Run Text="- Moved tab strip to the side to accomodate future overlays"/><LineBreak/><Run Text="- Fixed an issue with the bar spotter breaking when changing sessions. (Thanks /u/z4ckm0rris!)"/></TextBlock>
     </Grid>
 
 </Window>

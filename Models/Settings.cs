@@ -35,9 +35,9 @@ namespace SharpOverlay.Models
             }
         }
 
-        public bool IsEnabled 
+        public bool IsEnabled
         {
-            get => _isEnabled; 
+            get => _isEnabled;
             set
             {
                 _isEnabled = value;
@@ -60,7 +60,7 @@ namespace SharpOverlay.Models
             set
             {
                 _barLength = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(BarLength)));   
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(BarLength)));
             }
         }
 
@@ -101,9 +101,9 @@ namespace SharpOverlay.Models
         }
 
         private bool _showClutch;
-        public bool ShowClutch 
-        { 
-         get => _showClutch;
+        public bool ShowClutch
+        {
+            get => _showClutch;
             set
             {
                 _showClutch = value;
@@ -113,7 +113,7 @@ namespace SharpOverlay.Models
 
 
         private bool _useRawValues;
-        public bool UseRawValues 
+        public bool UseRawValues
         {
             get => _useRawValues;
             set
@@ -122,6 +122,9 @@ namespace SharpOverlay.Models
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(UseRawValues)));
             }
         }
+
+        private SolidColorBrush? _backgroundColor;
+
         private SolidColorBrush? _throttleColor;
 
         private SolidColorBrush? _brakeColor;
@@ -129,6 +132,18 @@ namespace SharpOverlay.Models
         private SolidColorBrush? _clutchColor;
 
         private SolidColorBrush? _ABSColor;
+
+        public SolidColorBrush? BackgroundColor
+
+        {
+            get => _backgroundColor;
+            set
+            {
+                _backgroundColor = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(BackgroundColor)));
+            }
+        }
+
         public SolidColorBrush? ThrottleColor
 
         {
@@ -238,18 +253,35 @@ namespace SharpOverlay.Models
         }
 
     }
+    public class GeneralSettings : INotifyPropertyChanged
+    {
+        private bool _useHardwareAcceleration;
 
+        public bool UseHardwareAcceleration
+        {
+            get => _useHardwareAcceleration;
+            set
+            {
+                _useHardwareAcceleration = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(UseHardwareAcceleration)));
+            }
+        }
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+    }
     public class Settings : INotifyPropertyChanged
     {
+        public GeneralSettings GeneralSettings { get; set; }
         public BarSpotterSettings BarSpotterSettings { get; set; }
         public InputGraphSettings InputGraphSettings { get; set; }
         public WindSettings WindSettings { get; set; }
         public bool IsUpdate { get; set; }
-
+        
         public event PropertyChangedEventHandler? PropertyChanged;
 
         public Settings()
         {
+            GeneralSettings = new GeneralSettings();
             InputGraphSettings = new InputGraphSettings();
             BarSpotterSettings = new BarSpotterSettings();
             WindSettings = new WindSettings();
