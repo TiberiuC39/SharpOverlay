@@ -29,7 +29,6 @@ namespace SharpOverlay
             Services.JotService.tracker.Track(this);
             iracingWrapper.TelemetryUpdated += iracingWrapper_TelemetryUpdated;
             App.appSettings.InputGraphSettings.PropertyChanged += graph_HandleSettingUpdated;
-
             HookStreamer(ref throttleStreamer, App.appSettings.InputGraphSettings.ThrottleColor, true);
             HookStreamer(ref brakeStreamer, App.appSettings.InputGraphSettings.BrakeColor, true);
             HookStreamer(ref clutchStreamer, App.appSettings.InputGraphSettings.ClutchColor, App.appSettings.InputGraphSettings.ShowClutch);
@@ -41,6 +40,10 @@ namespace SharpOverlay
             SetStreamerColorAndWidth(ref throttleStreamer, App.appSettings.InputGraphSettings.ThrottleColor);
             SetStreamerColorAndWidth(ref brakeStreamer, App.appSettings.InputGraphSettings.BrakeColor);
             SetStreamerColorAndWidth(ref clutchStreamer, App.appSettings.InputGraphSettings.ClutchColor);
+
+            //InputPlot.Plot.DataBackground.Color = TransformColor(App.appSettings.InputGraphSettings.BackgroundColor);
+            InputPlot.Plot.FigureBackground.Color = TransformColor(App.appSettings.InputGraphSettings.BackgroundColor);
+            InputPlot.Refresh();
 
             if (App.appSettings.InputGraphSettings.ShowClutch)
             {
@@ -102,7 +105,7 @@ namespace SharpOverlay
         {
             InputPlot.Menu.Clear();
 
-            InputPlot.Plot.DataBackground.Color = ScottPlot.Colors.Black;
+            InputPlot.Plot.FigureBackground.Color = TransformColor(App.appSettings.InputGraphSettings.BackgroundColor);
             InputPlot.Plot.Axes.Frameless();
 
             InputPlot.Plot.Axes.SetLimitsY(-5, 105);
@@ -141,15 +144,15 @@ namespace SharpOverlay
 
         private void ABSFlash()
         {
-            if (absActive && currentBgColor == ScottPlot.Colors.Black)
+            if (absActive && currentBgColor == TransformColor(App.appSettings.InputGraphSettings.BackgroundColor))
             {
-                InputPlot.Plot.DataBackground.Color = TransformColor(App.appSettings.InputGraphSettings.ABSColor);
+                InputPlot.Plot.FigureBackground.Color = TransformColor(App.appSettings.InputGraphSettings.ABSColor);
                 currentBgColor = InputPlot.Plot.DataBackground.Color;
             }
-            else if(currentBgColor != ScottPlot.Colors.Black)
+            else if(currentBgColor != TransformColor(App.appSettings.InputGraphSettings.BackgroundColor))
             {
-                InputPlot.Plot.DataBackground.Color = ScottPlot.Colors.Black;
-                currentBgColor = ScottPlot.Colors.Black;
+                InputPlot.Plot.FigureBackground.Color = TransformColor(App.appSettings.InputGraphSettings.BackgroundColor);
+                currentBgColor = TransformColor(App.appSettings.InputGraphSettings.BackgroundColor);
             }
         }
     }

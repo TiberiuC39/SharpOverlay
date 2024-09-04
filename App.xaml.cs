@@ -1,13 +1,9 @@
 ﻿using SharpOverlay.Models;
+using SharpOverlay.Services;
 using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media;
 using Velopack;
-using Velopack.Sources;
 
 namespace SharpOverlay
 {
@@ -22,9 +18,21 @@ namespace SharpOverlay
         private static void Main(string[] args)
         {
             VelopackApp.Build().Run();
+
+            JotService.tracker.Apply(appSettings);
+
+            if (appSettings.GeneralSettings.UseHardwareAcceleration) {
+                RenderOptions.ProcessRenderMode = System.Windows.Interop.RenderMode.Default;
+            }
+            else
+            {
+                RenderOptions.ProcessRenderMode = System.Windows.Interop.RenderMode.SoftwareOnly;
+            }
+
             App app = new();
             app.InitializeComponent();
             app.Run();
+
         }
 
 

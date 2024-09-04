@@ -6,8 +6,8 @@
         xmlns:local="clr-namespace:SharpOverlay"
         xmlns:ScottPlot="clr-namespace:ScottPlot.WPF;assembly=ScottPlot.WPF"
         mc:Ignorable="d"
-        Title="InputGraph" Height="450" Width="800" Opacity="0.8" WindowStyle="None" ResizeMode="CanResizeWithGrip" AllowsTransparency="True" Topmost="True" MouseDown="Window_MouseDown">
-    <Grid Opacity="0.8" MouseDown="Window_MouseDown">
-        <ScottPlot:WpfPlot x:Name="InputPlot" Opacity="0.8" />
+        Title="InputGraph" Height="450" Width="800" WindowStyle="None" ResizeMode="CanResizeWithGrip" AllowsTransparency="True" Topmost="True" MouseDown="Window_MouseDown" Background="Transparent">
+    <Grid MouseDown="Window_MouseDown" Background="Transparent">
+        <ScottPlot:WpfPlot x:Name="InputPlot"/>
     </Grid>
 </Window>
