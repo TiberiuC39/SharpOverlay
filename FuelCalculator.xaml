@@ -1,0 +1,114 @@
+﻿<Window x:Class="SharpOverlay.FuelCalculatorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:models="clr-namespace:SharpOverlay.Models" 
+        d:DataContext="{d:DesignInstance Type=models:FuelViewModel}"
+        mc:Ignorable="d"
+        Title="Fuel Data" Height="160" Width="260"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        Foreground="White">
+
+    <Grid Margin="10" Background="Black" Opacity="0.85">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <!-- Row 0: Fuel and Race Laps -->
+            <RowDefinition Height="Auto"/>
+            <!-- Row 1: Column Headers -->
+            <RowDefinition Height="Auto"/>
+            <!-- Row 2: Values -->
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <!-- Column 0: Avg Label -->
+            <ColumnDefinition Width="Auto"/>
+            <!-- Column 1: Fuel Label -->
+            <ColumnDefinition Width="Auto"/>
+            <!-- Column 2: Fuel Value -->
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- First Row: Fuel and Race Laps Labels and Values -->
+        <Label Grid.Row="0" Grid.Column="0" Content="Fuel" 
+               VerticalAlignment="Center" 
+               Margin="5" 
+               Foreground="Red" 
+               FontWeight="Bold"/>
+        <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding CurrentFuelLevel, StringFormat=N2}" 
+                   VerticalAlignment="Center" 
+                   Margin="5" 
+                   Padding="5"/>
+        <Label Grid.Row="0" Grid.Column="2" Content="Race Laps" 
+               VerticalAlignment="Center" 
+               Margin="5" 
+               Foreground="Red" 
+               FontWeight="Bold"/>
+        <TextBlock Grid.Row="0" Grid.Column="3" Text="{Binding LapsCompleted, StringFormat=N2}" 
+                   VerticalAlignment="Center" 
+                   Margin="5" 
+                   Padding="5"/>
+
+        <!-- Second Row: Column Headers -->
+        <Label Grid.Row="1" Grid.Column="0" Content="" 
+               VerticalAlignment="Center" 
+               Margin="5" 
+               Foreground="Red" 
+               FontWeight="Bold"/>
+        <Label Grid.Row="1" Grid.Column="1" Content="Avg" 
+               VerticalAlignment="Center" 
+               Margin="5" 
+               Foreground="Red" 
+               FontWeight="Bold"/>
+        <Label Grid.Row="1" Grid.Column="2" Content="Refuel" 
+               VerticalAlignment="Center" 
+               Margin="5" 
+               Foreground="Red" 
+               FontWeight="Bold"/>
+        <Label Grid.Row="1" Grid.Column="3" Content="Laps of fuel" 
+               VerticalAlignment="Center" 
+               Margin="5" 
+               Foreground="Red" 
+               FontWeight="Bold"/>
+
+        <!-- Third Row: Values and Avg Label -->
+        <Label Grid.Row="2" Grid.Column="0" Content="All" 
+               VerticalAlignment="Center" 
+               Margin="5" 
+               Foreground="Red" 
+               FontWeight="Bold"/>
+        <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding AverageFuelConsumption, StringFormat=N2}" 
+                   VerticalAlignment="Center" 
+                   Margin="5" 
+                   Padding="5"/>
+        <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding RefuelRequired, StringFormat=N2}" 
+                   VerticalAlignment="Center" 
+                   Margin="5" 
+                   Padding="5"/>
+        <TextBlock Grid.Row="2" Grid.Column="3" Text="{Binding LapsOfFuelRemaining, StringFormat=N2}" 
+                   VerticalAlignment="Center" 
+                   Margin="5" 
+                   Padding="5"/>
+
+        <Label Grid.Row="3" Grid.Column="0" Content="5L" 
+               VerticalAlignment="Center"
+               Margin="5"
+               Foreground="Red"
+               FontWeight="Bold"/>
+        <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding FiveLapAverage, StringFormat=N2}" 
+           VerticalAlignment="Center" 
+           Margin="5" 
+           Padding="5"/>
+        <TextBlock Grid.Row="3" Grid.Column="2" Text="{Binding PitActive, StringFormat=N2}" 
+           VerticalAlignment="Center" 
+           Margin="5" 
+           Padding="5"/>
+        <TextBlock Grid.Row="3" Grid.Column="3" Text="{Binding Serviced, StringFormat=N2}" 
+           VerticalAlignment="Center" 
+           Margin="5" 
+           Padding="5"/>
+    </Grid>
+</Window>
