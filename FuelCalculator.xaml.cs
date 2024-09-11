@@ -1,18 +1,6 @@
-﻿using iRacingSdkWrapper;
-using SharpOverlay.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using SharpOverlay.Services;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace SharpOverlay
 {
@@ -28,7 +16,7 @@ namespace SharpOverlay
             _fuelService = new FuelCalculatorService();
 
             InitializeComponent();
-            _fuelService.HookUpToSdkEvent(RefreshDataContext);
+            _fuelService.FuelUpdated += OnFuelUpdate;
             Topmost = true;
         }
 
@@ -38,9 +26,9 @@ namespace SharpOverlay
                 DragMove();
         }
 
-        private void RefreshDataContext(object? sender, SdkWrapper.TelemetryUpdatedEventArgs e)
+        private void OnFuelUpdate(object? sender, FuelEventArgs e)
         {
-            this.DataContext = _fuelService.GetViewModel();
+            this.DataContext = e.ViewModel;
         }
     }
 }

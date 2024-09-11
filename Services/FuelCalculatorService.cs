@@ -25,6 +25,9 @@ namespace SharpOverlay.Services
         private bool _movedLapOnce;
         private float _avgFuelPerLap;
         private double _refuelRequired;
+        private float _fiveLapAverage;
+        private float _fiveLapRefuelRequired;
+        private float _fiveLapLapsOfFuelRemaining;
 
         public FuelCalculatorService()
         {
@@ -33,6 +36,8 @@ namespace SharpOverlay.Services
 
             _completedLaps = new List<Lap>();
         }
+
+        public event EventHandler<FuelEventArgs> FuelUpdated;
 
         private void Clear()
         {
@@ -50,15 +55,15 @@ namespace SharpOverlay.Services
             _refuelRequired = 0;
         }
 
-        public void HookUpToSdkEvent(EventHandler<SdkWrapper.TelemetryUpdatedEventArgs> handler)
-        {
-            _iRacingService.HookUpToTelemetryEvent(handler);
-        }
-
         private void ExecuteOnTelemetryEvent(object? sender, SdkWrapper.TelemetryUpdatedEventArgs eventArgs)
         {
-            var telemetry = _iRacingService.GetTelemetry();
+            ProcessTelemetryUpdate(eventArgs.TelemetryInfo);
 
+            FuelUpdated(this, new FuelEventArgs(GetViewModel()));
+        }
+
+        private void ProcessTelemetryUpdate(TelemetryInfo telemetry)
+        {
             if ((telemetry.SessionState.Value != SessionStates.Invalid || telemetry.SessionState.Value != SessionStates.CoolDown)
                 && telemetry.IsOnTrack.Value)
             {
@@ -77,7 +82,7 @@ namespace SharpOverlay.Services
                     {
                         _isRaceStart = true;
                     }
-                }                
+                }
                 else if (_hasBegunService && !_hasCompletedService && !_movedLapOnce)
                 {
                     CompleteCurrentLap(telemetry);
@@ -96,7 +101,7 @@ namespace SharpOverlay.Services
 
                     if (_avgFuelPerLap > 0)
                     {
-                        _refuelRequired = CalculateRefuel(_currentLap.StartingFuel);
+                        CalculateRefuel(_currentLap.StartingFuel);
                     }
                 }
                 else if (IsCrossingFinishLine(currentLapNumber))
@@ -114,7 +119,7 @@ namespace SharpOverlay.Services
                     {
                         _isComingOutOfPits = false;
                         _movedLapOnce = false;
-                    }                    
+                    }
 
                     _averageLapTime = CalculateAverageTime();
 
@@ -125,11 +130,11 @@ namespace SharpOverlay.Services
                         CalculateLapsRemaining(timeRemainingInSession);
                     }
 
-                    _avgFuelPerLap = CalculateAverageFuelConsumption();
+                    CalculateAverageFuelConsumption();
 
                     if (_avgFuelPerLap > 0)
                     {
-                        _refuelRequired = CalculateRefuel(_currentLap.StartingFuel);
+                        CalculateRefuel(_currentLap.StartingFuel);
                     }
 
                     _raceTotalLaps = telemetry.RaceLaps.Value;
@@ -147,14 +152,17 @@ namespace SharpOverlay.Services
             }
         }
 
-        private float CalculateAverageFuelConsumption()
+        private void CalculateAverageFuelConsumption()
         {
             if (_completedLaps.Count > 1)
             {
-                return _completedLaps.Skip(1).Average(l => l.FuelUsed);
+                _avgFuelPerLap = _completedLaps.Skip(1).Average(l => l.FuelUsed);
             }
 
-            return default;
+            if (_completedLaps.Count > 6)
+            {
+                _fiveLapAverage = _completedLaps.TakeLast(5).Average(l => l.FuelUsed);
+            }
         }
 
         private void UpdatePitServiceStatus(bool isReceivingPitService)
@@ -204,18 +212,16 @@ namespace SharpOverlay.Services
         {
             if (_completedLaps.Count > 1 && _completedLaps.Any(l => l.Time >= TimeSpan.Zero))
             {
-                var averageLapTime = TimeSpan.FromSeconds(_completedLaps
+                _averageLapTime = TimeSpan.FromSeconds(_completedLaps
                     .Skip(1)
                 .Where(l => l.Time >= TimeSpan.Zero)
                 .Average(l => l.Time.TotalSeconds));
-                
-                return averageLapTime;
             }
 
             return TimeSpan.Zero;
         }        
 
-        private void StartNewLap(TelemetryOutput telemetry)
+        private void StartNewLap(TelemetryInfo telemetry)
         {
             int currentLap = telemetry.Lap.Value;
             float startingFuel = telemetry.FuelLevel.Value;
@@ -234,7 +240,7 @@ namespace SharpOverlay.Services
             _currentLap = newLap;
         }
 
-        private void CompleteCurrentLap(TelemetryOutput telemetry)
+        private void CompleteCurrentLap(TelemetryInfo telemetry)
         {
             _currentLap!.EndingFuel = telemetry.FuelLevel.Value;
             _currentLap.Time = TimeSpan.FromSeconds(telemetry.LapLastLapTime.Value);
@@ -263,10 +269,9 @@ namespace SharpOverlay.Services
                     LapsOfFuelRemaining = _currentFuelLevel / _avgFuelPerLap,
                     TotalRaceLaps = _raceTotalLaps,
                     RefuelRequired = _refuelRequired,
-                    PitRoad = _onPitRoad,
-                    PitActive = _isInService,
-                    Serviced = _hasBegunService,
-                    FiveLapAverage = fiveLapAverage
+                    FiveLapAverage = _fiveLapAverage,
+                    FiveLapRefuelRequired = _fiveLapRefuelRequired,
+                    FiveLapLapsOfFuelRemaining = _fiveLapLapsOfFuelRemaining
                 };
             }
 
@@ -276,13 +281,16 @@ namespace SharpOverlay.Services
             };
         }
 
-        private double CalculateRefuel(float fuelLeftInCar)
+        private void CalculateRefuel(float fuelLeftInCar)
         {
-            var refuelRequired = _lapsRemainingInRace * _avgFuelPerLap - fuelLeftInCar;
+            float fuelCutoff = 0.3f;
 
-            //TODO Calculate for fuel cutoff point            
+            _refuelRequired = _lapsRemainingInRace * _avgFuelPerLap - fuelLeftInCar + fuelCutoff;
 
-            return refuelRequired;
+            if (_completedLaps.Count > 5)
+            {
+                _fiveLapRefuelRequired = (float)(_lapsRemainingInRace * _fiveLapAverage - fuelLeftInCar) + fuelCutoff;
+            }
         }
     }
 }

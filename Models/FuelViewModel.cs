@@ -9,9 +9,8 @@
         public float AverageFuelConsumption { get; set; }
         public double RefuelRequired { get; set; }
         public double LapsOfFuelRemaining { get; set; }
-        public bool PitRoad { get; set; }
-        public bool PitActive { get; set; }
-        public bool Serviced { get; set; }
         public float FiveLapAverage { get; set; }
+        public float FiveLapRefuelRequired { get; set; }
+        public float FiveLapLapsOfFuelRemaining { get; set; }
     }
 }
