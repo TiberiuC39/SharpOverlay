@@ -18,6 +18,7 @@
 		<Page Include="App.xaml" />
 	</ItemGroup>
 	<ItemGroup>
+		<None Remove="Fonts\EurostileExtendedBlack.ttf" />
 		<None Remove="Media\sharpoverlayicon.png" />
 		<None Remove="Media\sharpoverlaylogo.png" />
 	</ItemGroup>
@@ -48,6 +49,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Resource Include="Fonts\EurostileExtendedBlack.ttf" />
 		<Resource Include="Media\sharpoverlayicon.png">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Resource>

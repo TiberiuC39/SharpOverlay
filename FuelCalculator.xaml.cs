@@ -9,18 +9,19 @@ namespace SharpOverlay
     /// </summary>
     public partial class FuelCalculatorWindow : Window
     {
-        private readonly FuelCalculatorService _fuelService;
+        private readonly IFuelCalculator _fuelCalculator;
 
         public FuelCalculatorWindow()
         {
-            _fuelService = new FuelCalculatorService();
+            _fuelCalculator = new FuelCalculatorService();
+            _fuelCalculator.FuelUpdated += OnFuelUpdate;
+            
+            Topmost = true;
 
             InitializeComponent();
-            _fuelService.FuelUpdated += OnFuelUpdate;
-            Topmost = true;
         }
 
-        private void Window_MouseDown(object sender, MouseButtonEventArgs e)
+        private void Window_MouseDown(object? sender, MouseButtonEventArgs e)
         {
             if (e.ChangedButton == MouseButton.Left)
                 DragMove();
