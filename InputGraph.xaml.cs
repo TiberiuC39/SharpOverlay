@@ -109,7 +109,7 @@ namespace SharpOverlay
             InputPlot.Plot.Axes.Frameless();
 
             InputPlot.Plot.Axes.SetLimitsY(-5, 105);
-            InputPlot.Plot.Axes.SetLimitsX(0, 250);
+            InputPlot.Plot.Axes.SetLimitsX(0, 500);
 
             InputPlot.UserInputProcessor.IsEnabled = false;
             InputPlot.Interaction.IsEnabled = false;
@@ -117,7 +117,7 @@ namespace SharpOverlay
 
         private void HookStreamer(ref DataStreamer ds, SolidColorBrush color, bool isVisible)
         {
-            ds = InputPlot.Plot.Add.DataStreamer(250);
+            ds = InputPlot.Plot.Add.DataStreamer(500);
 
             ds.Color = TransformColor(color);
 
