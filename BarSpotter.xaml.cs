@@ -110,18 +110,10 @@ namespace SharpOverlay
             do
             {
                 driver = null;
-                var inputDriver = sessionInfo.Drivers.FirstOrDefault(d => d.CarIdx == id);
+                var racer = sessionInfo.Drivers.FirstOrDefault(d => d.CarIdx == id);
 
+                string name = racer?.UserName;
 
-                if (inputDriver is null)
-                {
-                    break;
-                }
-
-                string name = inputDriver.UserName;
-                if (name != null)
-
-                string name = query["UserName"].GetValue();
                 if (name != null && name != "Pace Car")
                 {
                     if (drivers.Any())
@@ -134,7 +126,8 @@ namespace SharpOverlay
                         driver = new Driver();
                         driver.Id = id;
                         driver.Name = name;
-                        driver.Number = inputDriver.CarNumber.ToString();
+                        driver.Number = racer.CarNumber.ToString();
+
                     }
                     newDrivers.Add(driver);
 
