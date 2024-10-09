@@ -17,7 +17,12 @@ namespace SharpOverlay.Services
 
         public SessionInfo GetSessionInfo()
         {
-            return Wrapper.GetSessionInfoWithoutEvent().SessionInfo;
+            return Wrapper.GetSessionInfoWithoutEvent();
+        }
+
+        public TelemetryInfo GetTelemetryInfo()
+        {
+            return Wrapper.GetTelemetryInfoWithoutEvent();
         }
 
         private static void AdjustTickRate(int tickrate)
@@ -49,7 +54,7 @@ namespace SharpOverlay.Services
             Wrapper.Connected += (sender, e) => action(sender, e);
         }
 
-        internal void DisconnectedEvent(Action<object?, EventArgs> action)
+        internal void HookUpToDisconnectedEvent(Action<object?, EventArgs> action)
         {
             Wrapper.Disconnected += (sender, e) => action(sender, e);
         }

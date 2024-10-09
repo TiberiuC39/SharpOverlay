@@ -11,8 +11,9 @@
         FontFamily="pack://application:,,,/SharpOverlay;component/Fonts/#EurostileExtendedBlack"
         FontSize="15"
         AllowsTransparency="True"
-        Background="Transparent"
-        Foreground="White">
+        Background="{x:Null}"
+        Foreground="White"
+        MouseLeftButtonDown="Window_MouseDown">
 
     <Window.Resources>
         <Style x:Key="LabelStyle" TargetType="Label">
