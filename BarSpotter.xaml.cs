@@ -87,6 +87,7 @@ namespace SharpOverlay
 
             isUpdatingDrivers = true;
             this.ParseDrivers(e.SessionInfo);
+            Driver? me = drivers.Find(d => d.Id == iracingWrapper.DriverId);
             isUpdatingDrivers = false;
         }
 
@@ -97,7 +98,6 @@ namespace SharpOverlay
             this.UpdateDriversTelemetry(e.TelemetryInfo);
 
             var closestDriver = relatives.OrderBy(x => x.Value).FirstOrDefault();
-            Driver? me = drivers.Find(d => d.Id == iracingWrapper.DriverId);
         }
 
         private void ParseDrivers(SessionInfo sessionInfo)
@@ -112,6 +112,7 @@ namespace SharpOverlay
                 driver = null;
                 var inputDriver = sessionInfo.Drivers.FirstOrDefault(d => d.CarIdx == id);
 
+
                 if (inputDriver is null)
                 {
                     break;
@@ -119,6 +120,9 @@ namespace SharpOverlay
 
                 string name = inputDriver.UserName;
                 if (name != null)
+
+                string name = query["UserName"].GetValue();
+                if (name != null && name != "Pace Car")
                 {
                     if (drivers.Any())
                     {
@@ -148,15 +152,16 @@ namespace SharpOverlay
             var laps = info.CarIdxLap.Value;
             var lapDistances = info.CarIdxLapDistPct.Value;
             var trackSurfaces = info.CarIdxTrackSurface.Value;
-
+            var minRelative = float.MaxValue;
+            var difference = 100f;
+            
             foreach (Driver driver in drivers)
             {
                 driver.LapDistance = lapDistances[driver.Id];
                 driver.TrackSurface = trackSurfaces[driver.Id];
 
-                if (me != null && driver.TrackSurface == TrackSurfaces.OnTrack && driver.Id != me.Id)
+                if (me != null && driver.TrackSurface != TrackSurfaces.NotInWorld && driver.Id != me.Id)
                 {
-
                     var relative = driver.LapDistance - me.LapDistance;
 
                     if (relative > 0.5)
@@ -173,6 +178,16 @@ namespace SharpOverlay
 
                     var closestDriver = relatives.OrderBy(e => Math.Abs(e.Value - 0)).FirstOrDefault();
                     closestCar = closestDriver.Value;
+
+                    foreach(var r in relatives.Values)
+                    {
+                        var currentDifference = Math.Abs(0 - r);
+                        if (currentDifference < difference)
+                        {
+                            closestCar = r;
+                            difference = currentDifference;
+                        }
+                    }
                 }
                 else
                 {
@@ -183,9 +198,13 @@ namespace SharpOverlay
             {
                 leftFill.Visibility = Visibility.Hidden;
                 rightFill.Visibility = Visibility.Hidden;
+
                 carLeftRight = (Enums.CarLeftRight)iracingWrapper.GetData("CarLeftRight");
+
                 if (carLeftRight == Enums.CarLeftRight.irsdk_LRClear)
                 {
+                    leftFill.Visibility = Visibility.Hidden;
+                    rightFill.Visibility = Visibility.Hidden;
                 }
                 if (carLeftRight == Enums.CarLeftRight.irsdk_LRCarLeft)
                 {
