@@ -32,9 +32,6 @@ namespace SharpOverlay
             App app = new();
             app.InitializeComponent();
             app.Run();
-
         }
-
-
     }
 }

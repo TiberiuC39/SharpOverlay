@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<OutputType>WinExe</OutputType>
-		<TargetFramework>net7.0-windows10.0.17763.0</TargetFramework>
+		<TargetFramework>net8.0-windows10.0.17763.0</TargetFramework>
 		<RootNamespace>SharpOverlay</RootNamespace>
 		<Nullable>enable</Nullable>
 		<UseWPF>true</UseWPF>
@@ -18,6 +18,7 @@
 		<Page Include="App.xaml" />
 	</ItemGroup>
 	<ItemGroup>
+		<None Remove="Fonts\EurostileExtendedBlack.ttf" />
 		<None Remove="Media\sharpoverlayicon.png" />
 		<None Remove="Media\sharpoverlaylogo.png" />
 	</ItemGroup>
@@ -32,7 +33,7 @@
 		<PackageReference Include="PixiEditor.ColorPicker" Version="3.4.1" />
 		<PackageReference Include="ScottPlot.WPF" Version="5.0.37" />
 		<PackageReference Include="Velopack" Version="0.0.583" />
-		<PackageReference Include="YamlDotNet.NetCore" Version="1.0.0" />
+		<PackageReference Include="YamlDotNet" Version="16.1.0" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -48,12 +49,17 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Resource Include="Fonts\EurostileExtendedBlack.ttf" />
 		<Resource Include="Media\sharpoverlayicon.png">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Resource>
 		<Resource Include="Media\sharpoverlaylogo.png">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Resource>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Utilities\" />
 	</ItemGroup>
 
 </Project>
