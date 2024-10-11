@@ -6,13 +6,20 @@ using System.Collections.Generic;
 
 namespace SharpOverlay.Services
 {
-    public class TelemetryParser
+    public class TelemetryParser : ITelemetryParser
     {
         public int PlayerCarClassId { get; private set; }
         public int PlayerCarIdx { get; private set; }
         public int CurrentSessionNumber { get; private set; }
+        public bool HasSwitchedSessions { get; private set; }
         public Dictionary<int, int> PositionCarIdxInClass { get; private set; } = [];
         public Dictionary<int, int> PositionCarIdxInRace { get; private set; } = [];
+        public SessionStates SessionState { get; private set; }
+
+        public void ParseSessionState(TelemetryInfo telemetry)
+        {
+            SessionState = telemetry.SessionState.Value;
+        }
 
         public void ParsePositionCarIdxInPlayerClass(TelemetryInfo telemetry, SessionType sessionType = SessionType.Practice)
         {
@@ -77,6 +84,15 @@ namespace SharpOverlay.Services
         {
             int currentSessionNumber = telemetry.SessionNum.Value;
 
+            if (CurrentSessionNumber != currentSessionNumber)
+            {
+                HasSwitchedSessions = true;
+            }
+            else
+            {
+                HasSwitchedSessions = false;
+            }            
+
             CurrentSessionNumber = currentSessionNumber;
         }
 
@@ -103,7 +119,7 @@ namespace SharpOverlay.Services
             return driversLastLaps;
         }
 
-        public static SessionFlags GetSessionFlag(TelemetryInfo telemetry)
+        public SessionFlags GetSessionFlag(TelemetryInfo telemetry)
         {
             var flag = telemetry.SessionFlags.Value;
 
@@ -115,6 +131,7 @@ namespace SharpOverlay.Services
             CurrentSessionNumber = 0;
             PlayerCarClassId = 0;
             PlayerCarClassId = 0;
+            SessionState = SessionStates.Invalid;
             PositionCarIdxInClass.Clear();
             PositionCarIdxInRace.Clear();            
         }

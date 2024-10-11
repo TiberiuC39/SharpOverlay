@@ -36,5 +36,6 @@ namespace SharpOverlay.Models
         public int PlayerIdx { get; set; }
         public bool IsOnPitRoad { get; set; }
         public TrackSurfaces TrackSurface { get; set; }
+        public SessionStates SessionState { get; set; }
     }
 }

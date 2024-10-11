@@ -1,4 +1,5 @@
 ﻿using iRacingSdkWrapper;
+using iRacingSdkWrapper.Bitfields;
 using SharpOverlay.Models;
 using System;
 using System.Collections.Generic;
@@ -12,11 +13,11 @@ namespace SharpOverlay.Services
         private const int DefaultTickRate = 2;
 
         private readonly iRacingDataService _iRacingService;
-        private readonly SessionParser _sessionParser;
-        private readonly TelemetryParser _telemetryParser;
+        private readonly ISessionParser _sessionParser;
+        private readonly ITelemetryParser _telemetryParser;
 
-        private Dictionary<int, Lap> _completedLaps = [];
-        private Dictionary<int, List<Lap>> _driverLaps = [];
+        private readonly Dictionary<int, Lap> _completedLaps = [];
+        private readonly Dictionary<int, List<Lap>> _driverLaps = [];
         private Lap? _currentLap;
         private float _currentFuelLevel;
         private double _lapsRemainingInRace;
@@ -32,7 +33,6 @@ namespace SharpOverlay.Services
         private bool _isRaceStart;
         private TimeSpan _leaderAvgLapTime;
         private TimeSpan _leaderTimeToCompleteLap;
-        private int _currentSessionNumber;
         private TrackSurfaces _trackSurface;
         private int _leaderIdx;
         private int _playerIdx;
@@ -79,7 +79,7 @@ namespace SharpOverlay.Services
 
             _sessionParser.ParseStartType(sessionInfo);
             _sessionParser.ParseDrivers(sessionInfo);
-            _sessionParser.ParseLapsInSession(sessionInfo, _currentSessionNumber);
+            _sessionParser.ParseLapsInSession(sessionInfo, _telemetryParser.CurrentSessionNumber);
 
             _telemetryParser.ParsePlayerCarIdx(telemetry);
             _telemetryParser.ParsePlayerCarClassId(telemetry);
@@ -101,6 +101,12 @@ namespace SharpOverlay.Services
 
         private void Reset()
         {
+            Clear();
+            Initialize();
+        }
+
+        private void Clear()
+        {
             _completedLaps.Clear();
             _driverLaps.Clear();
             _currentLap = null;
@@ -111,14 +117,7 @@ namespace SharpOverlay.Services
             _refuelRequired = 0;
             _fiveLapAverage = 0;
             _fiveLapRefuelRequired = 0;
-
-            Initialize();
-        }
-
-        private void Clear()
-        {
-            Reset();
-
+            
             _sessionParser.Clear();
             _telemetryParser.Clear();
         }
@@ -126,6 +125,13 @@ namespace SharpOverlay.Services
         private void ExecuteOnTelemetryEvent(object? sender, SdkWrapper.TelemetryUpdatedEventArgs eventArgs)
         {
             var telemetry = eventArgs.TelemetryInfo;
+            _telemetryParser.ParseSessionState(telemetry);
+
+            if (_telemetryParser.GetSessionFlag(telemetry) == SessionFlags.Checkered)
+            {
+                return;
+            }
+
             _trackSurface = telemetry.PlayerTrackSurface.Value;
 
             _telemetryParser.ParseCurrentSessionNumber(telemetry);
@@ -154,23 +160,30 @@ namespace SharpOverlay.Services
             FuelUpdated(this, new FuelEventArgs(GetViewModel()));
         }
 
+        private bool IsSessionStateValid(TelemetryInfo telemetry)
+        {
+            return (_telemetryParser.SessionState == SessionStates.Racing
+                            || _telemetryParser.SessionState == SessionStates.GetInCar
+                            || _telemetryParser.SessionState == SessionStates.CoolDown
+                            || _telemetryParser.SessionState == SessionStates.ParadeLaps
+                            || _telemetryParser.SessionState == SessionStates.Checkered);
+                            //&& telemetry.IsOnTrack.Value;
+        }
+
         private bool IsSessionStateInvalid(TelemetryInfo telemetry)
         {
-            return telemetry.SessionState.Value == SessionStates.Invalid
-                            || telemetry.SessionState.Value == SessionStates.CoolDown
-                            || telemetry.SessionNum.Value != _currentSessionNumber
-                            || telemetry.SessionState.Value == SessionStates.Warmup;
+            return _telemetryParser.HasSwitchedSessions
+                            || _telemetryParser.SessionState == SessionStates.Invalid
+                            || _telemetryParser.SessionState == SessionStates.Warmup;
                             //|| telemetry.SessionState.Value == SessionStates.GetInCar;
         }
 
         private void ExecuteOnSessionEvent(object? sender, SdkWrapper.SessionUpdatedEventArgs eventArgs)
         {
             var sessionInfo = eventArgs.SessionInfo;
-            
-            if (_sessionParser.SessionLaps == 0)
-            {
-                _sessionParser.ParseLapsInSession(sessionInfo, _telemetryParser.CurrentSessionNumber);
-            }
+
+            _sessionParser.ParseLapsInSession(sessionInfo, _telemetryParser.CurrentSessionNumber);
+            _sessionParser.ParseCurrentSessionType(sessionInfo, _telemetryParser.CurrentSessionNumber);
 
             _sessionParser.ParseDrivers(sessionInfo);
             _sessionParser.ParseSessions(sessionInfo);
@@ -179,8 +192,7 @@ namespace SharpOverlay.Services
         private void CalculateOtherDriversLaps(TelemetryInfo telemetry)
         {
             var driversLastLapTimes = TelemetryParser.GetDriversLastLapTime(telemetry);
-
-            foreach ((int idx, var driver) in _sessionParser.Drivers)
+            foreach ((int idx, _) in _sessionParser.Drivers)
             {
                 if (!_driverLaps.ContainsKey(idx))
                 {
@@ -223,7 +235,7 @@ namespace SharpOverlay.Services
             }
             else if (_leaderAvgLapTime <= TimeSpan.Zero)
             {
-                _leaderAvgLapTime = _sessionParser.GetBestLapTime(_leaderIdx);
+                _leaderAvgLapTime = _sessionParser.GetBestLapTime(_leaderIdx, _telemetryParser.CurrentSessionNumber);
                 _leaderTimeToCompleteLap = (1 - leaderLapDistance) * _leaderAvgLapTime;
             }
             else
@@ -321,13 +333,7 @@ namespace SharpOverlay.Services
             return telemetry.EnterExitReset.Value == 0;
         }
 
-        private static bool IsSessionStateValid(TelemetryInfo telemetry)
-        {
-            return (telemetry.SessionState.Value != SessionStates.Invalid
-                            || telemetry.SessionState.Value != SessionStates.Checkered
-                            || telemetry.SessionState.Value != SessionStates.CoolDown)
-                            && telemetry.IsOnTrack.Value;
-        }
+        
 
         private void CalculateFuelAndLapData(double timeRemaining)
         {
@@ -407,7 +413,7 @@ namespace SharpOverlay.Services
 
                 var startType = _sessionParser.StartType;
 
-                if (startType == StartType.Rolling)
+                if (startType == StartType.Rolling || _sessionParser.SessionType == SessionType.Qualifying)
                 {
                     completedLaps--;
                 }
@@ -490,11 +496,12 @@ namespace SharpOverlay.Services
                     LeaderAvgLapTime = _leaderAvgLapTime,
                     LeaderTimeToCompleteLap = _leaderTimeToCompleteLap,
                     LeaderIdx = _leaderIdx,
-                    CurrentSessionNumber = _currentSessionNumber,
+                    CurrentSessionNumber = _telemetryParser.CurrentSessionNumber,
                     CurrentLap = _currentLap,
                     PlayerIdx = _playerIdx,
                     IsOnPitRoad = _isOnPitRoad,
-                    TrackSurface = _trackSurface
+                    TrackSurface = _trackSurface,
+                    SessionState = _telemetryParser.SessionState
                 };
             }
 
@@ -513,11 +520,12 @@ namespace SharpOverlay.Services
                 LeaderAvgLapTime = _leaderAvgLapTime,
                 LeaderTimeToCompleteLap = _leaderTimeToCompleteLap,
                 LeaderIdx = _leaderIdx,
-                CurrentSessionNumber = _currentSessionNumber,
+                CurrentSessionNumber = _telemetryParser.CurrentSessionNumber,
                 CurrentLap = _currentLap,
                 PlayerIdx = _playerIdx,
                 IsOnPitRoad = _isOnPitRoad,
-                TrackSurface = _trackSurface
+                TrackSurface = _trackSurface,
+                SessionState = _telemetryParser.SessionState
             };
         }
 
@@ -527,7 +535,7 @@ namespace SharpOverlay.Services
 
             if (_avgFuelPerLap > 0)
             {
-                _refuelRequired = _lapsRemainingInRace * _avgFuelPerLap - fuelLeftInCar + fuelCutoff;
+                _refuelRequired = _lapsRemainingInRace * _avgFuelPerLap - (fuelLeftInCar - fuelCutoff);
             }
 
             if (_completedLaps.Count > 5)

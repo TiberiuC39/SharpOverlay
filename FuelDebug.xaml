@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         IsHitTestVisible="False"
         d:DataContext="{d:DesignInstance Type=models:FuelViewModel}"
-        Title="Fuel Calculator Debug" Height="530" Width="300">
+        Title="Fuel Calculator Debug" Height="600" Width="300">
     
     <Window.Resources>
     <Style x:Key="LabelStyle" TargetType="Label">
@@ -72,6 +72,7 @@
             <TextBlock Text="{Binding RefuelRequired, StringFormat='Refuel Required: {0:F2}'}" Style="{StaticResource RefuelRequiredTextBlockStyle}"/>
             <TextBlock Text="{Binding CurrentSessionNumber, StringFormat='Current Session: {0}'}" Style="{StaticResource TextBlockStyle}"/> 
             <TextBlock Text="{Binding TrackSurface, StringFormat='Surface: {0}'}" Style="{StaticResource TextBlockStyle}"/> 
+            <TextBlock Text="{Binding SessionState, StringFormat='Session State: {0}'}" Style="{StaticResource TextBlockStyle}"/> 
         </StackPanel>
     </Grid>
 </Window>

@@ -9,7 +9,7 @@ using System.Text.Json;
 
 namespace SharpOverlay.Services
 {
-    public class SessionParser
+    public class SessionParser : ISessionParser
     {
         public List<Session> Sessions { get; private set; } = [];
         public Dictionary<int, Racer> Drivers { get; private set; } = [];
@@ -88,9 +88,15 @@ namespace SharpOverlay.Services
 
             string currentSessionLaps = currentSession.SessionLaps;
 
+            const int unlimitedLaps = -1;
+
             if (int.TryParse(currentSessionLaps, out int lapsInCurrentSession))
             {
                 SessionLaps = lapsInCurrentSession;
+            }
+            else
+            {
+                SessionLaps = unlimitedLaps;
             }
         }
 
@@ -108,8 +114,8 @@ namespace SharpOverlay.Services
         {
             Sessions.Clear();
             Drivers.Clear();
-            SessionLaps = 0;
-            SessionType = SessionType.Practice;
+            SessionLaps = -1;
+            SessionType = SessionType.Invalid;
             StartType = StartType.Unknown;
         }
     }
