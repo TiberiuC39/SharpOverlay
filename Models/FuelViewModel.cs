@@ -13,8 +13,13 @@ namespace SharpOverlay.Models
         public double RefuelRequired { get; set; }
         public bool DoesRequireRefueling => RefuelRequired > 0;
         public double LapsOfFuelRemaining { get; set; }
+
+        public float LastLapConsumption { get; set; }
+        public double LastLapRefuelRequired { get; set; }
+        public float LastLapLapsOfFuelRemaining { get; set; }
+
         public float FiveLapAverage { get; set; }
-        public float FiveLapRefuelRequired { get; set; }
+        public double FiveLapRefuelRequired { get; set; }
         public float FiveLapLapsOfFuelRemaining { get; set; }
 
 

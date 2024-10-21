@@ -16,6 +16,10 @@ namespace SharpOverlay.Services
         public Dictionary<int, int> PositionCarIdxInRace { get; private set; } = [];
         public SessionStates SessionState { get; private set; }
 
+        public double PlayerPctOnTrack { get; private set; }
+
+        public float FuelLevel { get; private set; }
+
         public void ParseSessionState(TelemetryInfo telemetry)
         {
             SessionState = telemetry.SessionState.Value;
@@ -87,11 +91,7 @@ namespace SharpOverlay.Services
             if (CurrentSessionNumber != currentSessionNumber)
             {
                 HasSwitchedSessions = true;
-            }
-            else
-            {
-                HasSwitchedSessions = false;
-            }            
+            }                        
 
             CurrentSessionNumber = currentSessionNumber;
         }
@@ -128,12 +128,24 @@ namespace SharpOverlay.Services
 
         public void Clear()
         {
-            CurrentSessionNumber = 0;
-            PlayerCarClassId = 0;
+            PlayerCarIdx = -1;
             PlayerCarClassId = 0;
             SessionState = SessionStates.Invalid;
             PositionCarIdxInClass.Clear();
-            PositionCarIdxInRace.Clear();            
+            PositionCarIdxInRace.Clear();
+            HasSwitchedSessions = false;
+            PlayerPctOnTrack = 0;
+            FuelLevel = 0;
+        }
+
+        public void ParsePlayerPctOnTrack(TelemetryInfo telemetry)
+        {
+            PlayerPctOnTrack = telemetry.CarIdxLapDistPct.Value[PlayerCarIdx];
+        }
+
+        public void ParseFuelLevel(TelemetryInfo telemetry)
+        {
+            FuelLevel = telemetry.FuelLevel.Value;
         }
     }
 }
