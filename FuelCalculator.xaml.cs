@@ -1,18 +1,7 @@
-﻿using iRacingSdkWrapper;
-using SharpOverlay.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using SharpOverlay.Services;
+using System.ComponentModel;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace SharpOverlay
 {
@@ -21,26 +10,47 @@ namespace SharpOverlay
     /// </summary>
     public partial class FuelCalculatorWindow : Window
     {
-        private readonly FuelCalculatorService _fuelService;
+        private readonly IFuelCalculator _fuelCalculator;
+        private FuelDebugWindow? _fuelDebugWindow;
 
         public FuelCalculatorWindow()
         {
-            _fuelService = new FuelCalculatorService();
+            _fuelCalculator = new FuelCalculatorService();
+            _fuelCalculator.FuelUpdated += OnFuelUpdate;
+
+            App.appSettings.FuelSettings.PropertyChanged += HandlePropertyChange;
+
+            JotService.tracker.Track(this);
+
+            Topmost = true;
 
             InitializeComponent();
-            _fuelService.HookUpToSdkEvent(RefreshDataContext);
-            Topmost = true;
         }
 
-        private void Window_MouseDown(object sender, MouseButtonEventArgs e)
+        private void Window_MouseDown(object? sender, MouseButtonEventArgs e)
         {
             if (e.ChangedButton == MouseButton.Left)
                 DragMove();
         }
 
-        private void RefreshDataContext(object? sender, SdkWrapper.TelemetryUpdatedEventArgs e)
+        private void OnFuelUpdate(object? sender, FuelEventArgs e)
         {
-            this.DataContext = _fuelService.GetViewModel();
+            this.DataContext = e.ViewModel;
+        }
+
+        private void HandlePropertyChange(object? sender, PropertyChangedEventArgs e)
+        {
+            if (App.appSettings.FuelSettings.TestMode)
+            {
+                _fuelDebugWindow = new FuelDebugWindow(_fuelCalculator);
+                _fuelDebugWindow.Show();
+            }
+            else if (_fuelDebugWindow is not null)
+            {
+                _fuelCalculator.FuelUpdated -= _fuelDebugWindow!.ExecuteOnFuelUpdated;
+                _fuelDebugWindow.Hide();
+                _fuelDebugWindow = null;
+            }
         }
     }
 }

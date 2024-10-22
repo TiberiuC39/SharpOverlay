@@ -278,6 +278,29 @@ namespace SharpOverlay.Models
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsEnabled)));
             }
         }
+
+        private bool _testMode;
+        public bool TestMode
+        {
+            get => _testMode;
+            set
+            {
+                _testMode = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(TestMode)));
+            }
+        }
+
+        private bool _positioningMode;
+
+        public bool PositioningMode
+        {
+            get => _positioningMode;
+            set
+            {
+                _positioningMode = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PositioningMode)));
+            }
+        }
     }
   
     public class GeneralSettings : INotifyPropertyChanged
