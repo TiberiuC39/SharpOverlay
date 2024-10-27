@@ -13,7 +13,7 @@ namespace SharpOverlay.Strategies
         {            
         }
 
-        protected override double GetAverageFuelConsumption(Dictionary<int, Lap> lapsCompleted)
-            => lapsCompleted.Values.TakeLast(5).Average(l => l.FuelUsed);
+        protected override double GetAverageFuelConsumption(List<Lap> lapsCompleted)
+            => lapsCompleted.Count > 5 ? lapsCompleted.TakeLast(5).Average(l => l.FuelUsed) : default;
     }
 }

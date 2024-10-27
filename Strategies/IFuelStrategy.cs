@@ -1,16 +1,14 @@
 ﻿using SharpOverlay.Models;
+using SharpOverlay.Services;
 using System.Collections.Generic;
 
 namespace SharpOverlay.Strategies
 {
-    public interface IFuelStrategy
+    public interface IFuelStrategy : IClear
     {
-        string Name { get; }
-        double FuelConsumption { get; }
-        double LapsOfFuelRemaining { get; }
-        double RefuelRequired { get; }
-        double FuelAtEnd { get; }
-
-        void Calculate(Dictionary<int, Lap> lapsCompleted, int sessionLapsRemaining);
+        void Calculate(List<Lap> lapsCompleted, int sessionLapsRemaining);
+        void UpdateRefuel(double currentFuelLevel, int sessionLapsRemaining);
+        void UpdateLapsOfFuelRemaining(double currentFuelLevel);
+        StrategyViewModel GetView();
     }
 }

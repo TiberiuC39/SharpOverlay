@@ -1,14 +1,19 @@
 ﻿using iRacingSdkWrapper;
+using SharpOverlay.Strategies;
 using System;
+using System.Collections.ObjectModel;
 
 namespace SharpOverlay.Models
 {
     public class FuelViewModel
     {
+
+        public ObservableCollection<StrategyViewModel> Strategies { get; set; }
+
         public int LapsCompleted { get; set; }
         public double RaceLapsRemaining { get; set; }
-        public float CurrentFuelLevel { get; set; }
-        public float ConsumedFuel { get; set; }
+        public double CurrentFuelLevel { get; set; }
+        public double ConsumedFuel { get; set; }
         public float AverageFuelConsumption { get; set; }
         public double RefuelRequired { get; set; }
         public bool DoesRequireRefueling => RefuelRequired > 0;

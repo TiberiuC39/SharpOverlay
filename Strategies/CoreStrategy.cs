@@ -13,36 +13,78 @@ namespace SharpOverlay.Strategies
             _fuelCutOff = fuelCutOff;
         }
 
-        public string Name { get; }
+        private string Name { get; }
 
-        public double FuelConsumption { get; private set; }
+        private double FuelConsumption { get; set; }
 
-        public double LapsOfFuelRemaining { get; private set; }
+        private double LapsOfFuelRemaining { get; set; }
 
-        public double RefuelRequired { get; private set; }
+        private double RefuelRequired { get; set; }
 
-        public double FuelAtEnd { get; private set; }
+        private double FuelAtEnd { get; set; }
 
-        public void Calculate(Dictionary<int, Lap> lapsCompleted, int sessionLapsRemaining)
+        public void Calculate(List<Lap> lapsCompleted, int sessionLapsRemaining)
         {
             FuelConsumption = GetAverageFuelConsumption(lapsCompleted);
 
-            double fuelRequired = sessionLapsRemaining * FuelConsumption;          
+            Lap lastLap = lapsCompleted.Last();
 
-            Lap lastLap = lapsCompleted.Last().Value;
+            double currentFuelLevel = lastLap.EndingFuel;
 
-            FuelAtEnd = lastLap.EndingFuel - fuelRequired;
+            UpdateRefuel(currentFuelLevel, sessionLapsRemaining);
+        }
 
-            RefuelRequired = fuelRequired - lastLap.EndingFuel;
-
-            if (FuelAtEnd > 0 && FuelAtEnd < _fuelCutOff)
+        public void UpdateRefuel(double currentFuelLevel, int sessionLapsRemaining)
+        {
+            if (sessionLapsRemaining == 0)
             {
-                double difference = _fuelCutOff - FuelAtEnd;
-                RefuelRequired += difference;
+                RefuelRequired = 0;
+            }
+            else if (FuelConsumption > 0)
+            {
+                double fuelRequired = sessionLapsRemaining * FuelConsumption;
+
+                FuelAtEnd = currentFuelLevel - fuelRequired;
+
+                RefuelRequired = fuelRequired - currentFuelLevel;
+
+                if (FuelAtEnd > 0 && FuelAtEnd < _fuelCutOff)
+                {
+                    double difference = _fuelCutOff - FuelAtEnd;
+                    RefuelRequired += difference;
+                }
+            }
+
+            UpdateLapsOfFuelRemaining(currentFuelLevel);
+        }
+
+        public StrategyViewModel GetView()
+            => new StrategyViewModel()
+            {
+                Name = Name,
+                FuelAtEnd = FuelAtEnd,
+                RefuelAmount = RefuelRequired,
+                LapsOfFuelRemaining = LapsOfFuelRemaining,
+                FuelConsumption = FuelConsumption
+            };
+
+        protected virtual double GetAverageFuelConsumption(List<Lap> lapsCompleted)
+            => lapsCompleted.Count > 1 ? lapsCompleted.Skip(1).Average(l => l.FuelUsed) : default;
+
+        public void UpdateLapsOfFuelRemaining(double currentFuelLevel)
+        {
+            if (FuelConsumption > 0)
+            {
+                LapsOfFuelRemaining = currentFuelLevel / FuelConsumption;
             }
         }
 
-        protected virtual double GetAverageFuelConsumption(Dictionary<int, Lap> lapsCompleted)
-            => lapsCompleted.Values.Average(l => l.FuelUsed);
+        public void Clear()
+        {
+            FuelAtEnd = 0;
+            RefuelRequired = 0;
+            LapsOfFuelRemaining = 0;
+            FuelConsumption = 0;
+        }
     }
 }

@@ -8,7 +8,7 @@ namespace SharpOverlay.Services
 {
     public interface ITelemetryParser
     {
-        public float FuelLevel { get; }
+        public double FuelLevel { get; }
         public int PlayerCarIdx { get; }
         public int PlayerCarClassId { get; }
         public double PlayerPctOnTrack { get; }
@@ -17,6 +17,7 @@ namespace SharpOverlay.Services
         int CurrentSessionNumber { get; }
         bool HasSwitchedSessions { get; }
         SessionStates SessionState { get; }
+        float[] CarIdxPctOnTrack { get; }
 
         void Clear();
         TimeSpan GetTimeRemaining(TelemetryInfo telemetry);
@@ -28,5 +29,6 @@ namespace SharpOverlay.Services
         void ParsePlayerPctOnTrack(TelemetryInfo telemetry);
         void ParsePositionCarIdxInPlayerClass(TelemetryInfo telemetry, SessionType sessionType = SessionType.Practice);
         SessionFlags GetSessionFlag(TelemetryInfo telemetry);
+        void ParseCarIdxOnTrack(TelemetryInfo telemetry);
     }
 }

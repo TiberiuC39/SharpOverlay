@@ -17,8 +17,9 @@ namespace SharpOverlay.Services
         public SessionStates SessionState { get; private set; }
 
         public double PlayerPctOnTrack { get; private set; }
+        public float[] CarIdxPctOnTrack { get; private set; }
 
-        public float FuelLevel { get; private set; }
+        public double FuelLevel { get; private set; }
 
         public void ParseSessionState(TelemetryInfo telemetry)
         {
@@ -56,6 +57,11 @@ namespace SharpOverlay.Services
                     }
                 }
             }
+        }
+
+        public void ParseCarIdxOnTrack(TelemetryInfo telemetry)
+        {
+            CarIdxPctOnTrack = telemetry.CarIdxLapDistPct.Value;
         }
 
         public TimeSpan GetTimeRemaining(TelemetryInfo telemetry)
@@ -136,6 +142,7 @@ namespace SharpOverlay.Services
             HasSwitchedSessions = false;
             PlayerPctOnTrack = 0;
             FuelLevel = 0;
+            CurrentSessionNumber = 0;
         }
 
         public void ParsePlayerPctOnTrack(TelemetryInfo telemetry)
@@ -145,7 +152,7 @@ namespace SharpOverlay.Services
 
         public void ParseFuelLevel(TelemetryInfo telemetry)
         {
-            FuelLevel = telemetry.FuelLevel.Value;
+            FuelLevel = (double) telemetry.FuelLevel.Value;
         }
     }
 }

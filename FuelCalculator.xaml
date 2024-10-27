@@ -67,7 +67,6 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
             <!-- First Row: Fuel and Race Laps Labels and Values -->
@@ -81,24 +80,24 @@
             <Label Grid.Row="1" Grid.Column="1" Content="AVG" Style="{StaticResource LabelStyle}" />
             <Label Grid.Row="1" Grid.Column="2" Content="REFUEL" Style="{StaticResource LabelStyle}"/>
             <Label Grid.Row="1" Grid.Column="3" Content="LAPS OF FUEL" Style="{StaticResource LabelStyle}"/>
-
+            
             <!-- Third Row: Values and Avg Label -->
-            <Label Grid.Row="2" Content="LAST" Style="{StaticResource LabelStyle}" />
-            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding LastLapConsumption, StringFormat=N2}" Style="{StaticResource TextBlockStyle}"/>
-            <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding LastLapRefuelRequired, StringFormat={}{0:F2}}" Style="{StaticResource RefuelRequiredTextBlockStyle}"/>
-            <TextBlock Grid.Row="2" Grid.Column="3" Text="{Binding LastLapLapsOfFuelRemaining, StringFormat={}{0:F2}}" Style="{StaticResource TextBlockStyle}"/>
+            <Label Grid.Row="2" Content="{Binding Strategies[0].Name}" Style="{StaticResource LabelStyle}" />
+            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding FuelConsumption, StringFormat=N2}" Style="{StaticResource TextBlockStyle}" DataContext="{Binding Strategies[0]}"/>
+            <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding RefuelAmount, StringFormat={}{0:F2}}" Style="{StaticResource RefuelRequiredTextBlockStyle}" DataContext="{Binding Strategies[0]}"/>
+            <TextBlock Grid.Row="2" Grid.Column="3" Text="{Binding LapsOfFuelRemaining, StringFormat={}{0:F2}}" Style="{StaticResource TextBlockStyle}" DataContext="{Binding Strategies[0]}"/>
 
             <!-- Fourth Row: Values and Avg Label -->
-            <Label Grid.Row="3" Content="ALL" Style="{StaticResource LabelStyle}" />
-            <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding AverageFuelConsumption, StringFormat=N2}" Style="{StaticResource TextBlockStyle}"/>
-            <TextBlock Grid.Row="3" Grid.Column="2" Text="{Binding RefuelRequired, StringFormat={}{0:F2}}" Style="{StaticResource RefuelRequiredTextBlockStyle}"/>
-            <TextBlock Grid.Row="3" Grid.Column="3" Text="{Binding LapsOfFuelRemaining, StringFormat={}{0:F2}}" Style="{StaticResource TextBlockStyle}"/>
+            <Label Grid.Row="3" Content="{Binding Strategies[1].Name}" Style="{StaticResource LabelStyle}" />
+            <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding FuelConsumption, StringFormat=N2}" Style="{StaticResource TextBlockStyle}" DataContext="{Binding Strategies[1]}"/>
+            <TextBlock Grid.Row="3" Grid.Column="2" Text="{Binding RefuelAmount, StringFormat={}{0:F2}}" Style="{StaticResource RefuelRequiredTextBlockStyle}" DataContext="{Binding Strategies[1]}"/>
+            <TextBlock Grid.Row="3" Grid.Column="3" Text="{Binding LapsOfFuelRemaining, StringFormat={}{0:F2}}" Style="{StaticResource TextBlockStyle}" DataContext="{Binding Strategies[1]}"/>
 
             <!-- Fifth Row: 5L Data -->
-            <Label Grid.Row="4" Content="5L" Style="{StaticResource LabelStyle}"/>
-            <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding FiveLapAverage, StringFormat=N2}" Style="{StaticResource TextBlockStyle}"/>
-            <TextBlock Grid.Row="4" Grid.Column="2" Text="{Binding FiveLapRefuelRequired, StringFormat=N2}" Style="{StaticResource RefuelRequiredTextBlockStyle}"/>
-            <TextBlock Grid.Row="4" Grid.Column="3" Text="{Binding FiveLapLapsOfFuelRemaining, StringFormat=N2}" Style="{StaticResource TextBlockStyle}"/>
+            <Label Grid.Row="4" Content="{Binding Strategies[2].Name}" Style="{StaticResource LabelStyle}"/>
+            <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding FuelConsumption, StringFormat=N2}" Style="{StaticResource TextBlockStyle}" DataContext="{Binding Strategies[2]}"/>
+            <TextBlock Grid.Row="4" Grid.Column="2" Text="{Binding RefuelAmount, StringFormat=N2}" Style="{StaticResource RefuelRequiredTextBlockStyle}" DataContext="{Binding Strategies[2]}"/>
+            <TextBlock Grid.Row="4" Grid.Column="3" Text="{Binding LapsOfFuelRemaining, StringFormat=N2}" Style="{StaticResource TextBlockStyle}" DataContext="{Binding Strategies[2]}"/>
         </Grid>
     </Border>
 </Window>
