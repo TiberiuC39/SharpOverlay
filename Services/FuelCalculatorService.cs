@@ -181,8 +181,6 @@ namespace SharpOverlay.Services
             }
             else if (_pitManager.HasResetToPits(simulationOutput.EnterExitResetButton) && IsInCar)
             {
-                Thread.Sleep(1000);
-
                 currentLap.StartingFuel = simulationOutput.FuelLevel;
 
                 if (currentLap.Number == simulationOutput.CurrentLapNumber)
