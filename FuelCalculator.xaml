@@ -6,109 +6,98 @@
         xmlns:models="clr-namespace:SharpOverlay.Models" 
         d:DataContext="{d:DesignInstance Type=models:FuelViewModel}"
         mc:Ignorable="d"
-        Title="Fuel Data" Height="160" Width="260"
+        Title="Fuel Calculator" Height="140" Width="330"
         WindowStyle="None"
+        FontFamily="pack://application:,,,/SharpOverlay;component/Fonts/#EurostileExtendedBlack"
+        FontSize="15"
         AllowsTransparency="True"
-        Background="Transparent"
-        Foreground="White">
+        Background="{x:Null}"
+        Foreground="White"
+        MouseLeftButtonDown="Window_MouseDown">
 
-    <Grid Margin="10" Background="Black" Opacity="0.85">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <!-- Row 0: Fuel and Race Laps -->
-            <RowDefinition Height="Auto"/>
-            <!-- Row 1: Column Headers -->
-            <RowDefinition Height="Auto"/>
-            <!-- Row 2: Values -->
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <!-- Column 0: Avg Label -->
-            <ColumnDefinition Width="Auto"/>
-            <!-- Column 1: Fuel Label -->
-            <ColumnDefinition Width="Auto"/>
-            <!-- Column 2: Fuel Value -->
-            <ColumnDefinition Width="Auto"/>
-        </Grid.ColumnDefinitions>
+    <Window.Resources>
+        <Style x:Key="LabelStyle" TargetType="Label">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="5,0,5,0"/>
+            <Setter Property="Foreground" Value="#f5bd3b"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Height" Value="25"/>
+            <Setter Property="Opacity" Value="1"/>
+        </Style>
 
-        <!-- First Row: Fuel and Race Laps Labels and Values -->
-        <Label Grid.Row="0" Grid.Column="0" Content="Fuel" 
-               VerticalAlignment="Center" 
-               Margin="5" 
-               Foreground="Red" 
-               FontWeight="Bold"/>
-        <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding CurrentFuelLevel, StringFormat=N2}" 
-                   VerticalAlignment="Center" 
-                   Margin="5" 
-                   Padding="5"/>
-        <Label Grid.Row="0" Grid.Column="2" Content="Race Laps" 
-               VerticalAlignment="Center" 
-               Margin="5" 
-               Foreground="Red" 
-               FontWeight="Bold"/>
-        <TextBlock Grid.Row="0" Grid.Column="3" Text="{Binding LapsCompleted, StringFormat=N2}" 
-                   VerticalAlignment="Center" 
-                   Margin="5" 
-                   Padding="5"/>
+        <Style x:Key="TextBlockStyle" TargetType="TextBlock">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="5,0,5,0"/>
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="Height" Value="25"/>
+            <Setter Property="Opacity" Value="1"/>
+        </Style>
 
-        <!-- Second Row: Column Headers -->
-        <Label Grid.Row="1" Grid.Column="0" Content="" 
-               VerticalAlignment="Center" 
-               Margin="5" 
-               Foreground="Red" 
-               FontWeight="Bold"/>
-        <Label Grid.Row="1" Grid.Column="1" Content="Avg" 
-               VerticalAlignment="Center" 
-               Margin="5" 
-               Foreground="Red" 
-               FontWeight="Bold"/>
-        <Label Grid.Row="1" Grid.Column="2" Content="Refuel" 
-               VerticalAlignment="Center" 
-               Margin="5" 
-               Foreground="Red" 
-               FontWeight="Bold"/>
-        <Label Grid.Row="1" Grid.Column="3" Content="Laps of fuel" 
-               VerticalAlignment="Center" 
-               Margin="5" 
-               Foreground="Red" 
-               FontWeight="Bold"/>
+        <Style x:Key="RefuelRequiredTextBlockStyle" TargetType="TextBlock">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="5,0,5,0"/>
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="Foreground" Value="LightGreen"/>
+            <Setter Property="Opacity" Value="1"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding DoesRequireRefueling}" Value="true">
+                    <Setter Property="Foreground" Value="Red"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
 
-        <!-- Third Row: Values and Avg Label -->
-        <Label Grid.Row="2" Grid.Column="0" Content="All" 
-               VerticalAlignment="Center" 
-               Margin="5" 
-               Foreground="Red" 
-               FontWeight="Bold"/>
-        <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding AverageFuelConsumption, StringFormat=N2}" 
-                   VerticalAlignment="Center" 
-                   Margin="5" 
-                   Padding="5"/>
-        <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding RefuelRequired, StringFormat=N2}" 
-                   VerticalAlignment="Center" 
-                   Margin="5" 
-                   Padding="5"/>
-        <TextBlock Grid.Row="2" Grid.Column="3" Text="{Binding LapsOfFuelRemaining, StringFormat=N2}" 
-                   VerticalAlignment="Center" 
-                   Margin="5" 
-                   Padding="5"/>
+    <Border BorderBrush="#B3000000" BorderThickness="2" CornerRadius="5">
+        <Border.Clip>
+            <RectangleGeometry Rect="0,0,330,140" RadiusX="5" RadiusY="5"/>
+        </Border.Clip>
+        <Grid Background="#B3000000">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
 
-        <Label Grid.Row="3" Grid.Column="0" Content="5L" 
-               VerticalAlignment="Center"
-               Margin="5"
-               Foreground="Red"
-               FontWeight="Bold"/>
-        <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding FiveLapAverage, StringFormat=N2}" 
-           VerticalAlignment="Center" 
-           Margin="5" 
-           Padding="5"/>
-        <TextBlock Grid.Row="3" Grid.Column="2" Text="{Binding PitActive, StringFormat=N2}" 
-           VerticalAlignment="Center" 
-           Margin="5" 
-           Padding="5"/>
-        <TextBlock Grid.Row="3" Grid.Column="3" Text="{Binding Serviced, StringFormat=N2}" 
-           VerticalAlignment="Center" 
-           Margin="5" 
-           Padding="5"/>
-    </Grid>
+            <!-- First Row: Fuel and Race Laps Labels and Values -->
+            <Label Content="FUEL" Style="{StaticResource LabelStyle}"/>
+            <TextBlock Grid.Column="1" Text="{Binding CurrentFuelLevel, StringFormat=N2}" Style="{StaticResource TextBlockStyle}"/>
+            <Label Grid.Column="2" Content="LAPS REM" Style="{StaticResource LabelStyle}"/>
+            <TextBlock Grid.Column="3" Text="{Binding RaceLapsRemaining, StringFormat=N2}" Style="{StaticResource TextBlockStyle}"/>
+
+            <!-- Second Row: Column Headers -->
+            <Label Grid.Row="1" Content="" Style="{StaticResource LabelStyle}"/>
+            <Label Grid.Row="1" Grid.Column="1" Content="AVG" Style="{StaticResource LabelStyle}" />
+            <Label Grid.Row="1" Grid.Column="2" Content="REFUEL" Style="{StaticResource LabelStyle}"/>
+            <Label Grid.Row="1" Grid.Column="3" Content="LAPS OF FUEL" Style="{StaticResource LabelStyle}"/>
+            
+            <!-- Third Row: Values and Avg Label -->
+            <Label Grid.Row="2" Content="{Binding Strategies[0].Name}" Style="{StaticResource LabelStyle}" />
+            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding FuelConsumption, StringFormat=N2}" Style="{StaticResource TextBlockStyle}" DataContext="{Binding Strategies[0]}"/>
+            <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding RefuelAmount, StringFormat={}{0:F2}}" Style="{StaticResource RefuelRequiredTextBlockStyle}" DataContext="{Binding Strategies[0]}"/>
+            <TextBlock Grid.Row="2" Grid.Column="3" Text="{Binding LapsOfFuelRemaining, StringFormat={}{0:F2}}" Style="{StaticResource TextBlockStyle}" DataContext="{Binding Strategies[0]}"/>
+
+            <!-- Fourth Row: Values and Avg Label -->
+            <Label Grid.Row="3" Content="{Binding Strategies[1].Name}" Style="{StaticResource LabelStyle}" />
+            <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding FuelConsumption, StringFormat=N2}" Style="{StaticResource TextBlockStyle}" DataContext="{Binding Strategies[1]}"/>
+            <TextBlock Grid.Row="3" Grid.Column="2" Text="{Binding RefuelAmount, StringFormat={}{0:F2}}" Style="{StaticResource RefuelRequiredTextBlockStyle}" DataContext="{Binding Strategies[1]}"/>
+            <TextBlock Grid.Row="3" Grid.Column="3" Text="{Binding LapsOfFuelRemaining, StringFormat={}{0:F2}}" Style="{StaticResource TextBlockStyle}" DataContext="{Binding Strategies[1]}"/>
+
+            <!-- Fifth Row: 5L Data -->
+            <Label Grid.Row="4" Content="{Binding Strategies[2].Name}" Style="{StaticResource LabelStyle}"/>
+            <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding FuelConsumption, StringFormat=N2}" Style="{StaticResource TextBlockStyle}" DataContext="{Binding Strategies[2]}"/>
+            <TextBlock Grid.Row="4" Grid.Column="2" Text="{Binding RefuelAmount, StringFormat=N2}" Style="{StaticResource RefuelRequiredTextBlockStyle}" DataContext="{Binding Strategies[2]}"/>
+            <TextBlock Grid.Row="4" Grid.Column="3" Text="{Binding LapsOfFuelRemaining, StringFormat=N2}" Style="{StaticResource TextBlockStyle}" DataContext="{Binding Strategies[2]}"/>
+        </Grid>
+    </Border>
 </Window>

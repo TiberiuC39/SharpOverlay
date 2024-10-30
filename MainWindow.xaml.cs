@@ -35,7 +35,7 @@ namespace SharpOverlay
 
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            await CheckForUpdate();
+            //await CheckForUpdate();
         }
         
         private async Task CheckForUpdate()

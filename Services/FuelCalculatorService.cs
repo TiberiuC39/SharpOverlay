@@ -1,288 +1,404 @@
 ﻿using iRacingSdkWrapper;
+using iRacingSdkWrapper.JsonModels;
 using SharpOverlay.Models;
+using SharpOverlay.Services.LapServices;
+using SharpOverlay.Strategies;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading;
+using System.Windows.Documents;
 
 namespace SharpOverlay.Services
 {
-    public class FuelCalculatorService
+    public class FuelCalculatorService : IFuelCalculator
     {
-        private readonly iRacingTelemetryService _iRacingService;
-        private List<Lap> _completedLaps;
-        private Lap? _currentLap;
-        private float _currentFuelLevel;
+        private const int _defaultTickRate = 2;
+        private const double _fuelCutOff = 0.3;
+
+        private readonly iRacingDataService _iRacingService;
+        private readonly ISessionParser _sessionParser;
+        private readonly ITelemetryParser _telemetryParser;
+
+        private readonly List<IFuelStrategy> _strategyList;
+
+        private readonly ILapTracker _lapTracker;
+        private readonly ILapTimeCalculator _lapTimeCalculator;
+        private readonly ILapCountCalculator _lapCountCalculator;
+        private readonly ILapDataAnalyzer _lapAnalyzer;
+
+        private readonly IPitManager _pitManager;
+
+        private readonly Dictionary<int, List<Lap>> _driverLaps = [];
         private double _lapsRemainingInRace;
-        private int _raceTotalLaps;
-        private bool _onPitRoad;
-        private bool _isInService;
-        private bool _hasBegunService;
         private bool _isRaceStart;
-        private TimeSpan _averageLapTime;
-        private bool _isComingOutOfPits;
-        private bool _hasCompletedService;
-        private bool _isEnteringPits;
-        private bool _movedLapOnce;
-        private float _avgFuelPerLap;
-        private double _refuelRequired;
+        private TrackSurfaces _trackSurface;
+        private int _leaderIdx;
+        private int _playerIdx;
+        private bool _isOnPitRoad;
 
-        public FuelCalculatorService()
+        public bool IsInCar { get; private set; }
+        
+
+        public FuelCalculatorService(int tickRate = _defaultTickRate)
         {
-            _iRacingService = new iRacingTelemetryService();
-            _iRacingService.HookUpToTelemetryEvent(ExecuteOnTelemetryEvent);
+            _iRacingService = new iRacingDataService();
+            _sessionParser = new SessionParser();
+            _telemetryParser = new TelemetryParser();
+            _lapTracker = new LapTracker();
+            _lapTimeCalculator = new LapTimeCalculator();
+            _lapCountCalculator = new LapCountCalculator();
+            _lapAnalyzer = new LapDataAnalyzer();
+            _pitManager = new PitManager();
 
-            _completedLaps = new List<Lap>();
+            _strategyList = new List<IFuelStrategy>
+            {
+                new FullRaceStrategy(_fuelCutOff),
+                new LastLapStrategy(_fuelCutOff),
+                new FiveLapStrategy(_fuelCutOff)
+            };
+            
+            _iRacingService.HookUpToConnectedEvent(ExecuteOnConnected);
+            _iRacingService.HookUpToSessionEvent(ExecuteOnSessionEvent);
+            _iRacingService.HookUpToTelemetryEvent(ExecuteOnTelemetryEvent);
+            _iRacingService.HookUpToDisconnectedEvent(ExecuteOnDisconnected);
+        }
+
+        private void ExecuteOnDisconnected(object? sender, EventArgs args)
+        {
+            Clear();
+
+            FuelUpdated(this, new FuelEventArgs(GetViewModel()));
+        }
+
+        private void ExecuteOnConnected(object? sender, EventArgs args)
+        {
+            Initialize();
+        }
+
+        private void Initialize()
+        {
+            var sessionInfo = _iRacingService.GetSessionInfo();
+            var telemetry = _iRacingService.GetTelemetryInfo();
+
+            _telemetryParser.ParseCurrentSessionNumber(telemetry);
+            _sessionParser.ParseSessions(sessionInfo);
+
+            if (_sessionParser.Sessions.Count == 0)
+            {
+                Thread.Sleep(5000);
+                sessionInfo = _iRacingService.GetSessionInfo();
+                _sessionParser.ParseSessions(sessionInfo);
+            }
+
+            _sessionParser.ParseCurrentSessionType(sessionInfo, _telemetryParser.CurrentSessionNumber);
+            _sessionParser.ParseStartType(sessionInfo);
+            _sessionParser.ParseDrivers(sessionInfo);
+            _sessionParser.ParseLapsInSession(sessionInfo, _telemetryParser.CurrentSessionNumber);
+
+            _telemetryParser.ParsePlayerCarIdx(telemetry);
+            _telemetryParser.ParsePlayerCarClassId(telemetry);
+            _telemetryParser.ParsePositionCarIdxInPlayerClass(telemetry, _sessionParser.SessionType);
+            _telemetryParser.ParseFuelLevel(telemetry);
+            _telemetryParser.ParseCarIdxOnTrack(telemetry);
+
+            _lapAnalyzer.CollectAllDriversLaps(_sessionParser.Drivers,
+                TelemetryParser.GetDriversLastLapTime(telemetry, _sessionParser.SessionType),
+                telemetry.CarIdxLapCompleted.Value);
+
+            int leaderIdx = _lapAnalyzer.FindLeaderIdxInClass(_telemetryParser.PositionCarIdxInClass);
+            var averageLapTime = GetAverageLapTime(leaderIdx);
+
+            var timeRemaining = _telemetryParser.GetTimeRemaining(telemetry);
+
+            CalculateLapsRemaining(leaderIdx, timeRemaining, averageLapTime);
+
+            _strategyList.ForEach(s => s.UpdateRefuel((double) _telemetryParser.FuelLevel, _sessionParser.SessionLaps));
+        }
+
+        public event EventHandler<FuelEventArgs> FuelUpdated = null!;
+
+        private void Reset()
+        {
+            Clear();
+            Initialize();
         }
 
         private void Clear()
         {
-            _completedLaps.Clear();
-            _currentLap = null;
-            _currentFuelLevel = 0;
+            _driverLaps.Clear();
             _lapsRemainingInRace = 0;
-            _onPitRoad = false;
-            _hasBegunService = false;
-            _isInService = false;
-            _isRaceStart = false;
-            _isEnteringPits = false;
-            _isComingOutOfPits = false;
-            _movedLapOnce = false;
-            _refuelRequired = 0;
-        }
+            
+            _sessionParser.Clear();
+            _telemetryParser.Clear();
+            _lapTracker.Clear();
 
-        public void HookUpToSdkEvent(EventHandler<SdkWrapper.TelemetryUpdatedEventArgs> handler)
-        {
-            _iRacingService.HookUpToTelemetryEvent(handler);
+            _strategyList.ForEach(s => s.Clear());
+
+            FuelUpdated.Invoke(this, new FuelEventArgs(GetViewModel()));
         }
 
         private void ExecuteOnTelemetryEvent(object? sender, SdkWrapper.TelemetryUpdatedEventArgs eventArgs)
         {
-            var telemetry = _iRacingService.GetTelemetry();
+            var telemetry = eventArgs.TelemetryInfo;
 
-            if ((telemetry.SessionState.Value != SessionStates.Invalid || telemetry.SessionState.Value != SessionStates.CoolDown)
-                && telemetry.IsOnTrack.Value)
+            _telemetryParser.ParseCurrentSessionNumber(telemetry);
+            _telemetryParser.ParseSessionState(telemetry);
+
+            _trackSurface = telemetry.PlayerTrackSurface.Value;
+
+            IsInCar = telemetry.IsOnTrack.Value;
+
+            _telemetryParser.ParseFuelLevel(telemetry);
+            _telemetryParser.ParsePositionCarIdxInPlayerClass(telemetry, _sessionParser.SessionType);
+            _telemetryParser.ParsePlayerPctOnTrack(telemetry);
+            _telemetryParser.ParseCarIdxOnTrack(telemetry);
+
+            if (IsSessionStateValid())
             {
-                bool isOnPitRoad = telemetry.IsOnPitRoad.Value;
-                int currentLapNumber = telemetry.Lap.Value;
-                bool isReceivingPitService = telemetry.IsPitstopActive.Value;
+                _lapAnalyzer.CollectAllDriversLaps(_sessionParser.Drivers,
+                    TelemetryParser.GetDriversLastLapTime(telemetry, _sessionParser.SessionType),
+                    telemetry.CarIdxLapCompleted.Value);
 
-                UpdatePitEntryStatus(isOnPitRoad);
-                UpdatePitServiceStatus(isReceivingPitService);
+                ProcessTelemetryUpdate(telemetry);
+            }
+            else if (IsSessionStateInvalid())
+            {
+                Reset();
+            }
+            else if (!IsInCar
+                && telemetry.IsReplayPlaying.Value
+                && _lapTracker.GetCurrentLap() is not null)
+            {
+                _lapTracker.ResetCurrentLap();
+            }
 
-                if (_currentLap is null)
+            _strategyList.ForEach(s => s.UpdateLapsOfFuelRemaining(_telemetryParser.FuelLevel));
+
+            FuelUpdated(this, new FuelEventArgs(GetViewModel()));
+        }
+
+        private bool IsSessionStateValid()
+        {
+            return (_telemetryParser.SessionState == SessionStates.Racing
+                            || _telemetryParser.SessionState == SessionStates.GetInCar
+                            || _telemetryParser.SessionState == SessionStates.CoolDown
+                            || _telemetryParser.SessionState == SessionStates.ParadeLaps
+                            || _telemetryParser.SessionState == SessionStates.Checkered);
+        }
+
+        private bool IsSessionStateInvalid()
+        {
+            return _telemetryParser.HasSwitchedSessions
+                            || _telemetryParser.SessionState == SessionStates.Invalid
+                            || _telemetryParser.SessionState == SessionStates.Warmup;
+        }
+
+        private void ExecuteOnSessionEvent(object? sender, SdkWrapper.SessionUpdatedEventArgs eventArgs)
+        {
+            var sessionInfo = eventArgs.SessionInfo;
+
+            _sessionParser.ParseLapsInSession(sessionInfo, _telemetryParser.CurrentSessionNumber);
+            _sessionParser.ParseCurrentSessionType(sessionInfo, _telemetryParser.CurrentSessionNumber);
+
+            _sessionParser.ParseDrivers(sessionInfo);
+            _sessionParser.ParseSessions(sessionInfo);
+        }
+
+        private void ProcessTelemetryUpdate(TelemetryInfo telemetry)
+        {
+            int currentLapNumber = telemetry.Lap.Value;
+            bool isOnPitRoad = telemetry.IsOnPitRoad.Value;
+            bool isReceivingPitService = telemetry.IsPitstopActive.Value;
+
+            _pitManager.UpdatePitRoadStatus(isOnPitRoad);
+            _pitManager.UpdatePitServiceStatus(isReceivingPitService);
+
+            double currentFuelLevel = _telemetryParser.FuelLevel;
+
+            var currentLap = _lapTracker.GetCurrentLap();
+            int enterExitResetButton = telemetry.EnterExitReset.Value;
+
+            if (currentLap is null)
+            {
+                _lapTracker.StartNewLap(currentLapNumber, currentFuelLevel);
+
+                var sessionState = _telemetryParser.SessionState;
+                var sessionType = _sessionParser.SessionType;
+
+                if (IsRaceStart(sessionState, currentLapNumber, sessionType))
                 {
-                    StartNewLap(telemetry);
-
-                    if (IsRaceStart(currentLapNumber))
-                    {
-                        _isRaceStart = true;
-                    }
-                }                
-                else if (_hasBegunService && !_hasCompletedService && !_movedLapOnce)
-                {
-                    CompleteCurrentLap(telemetry);
-
-                    _movedLapOnce = true;
+                    _isRaceStart = true;
                 }
-                else if (_hasBegunService && _hasCompletedService && _movedLapOnce)
+            }
+            else if (_isRaceStart && currentLapNumber == 2) // Simulator flickers quickly to lap 2 after the going through start finish line on lap 0 to 1
+            {
+                _isRaceStart = false;
+            }
+            else if (_pitManager.HasResetToPits(enterExitResetButton))
+            {
+                if (currentLapNumber == 0)
                 {
-                    StartNewLap(telemetry);
-                    _currentLap.Number++;
-
-                    _hasBegunService = false;
-                    _hasCompletedService = false;
-
-                    _isComingOutOfPits = true;
-
-                    if (_avgFuelPerLap > 0)
-                    {
-                        _refuelRequired = CalculateRefuel(_currentLap.StartingFuel);
-                    }
+                    currentLap.Number++;
                 }
-                else if (IsCrossingFinishLine(currentLapNumber))
+                currentLap.StartingFuel = currentFuelLevel;
+
+                _strategyList.ForEach(s => s.UpdateRefuel(currentLap.StartingFuel, (int) _lapsRemainingInRace));
+            }
+            else if (_pitManager.HasBegunService())
+            {
+                var lastLapTime = TimeSpan.FromSeconds(telemetry.LapLastLapTime.Value);
+                double timeRemaining = telemetry.SessionTimeRemain.Value;
+
+                _lapTracker.CompleteCurrentLap(_telemetryParser.FuelLevel, lastLapTime);
+                CalculateFuelAndLapData(timeRemaining);
+
+                _pitManager.ResetBegunServiceStatus();
+            }
+            else if (_pitManager.HasFinishedService())
+            {
+                int lastLapnumber = _lapTracker.GetCompletedLaps().Last().Number;
+
+                if (lastLapnumber == currentLapNumber)
                 {
-                    if (_isRaceStart)
-                    {
-                        _isRaceStart = false;
-                    }
-                    else if (!_isComingOutOfPits && !_onPitRoad)
-                    {
-                        CompleteCurrentLap(telemetry);
-                        StartNewLap(telemetry);
-                    }
-                    else if (_isComingOutOfPits && _movedLapOnce)
-                    {
-                        _isComingOutOfPits = false;
-                        _movedLapOnce = false;
-                    }                    
-
-                    _averageLapTime = CalculateAverageTime();
-
-                    if (_averageLapTime.TotalSeconds > 0)
-                    {
-                        var timeRemainingInSession = TimeSpan.FromSeconds(telemetry.SessionTimeRemain.Value);
-
-                        CalculateLapsRemaining(timeRemainingInSession);
-                    }
-
-                    _avgFuelPerLap = CalculateAverageFuelConsumption();
-
-                    if (_avgFuelPerLap > 0)
-                    {
-                        _refuelRequired = CalculateRefuel(_currentLap.StartingFuel);
-                    }
-
-                    _raceTotalLaps = telemetry.RaceLaps.Value;
+                    currentLapNumber++;
                 }
 
-                _currentFuelLevel = telemetry.FuelLevel.Value;
-            }
-            else if (telemetry.SessionState.Value == SessionStates.Invalid)
-            {
-                Clear();
-            }
-            else if (!telemetry.IsOnTrack.Value && telemetry.IsReplayPlaying.Value && _currentLap is not null)
-            {
-                _currentLap = null;
-            }
-        }
+                _lapTracker.StartNewLap(currentLapNumber, currentFuelLevel);
 
-        private float CalculateAverageFuelConsumption()
-        {
-            if (_completedLaps.Count > 1)
-            {
-                return _completedLaps.Skip(1).Average(l => l.FuelUsed);
-            }
+                _strategyList.ForEach(s => s.UpdateRefuel(currentLap.StartingFuel, (int)_lapsRemainingInRace));
 
-            return default;
-        }
-
-        private void UpdatePitServiceStatus(bool isReceivingPitService)
-        {
-            if (isReceivingPitService == true && _isInService == false)
-            {
-                _hasBegunService = true;
-                _isInService = true;
-                _hasCompletedService = false;
+                _pitManager.ResetFinishedServiceStatus();
             }
-            else if (isReceivingPitService == false && _isInService == true)
+            else if (IsCrossingFinishLine(currentLapNumber, currentLap.Number) && !_isOnPitRoad && telemetry.SessionState.Value != SessionStates.ParadeLaps)
             {
-                _isInService = false;
-                _hasCompletedService = true;
-            }            
-        }
+                var lastLapTime = TimeSpan.FromSeconds(telemetry.LapLastLapTime.Value);
+                double timeRemaining = telemetry.SessionTimeRemain.Value;
 
-        private void UpdatePitEntryStatus(bool isOnPitRoad)
-        {
-            if (isOnPitRoad == true && _isEnteringPits == false)
-            {
-                _isEnteringPits = true;
-            }
-            else if (isOnPitRoad == false && _isEnteringPits == true)
-            {
-                _isEnteringPits = false;
+                _lapTracker.CompleteCurrentLap(_telemetryParser.FuelLevel, lastLapTime);
+                _lapTracker.StartNewLap(currentLapNumber, currentFuelLevel);
+
+                CalculateFuelAndLapData(timeRemaining);
             }
         }
 
-        private bool IsCrossingFinishLine(int currentLapNumber)
-            => currentLapNumber > _currentLap!.Number;
-
-        private bool IsRaceStart(int currentLapNumber)
-            => currentLapNumber < 0;        
-
-        private void CalculateLapsRemaining(TimeSpan timeRemainingInSession)
+        private static bool IsRaceStart(SessionStates sessionState, int currentLapNumber, SessionType sessionType)
         {
-            _lapsRemainingInRace = Math.Ceiling(timeRemainingInSession / _averageLapTime);
+            return (sessionState == SessionStates.Racing || sessionState == SessionStates.ParadeLaps)
+                                && currentLapNumber == 0 && sessionType == SessionType.Race;
+        }
 
-            if (_lapsRemainingInRace > 1000)
+        private static bool IsCrossingFinishLine(int currentLapNumberTelemetry, int currentLapNumberTracked)
+            => currentLapNumberTelemetry > currentLapNumberTracked;
+
+        private void CalculateFuelAndLapData(double timeRemaining)
+        {
+            int leaderIdx;
+
+            if (_sessionParser.SessionType == SessionType.Practice)
             {
-                _lapsRemainingInRace = 1000;
+                leaderIdx = _playerIdx;
+            }
+            else
+            {
+                leaderIdx = _lapAnalyzer.FindLeaderIdxInClass(_telemetryParser.PositionCarIdxInClass);
+            }
+
+            var averageLapTime = GetAverageLapTime(leaderIdx);
+
+            var timeRemainingInSession = TimeSpan.FromSeconds(timeRemaining);
+
+            CalculateLapsRemaining(leaderIdx, timeRemainingInSession, averageLapTime);
+
+            foreach (var strategy in _strategyList)
+            {
+                strategy.Calculate(_lapTracker.GetCompletedLaps(), (int) _lapsRemainingInRace);
             }
         }
 
-        private TimeSpan CalculateAverageTime()
+        private void CalculateLapsRemaining(int leaderIdx, TimeSpan timeRemainingInSession, TimeSpan averageLapTime)
         {
-            if (_completedLaps.Count > 1 && _completedLaps.Any(l => l.Time >= TimeSpan.Zero))
+            if (_sessionParser.SessionLaps > 0)
             {
-                var averageLapTime = TimeSpan.FromSeconds(_completedLaps
-                    .Skip(1)
-                .Where(l => l.Time >= TimeSpan.Zero)
-                .Average(l => l.Time.TotalSeconds));
-                
-                return averageLapTime;
+                int completedLaps = _lapTracker.GetCompletedLapsCount();
+                var startType = _sessionParser.StartType;
+                var sessionType = _sessionParser.SessionType;
+
+                _lapsRemainingInRace = _lapCountCalculator.CalculateLapsRemaining(_sessionParser.SessionLaps, completedLaps, sessionType, startType);
+            }
+            else if (averageLapTime > TimeSpan.Zero)
+            {
+                float leaderPctOnTrack = _telemetryParser.CarIdxPctOnTrack[leaderIdx];
+
+                _lapsRemainingInRace = _lapCountCalculator.CalculateLapsRemaining(leaderPctOnTrack, timeRemainingInSession, averageLapTime);
+            }
+        }
+
+        private TimeSpan GetAverageLapTime(int driverIdx)
+        {
+            if (driverIdx < 0)
+            {
+                return TimeSpan.Zero;
             }
 
-            return TimeSpan.Zero;
-        }        
+            var driverLaps = _lapAnalyzer.GetDriversLaps()[driverIdx];
 
-        private void StartNewLap(TelemetryOutput telemetry)
+            return _lapTimeCalculator.CalculateLapTime(driverLaps);
+        }
+
+        private FuelViewModel GetViewModel()
         {
-            int currentLap = telemetry.Lap.Value;
-            float startingFuel = telemetry.FuelLevel.Value;
-
-            if (_currentLap is null)
+            var strategies = new ObservableCollection<StrategyViewModel>
             {
-                currentLap++;
-            }           
-
-            var newLap = new Lap()
-            {
-                Number = currentLap,
-                StartingFuel = startingFuel
+                _strategyList[0].GetView(),
+                _strategyList[1].GetView(),
+                _strategyList[2].GetView()
             };
 
-            _currentLap = newLap;
-        }
+            var completedLaps = _lapTracker.GetCompletedLaps();
 
-        private void CompleteCurrentLap(TelemetryOutput telemetry)
-        {
-            _currentLap!.EndingFuel = telemetry.FuelLevel.Value;
-            _currentLap.Time = TimeSpan.FromSeconds(telemetry.LapLastLapTime.Value);
-            _currentLap.FuelUsed = _currentLap.StartingFuel - _currentLap.EndingFuel;
-
-            _completedLaps.Add(_currentLap);
-        }
-
-        public FuelViewModel GetViewModel()
-        {
-            float fiveLapAverage = 0;
-
-            if (_completedLaps.Count > 5)
-            {
-                fiveLapAverage = _completedLaps.TakeLast(5).Average(l => l.FuelUsed);
-            }
-
-            if (_completedLaps.Count > 1)
+            if (completedLaps.Count > 1)
             {
                 return new FuelViewModel()
                 {
-                    ConsumedFuel = _completedLaps.Sum(l => l.FuelUsed),
-                    AverageFuelConsumption = _avgFuelPerLap,
-                    LapsCompleted = _completedLaps.Count,
-                    CurrentFuelLevel = _currentFuelLevel,
-                    LapsOfFuelRemaining = _currentFuelLevel / _avgFuelPerLap,
-                    TotalRaceLaps = _raceTotalLaps,
-                    RefuelRequired = _refuelRequired,
-                    PitRoad = _onPitRoad,
-                    PitActive = _isInService,
-                    Serviced = _hasBegunService,
-                    FiveLapAverage = fiveLapAverage
+                    Strategies = strategies,
+
+                    ConsumedFuel = completedLaps.Sum(l => l.FuelUsed),
+                    LapsCompleted = completedLaps.Count,
+                    CurrentFuelLevel = _telemetryParser.FuelLevel,
+                    RaceLapsRemaining = _lapsRemainingInRace,
+
+                    IsRollingStart = _sessionParser.StartType == StartType.Rolling,
+                    IsRaceStart = _isRaceStart,
+                    LeaderIdx = _leaderIdx,
+                    CurrentSessionNumber = _telemetryParser.CurrentSessionNumber,
+                    CurrentLap = _lapTracker.GetCurrentLap(),
+                    PlayerIdx = _playerIdx,
+                    IsOnPitRoad = _isOnPitRoad,
+                    TrackSurface = _trackSurface,
+                    SessionState = _telemetryParser.SessionState
                 };
             }
 
             return new FuelViewModel()
             {
-                CurrentFuelLevel = _currentFuelLevel
+                Strategies = strategies,
+
+                CurrentFuelLevel = _telemetryParser.FuelLevel,
+                LapsCompleted = completedLaps.Count,
+                RaceLapsRemaining = _lapsRemainingInRace,
+
+                IsRollingStart = _sessionParser.StartType == StartType.Rolling,
+                IsRaceStart = _isRaceStart,
+                LeaderIdx = _leaderIdx,
+                CurrentSessionNumber = _telemetryParser.CurrentSessionNumber,
+                CurrentLap = _lapTracker.GetCurrentLap(),
+                PlayerIdx = _playerIdx,
+                IsOnPitRoad = _isOnPitRoad,
+                TrackSurface = _trackSurface,
+                SessionState = _telemetryParser.SessionState
             };
-        }
-
-        private double CalculateRefuel(float fuelLeftInCar)
-        {
-            var refuelRequired = _lapsRemainingInRace * _avgFuelPerLap - fuelLeftInCar;
-
-            //TODO Calculate for fuel cutoff point            
-
-            return refuelRequired;
         }
     }
 }
