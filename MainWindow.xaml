@@ -6,7 +6,7 @@
         xmlns:converter="clr-namespace:SharpOverlay.Converters"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" xmlns:hc="https://handyorg.github.io/handycontrol" xmlns:models="clr-namespace:SharpOverlay.Models" xmlns:colorpicker="clr-namespace:ColorPicker;assembly=ColorPicker" x:Class="SharpOverlay.MainWindow"
     mc:Ignorable="d"
-        Title="Sharp Overlay" Height="507" Width="1189" ResizeMode="CanMinimize" Style="{StaticResource MaterialDesignWindow}" SizeToContent="WidthAndHeight" Icon="/Media/sharpoverlayicon.png" Loaded="Window_Loaded">
+        Title="Sharp Overlay" Height="507" Width="1189" ResizeMode="CanMinimize" Style="{StaticResource MaterialDesignWindow}" SizeToContent="WidthAndHeight" Icon="/Media/sharpoverlayicon.png" Loaded="Window_Loaded" >
 
     <Grid Margin="0,0,0,-6" Width="1200" Height="500">
         <Grid.RowDefinitions>
@@ -68,7 +68,8 @@
                                                      ShowAlpha="True" Margin="210,73,211,392" Grid.ColumnSpan="2" />
                         <ToggleButton x:Name="barSpotterToggleButton"
                       Style="{StaticResource MaterialDesignSwitchToggleButton}"
-                      Grid.Column="1" Margin="204,-22,10,406" IsChecked="{Binding IsEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Checked="windowToggle" Unchecked="windowToggle">
+                      Grid.Column="1" Margin="204,-22,10,406" IsChecked="{Binding IsEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      Checked="windowToggle" Unchecked="windowToggle">
                             <materialDesign:ToggleButtonAssist.SwitchTrackOnBackground>
                                 <SolidColorBrush Color="Green" />
                             </materialDesign:ToggleButtonAssist.SwitchTrackOnBackground>
@@ -78,14 +79,19 @@
                             </materialDesign:ToggleButtonAssist.SwitchTrackOffBackground>
                         </ToggleButton>
                         <Label Grid.Column="1" Content="Active" HorizontalAlignment="Left" Margin="123,18,0,0" VerticalAlignment="Top"/>
-                        <Label Content="Positioning mode" HorizontalAlignment="Left" Margin="67,446,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.044,-0.259" Height="40" Width="132" Grid.Column="1"/>
+                        <Label Content="Positioning mode" HorizontalAlignment="Left" Margin="67,446,0,0" VerticalAlignment="Top"
+                               RenderTransformOrigin="-0.044,-0.259" Height="40" Width="132" Grid.Column="1"/>
                         <ToggleButton x:Name="testModeToggle"
              ToolTip="Toggle to render the bars and position them"
             Style="{StaticResource MaterialDesignSwitchToggleButton}"
-            Margin="204,408,10,-24" IsChecked="{Binding TestMode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" materialDesign:ToggleButtonAssist.SwitchTrackOnBackground="DarkGreen" materialDesign:ToggleButtonAssist.SwitchTrackOffBackground="Red" Grid.Column="1"/>
+            Margin="204,408,10,-24" IsChecked="{Binding TestMode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                      materialDesign:ToggleButtonAssist.SwitchTrackOnBackground="DarkGreen"
+                                      materialDesign:ToggleButtonAssist.SwitchTrackOffBackground="Red" Grid.Column="1"/>
                         <ToggleButton x:Name="barSpotterToggleButton_Copy"
                             Style="{StaticResource MaterialDesignSwitchToggleButton}"
-                            Grid.Column="1" Margin="204,-22,9,406" IsChecked="{Binding IsEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Checked="windowToggle" Unchecked="windowToggle" materialDesign:ToggleButtonAssist.SwitchTrackOnBackground="Green" materialDesign:ToggleButtonAssist.SwitchTrackOffBackground="Red"/>
+                            Grid.Column="1" Margin="204,-22,9,406" IsChecked="{Binding IsEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      Checked="windowToggle" Unchecked="windowToggle" materialDesign:ToggleButtonAssist.SwitchTrackOnBackground="Green" 
+                                      materialDesign:ToggleButtonAssist.SwitchTrackOffBackground="Red"/>
 
                     </Grid>
                 </TabItem>
@@ -177,7 +183,42 @@ Grid.Column="1" Margin="204,-22,10,406" IsChecked="{Binding IsEnabled, Mode=TwoW
             Margin="204,408,10,-24" IsChecked="{Binding TestMode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" materialDesign:ToggleButtonAssist.SwitchTrackOnBackground="DarkGreen" materialDesign:ToggleButtonAssist.SwitchTrackOffBackground="Red" Grid.Column="1"/>
                     </Grid>
                 </TabItem>
-                <Label Content="Active" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                
+                
+                <TabItem Header="FuelCalculator" FontFamily="pack://application:,,,/SharpOverlay;component/Fonts/#EurostileExtendedBlack">
+                    <Grid DataContext="{Binding FuelSettings}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <ToggleButton x:Name="fuelCalculatorToggleButton"
+                            Style="{StaticResource MaterialDesignSwitchToggleButton}"
+                            Grid.Column="1" Margin="104,-22,10,406" IsChecked="{Binding IsEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Checked="windowToggle" Unchecked="windowToggle">
+                            <materialDesign:ToggleButtonAssist.SwitchTrackOnBackground>
+                                <SolidColorBrush Color="Green" />
+                            </materialDesign:ToggleButtonAssist.SwitchTrackOnBackground>
+                            <materialDesign:ToggleButtonAssist.SwitchTrackOffBackground>
+                                <SolidColorBrush Color="Red" />
+                            </materialDesign:ToggleButtonAssist.SwitchTrackOffBackground>
+                        </ToggleButton>
+                        <Label Grid.Column="1" Content="Active" HorizontalAlignment="Left" Margin="74,17,0,0" VerticalAlignment="Top"/>
+                        <!--<ToggleButton x:Name="fuelPositioningModeToggle"
+                                ToolTip="Toggle to render the positioning View"
+                                Style="{StaticResource MaterialDesignSwitchToggleButton}"
+                                Margin="90,0,0,-136" IsChecked="{Binding PositioningMode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                materialDesign:ToggleButtonAssist.SwitchTrackOnBackground="DarkGreen"
+                                materialDesign:ToggleButtonAssist.SwitchTrackOffBackground="Red" Grid.Column="1"/>
+                        <Label Grid.Column="1" Content="Reposition" HorizontalAlignment="Left" Margin="10,0,0,166" VerticalAlignment="Bottom"/>-->
+                        <ToggleButton x:Name="fuelTestModeToggle"
+                            ToolTip="Toggle to render the debug fuel View"
+                            Style="{StaticResource MaterialDesignSwitchToggleButton}"
+                            Margin="104,308,10,-24" IsChecked="{Binding TestMode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                            materialDesign:ToggleButtonAssist.SwitchTrackOnBackground="DarkGreen"
+                            materialDesign:ToggleButtonAssist.SwitchTrackOffBackground="Red" Grid.Column="1"/>
+                        <Label Grid.Column="1" Content="Debug" HorizontalAlignment="Left" Margin="50,0,0,66" VerticalAlignment="Bottom"/>
+                        
+                    </Grid>
+                </TabItem>
             </TabControl>
 
 

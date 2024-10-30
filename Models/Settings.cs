@@ -211,6 +211,15 @@ namespace SharpOverlay.Models
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
+        public InputGraphSettings()
+        {
+            ThrottleColor = new SolidColorBrush(Colors.Green);
+            BrakeColor = new SolidColorBrush(Colors.Red);
+            ClutchColor = new SolidColorBrush(Colors.Blue);
+            UseRawValues = true;
+            ShowClutch = true;
+        }
+
     }
 
     public class WindSettings : INotifyPropertyChanged
@@ -253,10 +262,51 @@ namespace SharpOverlay.Models
         }
 
     }
+    
+    public class FuelSettings : INotifyPropertyChanged
+    {
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        private bool _isEnabled;
+
+        public bool IsEnabled
+        {
+            get => _isEnabled;
+            set
+            {
+                _isEnabled = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsEnabled)));
+            }
+        }
+
+        private bool _testMode;
+        public bool TestMode
+        {
+            get => _testMode;
+            set
+            {
+                _testMode = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(TestMode)));
+            }
+        }
+
+        private bool _positioningMode;
+
+        public bool PositioningMode
+        {
+            get => _positioningMode;
+            set
+            {
+                _positioningMode = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PositioningMode)));
+            }
+        }
+    }
+  
     public class GeneralSettings : INotifyPropertyChanged
     {
         private bool _useHardwareAcceleration;
-
+        
         public bool UseHardwareAcceleration
         {
             get => _useHardwareAcceleration;
@@ -269,12 +319,14 @@ namespace SharpOverlay.Models
 
         public event PropertyChangedEventHandler? PropertyChanged;
     }
+
     public class Settings : INotifyPropertyChanged
     {
         public GeneralSettings GeneralSettings { get; set; }
         public BarSpotterSettings BarSpotterSettings { get; set; }
         public InputGraphSettings InputGraphSettings { get; set; }
         public WindSettings WindSettings { get; set; }
+        public FuelSettings FuelSettings { get; set; }
         public bool IsUpdate { get; set; }
         
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -285,6 +337,7 @@ namespace SharpOverlay.Models
             InputGraphSettings = new InputGraphSettings();
             BarSpotterSettings = new BarSpotterSettings();
             WindSettings = new WindSettings();
+            FuelSettings = new FuelSettings();
         }
     }
 }

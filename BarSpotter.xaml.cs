@@ -31,7 +31,7 @@ namespace SharpOverlay
             this.DataContext = App.appSettings.BarSpotterSettings;
             Services.JotService.tracker.Track(this);
 
-            iracingWrapper.SessionInfoUpdated += iracingWrapper_SessionInfoUpdated;
+            iracingWrapper.SessionUpdated += iracingWrapper_SessionInfoUpdated;
             iracingWrapper.TelemetryUpdated += iracingWrapper_TelemetryUpdated;
             iracingWrapper.Connected += iracingWrapper_Connected;
             iracingWrapper.Disconnected += iracingWrapper_Disconnected;
@@ -81,9 +81,9 @@ namespace SharpOverlay
             rect.Width = App.appSettings.BarSpotterSettings.BarWidth;
             rect.Fill = App.appSettings.BarSpotterSettings.BarColor;
         }
-        private void iracingWrapper_SessionInfoUpdated(object sender, SdkWrapper.SessionInfoUpdatedEventArgs e)
+        private void iracingWrapper_SessionInfoUpdated(object sender, SdkWrapper.SessionUpdatedEventArgs e)
         {
-            trackLen = float.Parse(e.SessionInfo["WeekendInfo"]["TrackLength"].GetValue("0").Replace(" km", "")) * 1000f;
+            trackLen = (float) (e.SessionInfo.WeekendInfo.TrackLength * 1000f);
 
             isUpdatingDrivers = true;
             this.ParseDrivers(e.SessionInfo);
@@ -110,9 +110,10 @@ namespace SharpOverlay
             do
             {
                 driver = null;
-                YamlQuery query = sessionInfo["DriverInfo"]["Drivers"]["CarIdx", id];
+                var racer = sessionInfo.Drivers.FirstOrDefault(d => d.CarIdx == id);
 
-                string name = query["UserName"].GetValue();
+                string name = racer?.UserName;
+
                 if (name != null && name != "Pace Car")
                 {
                     if (drivers.Any())
@@ -125,7 +126,7 @@ namespace SharpOverlay
                         driver = new Driver();
                         driver.Id = id;
                         driver.Name = name;
-                        driver.Number = query["CarNumber"].GetValue("").TrimStart('\"').TrimEnd('\"'); // trim the quotes
+                        driver.Number = racer.CarNumber.ToString();
 
                     }
                     newDrivers.Add(driver);
@@ -139,7 +140,6 @@ namespace SharpOverlay
         }
         private void UpdateDriversTelemetry(TelemetryInfo info)
         {
-
             Driver? me = drivers.Find(d => d.Id == iracingWrapper.DriverId);
 
             var laps = info.CarIdxLap.Value;
@@ -147,6 +147,7 @@ namespace SharpOverlay
             var trackSurfaces = info.CarIdxTrackSurface.Value;
             var minRelative = float.MaxValue;
             var difference = 100f;
+            
             foreach (Driver driver in drivers)
             {
                 driver.LapDistance = lapDistances[driver.Id];
@@ -167,6 +168,9 @@ namespace SharpOverlay
 
                     driver.RelativeLapDistance = relative;
                     relatives[driver] = relative;
+
+                    var closestDriver = relatives.OrderBy(e => Math.Abs(e.Value - 0)).FirstOrDefault();
+                    closestCar = closestDriver.Value;
 
                     foreach(var r in relatives.Values)
                     {
@@ -250,7 +254,6 @@ namespace SharpOverlay
 
             }
             Canvas.SetTop(rect, topPos);
-
         }
 
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
