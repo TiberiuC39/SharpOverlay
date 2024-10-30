@@ -16,12 +16,18 @@ namespace SharpOverlay.Services
         public StartType StartType { get; private set; }
         public SessionType SessionType { get; private set; }
         public int SessionLaps { get; private set; }
+        public int PaceCarIdx { get; private set; }
 
         public void ParseDrivers(SessionInfo sessionInfo)
         {
             var drivers = sessionInfo.Drivers.ToDictionary(d => d.CarIdx, d => d);
 
             Drivers = drivers;
+        }
+
+        public void ParsePaceCarIdx(SessionInfo sessionInfo)
+        {
+            PaceCarIdx = sessionInfo.Player.PaceCarIdx;
         }
 
         public void ParseSessions(SessionInfo sessionInfo)

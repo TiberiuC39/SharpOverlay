@@ -6,6 +6,7 @@
         void ResetBegunServiceStatus();
         void ResetFinishedServiceStatus();
         void UpdatePitRoadStatus(bool isOnPitRoad);
+        bool IsOnPitRoad();
         bool HasBegunService();
         bool HasFinishedService();
         bool HasResetToPits(int enterExitResetButton);

@@ -10,6 +10,11 @@ namespace SharpOverlay.Services.LapServices
     {
         private readonly Dictionary<int, List<Lap>> _driversLaps = [];
 
+        public void Clear()
+        {
+            _driversLaps.Clear();
+        }
+
         public void CollectAllDriversLaps(Dictionary<int, Racer> drivers, Dictionary<int, TimeSpan> lastLapTimes, int[] carIdxLapsCompleted)
         {
             foreach ((int idx, _) in drivers)
