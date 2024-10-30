@@ -183,11 +183,6 @@ namespace SharpOverlay.Services
             {
                 currentLap.StartingFuel = simulationOutput.FuelLevel;
 
-                if (currentLap.Number == simulationOutput.CurrentLapNumber)
-                {
-                    currentLap.Number++;
-                }
-
                 _strategyList.ForEach(s => s.UpdateRefuel(currentLap.StartingFuel, _lapsRemainingInRace));
             }
             else if (_pitManager.HasBegunService())
@@ -250,7 +245,7 @@ namespace SharpOverlay.Services
             {
                 _lapsRemainingInRace = _lapCountCalculator.CalculateLapsRemaining(_sessionParser.SessionLaps, simulationOutput.CarIdxLapCompleted[leaderIdx]);
             }
-            else
+            else if (leaderIdx >= 0)
             {
                 var averageLapTime = GetAverageLapTime(leaderIdx);
 

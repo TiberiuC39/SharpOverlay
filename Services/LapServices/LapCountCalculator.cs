@@ -7,9 +7,14 @@ namespace SharpOverlay.Services.LapServices
     {
         public int CalculateLapsRemaining(float leaderPctOnTrack, TimeSpan timeRemainingInSession, TimeSpan averageLapTime)
         {
-            TimeSpan leaderTimeToCompleteLap = (1 - leaderPctOnTrack) * averageLapTime;
+            if (averageLapTime > TimeSpan.Zero)
+            {
+                TimeSpan leaderTimeToCompleteLap = (1 - leaderPctOnTrack) * averageLapTime;
 
-            return (int)Math.Ceiling((timeRemainingInSession - leaderTimeToCompleteLap) / averageLapTime) + 1;
+                return (int)Math.Ceiling((timeRemainingInSession - leaderTimeToCompleteLap) / averageLapTime) + 1;
+            }
+
+            return default;
         }
 
         public int CalculateLapsRemaining(int sessionLaps, int completedLaps)
