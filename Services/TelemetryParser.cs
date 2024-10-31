@@ -14,10 +14,11 @@ namespace SharpOverlay.Services
         public bool HasSwitchedSessions { get; private set; }
         public Dictionary<int, int> PositionCarIdxInClass { get; private set; } = [];
         public Dictionary<int, int> PositionCarIdxInRace { get; private set; } = [];
+        public int[] CarIdxLapCompleted { get; private set; } = null!;
         public SessionStates SessionState { get; private set; }
 
         public double PlayerPctOnTrack { get; private set; }
-        public float[] CarIdxPctOnTrack { get; private set; }
+        public float[] CarIdxPctOnTrack { get; private set; } = null!;
 
         public double FuelLevel { get; private set; }
 
@@ -26,20 +27,21 @@ namespace SharpOverlay.Services
             SessionState = telemetry.SessionState.Value;
         }
 
-        public void ParsePositionCarIdxInPlayerClass(TelemetryInfo telemetry, SessionType sessionType = SessionType.Practice)
+        public void ParseCarIdxLapCompleted(TelemetryInfo telemetry)
         {
-            int firstRacerIndex = 0;
+            CarIdxLapCompleted = telemetry.CarIdxLapCompleted.Value;
+        }
 
-            if (sessionType == SessionType.Race)
-            {
-                firstRacerIndex = 1;
-            }
-
+        public void ParsePositionCarIdxInPlayerClass(TelemetryInfo telemetry, int paceCarIdx)
+        {
             var carIdxClass = telemetry.CarIdxClass.Value;
             var carIdxPositions = telemetry.CarIdxPosition.Value;
-
-            for (int idx = firstRacerIndex; idx < carIdxClass.Length; idx++)
+            
+            for (int idx = 0; idx < carIdxClass.Length; idx++)
             {
+                if (idx == paceCarIdx)
+                    continue;
+
                 if (carIdxClass[idx] == PlayerCarClassId)
                 {
                     var currentPosition = carIdxPositions[idx];
@@ -97,26 +99,24 @@ namespace SharpOverlay.Services
             if (CurrentSessionNumber != currentSessionNumber)
             {
                 HasSwitchedSessions = true;
-            }                        
+            }
+            else if (HasSwitchedSessions)
+            {
+                HasSwitchedSessions = false;
+            }
 
             CurrentSessionNumber = currentSessionNumber;
         }
 
-        public static Dictionary<int, TimeSpan> GetDriversLastLapTime(TelemetryInfo telemetry, SessionType sessionType = SessionType.Practice)
+        public static Dictionary<int, TimeSpan> GetDriversLastLapTime(int paceCarIdx, float[] lapTimes)
         {
-            int firstDriverIndex = 0;
-
-            if (sessionType == SessionType.Race)
-            {
-                // 0 is pace car IN RACE
-                firstDriverIndex = 1;
-            }
-
-            var lapTimes = telemetry.CarIdxLastLapTime.Value;
             var driversLastLaps = new Dictionary<int, TimeSpan>();
 
-            for (int idx = firstDriverIndex; idx < lapTimes.Length; idx++)
+            for (int idx = 0; idx < lapTimes.Length; idx++)
             {
+                if (idx == paceCarIdx)
+                    continue;
+
                 float lapTime = lapTimes[idx];
 
                 driversLastLaps.Add(idx, TimeSpan.FromSeconds(lapTime));

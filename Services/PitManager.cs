@@ -20,6 +20,8 @@
 
         public bool HasFinishedService()
             => _hasCompletedService;
+        public bool IsOnPitRoad()
+            => _isOnPitRoad;
 
         public bool HasResetToPits(int enterExitResetButton)
             => enterExitResetButton == 0;
@@ -59,5 +61,7 @@
         {
             _hasCompletedService = false;
         }
+
+        
     }
 }
