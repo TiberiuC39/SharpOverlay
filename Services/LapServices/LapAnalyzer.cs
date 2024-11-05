@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace SharpOverlay.Services.LapServices
 {
-    public class LapDataAnalyzer : ILapDataAnalyzer
+    public class LapAnalyzer : IClear
     {
         private readonly Dictionary<int, List<Lap>> _driversLaps = [];
 
@@ -52,5 +52,23 @@ namespace SharpOverlay.Services.LapServices
 
         public Dictionary<int, List<Lap>> GetDriversLaps()
             => _driversLaps;
+
+        public TimeSpan GetLapTime(int carIdx)
+        {
+            if (carIdx < 0)
+            {
+                return TimeSpan.Zero;
+            }
+
+            var validLaps = _driversLaps[carIdx].Where(l => l.Time > TimeSpan.Zero);
+
+            if (validLaps.Any())
+            {
+                return TimeSpan.FromSeconds(validLaps
+                    .Average(l => l.Time.TotalSeconds));
+            }
+
+            return TimeSpan.Zero;
+        }
     }
 }

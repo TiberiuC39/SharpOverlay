@@ -1,11 +1,14 @@
-﻿namespace SharpOverlay.Services
+﻿using iRacingSdkWrapper;
+
+namespace SharpOverlay.Services
 {
-    public class PitManager : IPitManager
+    public class PitManager : IClear
     {
         private bool _isInService;
         private bool _hasBegunService;
         private bool _hasCompletedService;
         private bool _isOnPitRoad;
+        private bool _isComingOutOfPits;
 
         public void Clear()
         {
@@ -13,6 +16,7 @@
             _hasBegunService = false;
             _hasCompletedService = false;
             _isOnPitRoad = false;
+            _isComingOutOfPits = false;
         }
 
         public bool HasBegunService()
@@ -26,19 +30,20 @@
         public bool HasResetToPits(int enterExitResetButton)
             => enterExitResetButton == 0;
 
-        public void UpdatePitRoadStatus(bool isOnPitRoad)
+        public void SetPitRoadStatus(bool isOnPitRoad, TrackSurfaces trackSurface)
         {
-            if (!_isOnPitRoad && isOnPitRoad)
+            if (!_isOnPitRoad && (isOnPitRoad || trackSurface == TrackSurfaces.AproachingPits))
             {
                 _isOnPitRoad = true;
             }
-            else if (_isOnPitRoad && !isOnPitRoad)
+            else if (_isOnPitRoad && !isOnPitRoad && trackSurface != TrackSurfaces.AproachingPits)
             {
                 _isOnPitRoad = false;
+                _isComingOutOfPits = true;
             }
         }
 
-        public void UpdatePitServiceStatus(bool isReceivingPitService)
+        public void SetPitServiceStatus(bool isReceivingPitService)
         {
             if (isReceivingPitService && !_isInService)
             {
@@ -62,6 +67,12 @@
             _hasCompletedService = false;
         }
 
-        
+        public bool IsComingOutOfPits()
+            => _isComingOutOfPits;
+
+        public void ResetIsComingOutOfPits()
+        {
+            _isComingOutOfPits = false;
+        }
     }
 }

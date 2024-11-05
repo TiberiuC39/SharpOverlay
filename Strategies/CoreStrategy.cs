@@ -27,11 +27,14 @@ namespace SharpOverlay.Strategies
         {
             FuelConsumption = GetAverageFuelConsumption(lapsCompleted);
 
-            Lap lastLap = lapsCompleted.Last();
+            if (lapsCompleted.Count > 0)
+            {
+                Lap lastLap = lapsCompleted.Last();
 
-            double currentFuelLevel = lastLap.EndingFuel;
+                double currentFuelLevel = lastLap.EndingFuel;
 
-            UpdateRefuel(currentFuelLevel, sessionLapsRemaining);
+                UpdateRefuel(currentFuelLevel, sessionLapsRemaining);
+            }
         }
 
         public void UpdateRefuel(double currentFuelLevel, int sessionLapsRemaining)

@@ -1,9 +1,8 @@
-﻿using SharpOverlay.Models;
-using System;
+﻿using System;
 
 namespace SharpOverlay.Services.LapServices
 {
-    public class LapCountCalculator : ILapCountCalculator
+    public class LapCountCalculator
     {
         public int CalculateLapsRemaining(float leaderPctOnTrack, TimeSpan timeRemainingInSession, TimeSpan averageLapTime)
         {

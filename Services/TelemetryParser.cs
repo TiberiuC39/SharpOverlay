@@ -14,23 +14,10 @@ namespace SharpOverlay.Services
         public bool HasSwitchedSessions { get; private set; }
         public Dictionary<int, int> PositionCarIdxInClass { get; private set; } = [];
         public Dictionary<int, int> PositionCarIdxInRace { get; private set; } = [];
-        public int[] CarIdxLapCompleted { get; private set; } = null!;
-        public SessionStates SessionState { get; private set; }
 
         public double PlayerPctOnTrack { get; private set; }
         public float[] CarIdxPctOnTrack { get; private set; } = null!;
 
-        public double FuelLevel { get; private set; }
-
-        public void ParseSessionState(TelemetryInfo telemetry)
-        {
-            SessionState = telemetry.SessionState.Value;
-        }
-
-        public void ParseCarIdxLapCompleted(TelemetryInfo telemetry)
-        {
-            CarIdxLapCompleted = telemetry.CarIdxLapCompleted.Value;
-        }
 
         public void ParsePositionCarIdxInPlayerClass(TelemetryInfo telemetry, int paceCarIdx)
         {
@@ -64,13 +51,6 @@ namespace SharpOverlay.Services
         public void ParseCarIdxOnTrack(TelemetryInfo telemetry)
         {
             CarIdxPctOnTrack = telemetry.CarIdxLapDistPct.Value;
-        }
-
-        public TimeSpan GetTimeRemaining(TelemetryInfo telemetry)
-        {
-            double timeRemaining = telemetry.SessionTimeRemain.Value;
-
-            return TimeSpan.FromSeconds(timeRemaining);
         }
 
         public void ParsePositionCarIdxForWholeRace(TelemetryInfo telemetry)
@@ -136,23 +116,16 @@ namespace SharpOverlay.Services
         {
             PlayerCarIdx = -1;
             PlayerCarClassId = 0;
-            SessionState = SessionStates.Invalid;
             PositionCarIdxInClass.Clear();
             PositionCarIdxInRace.Clear();
             HasSwitchedSessions = false;
             PlayerPctOnTrack = 0;
-            FuelLevel = 0;
             CurrentSessionNumber = 0;
         }
 
         public void ParsePlayerPctOnTrack(TelemetryInfo telemetry)
         {
             PlayerPctOnTrack = telemetry.CarIdxLapDistPct.Value[PlayerCarIdx];
-        }
-
-        public void ParseFuelLevel(TelemetryInfo telemetry)
-        {
-            FuelLevel = (double) telemetry.FuelLevel.Value;
         }
     }
 }

@@ -14,6 +14,6 @@ namespace SharpOverlay.Strategies
         }
 
         protected override double GetAverageFuelConsumption(List<Lap> lapsCompleted)
-            => lapsCompleted.Last().FuelUsed;
+            => lapsCompleted.Count > 0 ? lapsCompleted.Last().FuelUsed : 0;
     }
 }
