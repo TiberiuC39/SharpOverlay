@@ -18,6 +18,10 @@
 
         </Grid.ColumnDefinitions>
 
+        <TextBlock>
+            
+        </TextBlock>
+
         <Canvas Grid.Column="0" Width="{Binding Path=ActualWidth,ElementName=leftFill}">
             <Rectangle x:Name="leftFill" Height="{Binding Path=ActualHeight, ElementName=barSpotterWindow}" Width="{Binding BarWidth, Mode=OneWay}" Fill="{Binding BarColor, Mode=OneWay}" HorizontalAlignment="Center" VerticalAlignment="Top">
                 <Rectangle.RenderTransform>

@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SharpOverlay.Services.LapServices
+namespace SharpOverlay.Services.FuelServices.LapServices
 {
     public class LapAnalyzer : IClear
     {
@@ -36,15 +36,15 @@ namespace SharpOverlay.Services.LapServices
             }
         }
 
-        public int FindLeaderIdxInClass(Dictionary<int, int> positionIdxInClass)
+        public int GetLeaderIdx(Dictionary<int, int> positionIdx)
         {
             const int invalidLeaderPosition = -1;
 
-            int leaderInClassPosition = positionIdxInClass.Keys.Count > 0 ? positionIdxInClass.Keys.Min() : invalidLeaderPosition;
+            int leaderPosition = positionIdx.Keys.Count > 0 ? positionIdx.Keys.Min() : invalidLeaderPosition;
 
-            if (leaderInClassPosition > invalidLeaderPosition)
+            if (leaderPosition > invalidLeaderPosition)
             {
-                return positionIdxInClass[leaderInClassPosition];
+                return positionIdx[leaderPosition];
             }
 
             return -1;

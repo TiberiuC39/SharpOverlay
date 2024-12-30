@@ -7,12 +7,16 @@ namespace SharpOverlay.Services
     {
         private const int DefaultTickRate = 60;
 
-        public static SdkWrapper Wrapper = new SdkWrapper();
+        public event EventHandler<EventArgs> OnEnterExitCar = null!;
+
+        public SdkWrapper Wrapper { get; private set; }
         public int PlayerId => Wrapper.DriverId;
         public bool IsConnected => Wrapper.IsConnected;
         public iRacingDataService(int tickrate = DefaultTickRate)
         {
+            Wrapper = new SdkWrapper();
             AdjustTickRate(tickrate);
+            Wrapper.Start();
         }
 
         public SessionInfo GetSessionInfo()
@@ -25,7 +29,7 @@ namespace SharpOverlay.Services
             return Wrapper.GetTelemetryInfoWithoutEvent();
         }
 
-        private static void AdjustTickRate(int tickrate)
+        private void AdjustTickRate(int tickrate)
         {
             if (tickrate > 0 && tickrate <= DefaultTickRate)
             {
@@ -36,8 +40,6 @@ namespace SharpOverlay.Services
                 Wrapper.TelemetryUpdateFrequency = DefaultTickRate;
             }
         }
-
-        public EventHandler<SdkWrapper.TelemetryUpdatedEventArgs> OnTelemetryUpdate = null!;
 
         public void HookUpToTelemetryEvent(Action<object?, SdkWrapper.TelemetryUpdatedEventArgs> action)
         {

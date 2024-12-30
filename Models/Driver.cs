@@ -11,7 +11,7 @@ namespace SharpOverlay.Models
         /// <summary>
         /// The identifier (CarIdx) of this driver (unique to this session)
         /// </summary>
-        public int Id { get; set; }
+        public int CarIdx { get; set; }
 
         /// <summary>
         /// The current position of the driver

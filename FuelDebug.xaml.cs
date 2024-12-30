@@ -1,7 +1,5 @@
-﻿using SharpOverlay.Services;
-using System;
+﻿using SharpOverlay.Services.FuelServices;
 using System.Windows;
-using System.Windows.Input;
 
 namespace SharpOverlay
 {

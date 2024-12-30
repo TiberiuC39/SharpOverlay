@@ -1,8 +1,4 @@
-﻿using SharpOverlay.Models;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace SharpOverlay.Strategies
+﻿namespace SharpOverlay.Strategies
 {
     public class LastLapStrategy : CoreStrategy
     {
@@ -12,8 +8,5 @@ namespace SharpOverlay.Strategies
             :base(_name, fuelCutOff)
         {            
         }
-
-        protected override double GetAverageFuelConsumption(List<Lap> lapsCompleted)
-            => lapsCompleted.Count > 0 ? lapsCompleted.Last().FuelUsed : 0;
     }
 }

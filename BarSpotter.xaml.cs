@@ -1,8 +1,10 @@
-﻿using SharpOverlay.Models;
-using SharpOverlay.Services;
-using iRacingSdkWrapper;
+﻿using iRacingSdkWrapper;
+using iRacingSdkWrapper.JsonModels;
+using SharpOverlay.Models;
+using SharpOverlay.Services.Base;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -17,31 +19,27 @@ namespace SharpOverlay
     /// </summary>
     public partial class BarSpotter : Window
     {
-        private SdkWrapper iracingWrapper = iRacingDataService.Wrapper;
+        private readonly SimReader _simReader;
         private List<Driver> drivers = new List<Driver>();
         private bool isUpdatingDrivers = true;
         private float closestCar;
-        private Dictionary<Driver, float> relatives = new Dictionary<Driver, float>();
+        private Dictionary<int, float> relatives = new Dictionary<int, float>();
         private float trackLen;
         private Enums.CarLeftRight carLeftRight;
 
         public BarSpotter()
         {
+            _simReader = new SimReader();
             InitializeComponent();
             this.DataContext = App.appSettings.BarSpotterSettings;
             Services.JotService.tracker.Track(this);
 
-            iracingWrapper.SessionUpdated += iracingWrapper_SessionInfoUpdated;
-            iracingWrapper.TelemetryUpdated += iracingWrapper_TelemetryUpdated;
-            iracingWrapper.Connected += iracingWrapper_Connected;
-            iracingWrapper.Disconnected += iracingWrapper_Disconnected;
+            _simReader.OnSessionUpdated+= iracingWrapper_SessionInfoUpdated;
+            _simReader.OnTelemetryUpdated += iracingWrapper_TelemetryUpdated;
+            _simReader.OnConnected += iracingWrapper_Connected;
+            _simReader.OnDisconnected += iracingWrapper_Disconnected;
 
             barSpotterWindow.SizeChanged += window_SetBarEqualToWindow;
-
-            if (iracingWrapper.IsConnected)
-            {
-                iracingWrapper.RequestSessionInfoUpdate();
-            }
 
             App.appSettings.BarSpotterSettings.PropertyChanged += settings_TestMode;
         }
@@ -62,18 +60,18 @@ namespace SharpOverlay
             }
         }
 
-        private void window_SetBarEqualToWindow(object sender, EventArgs e)
+        private void window_SetBarEqualToWindow(object? sender, EventArgs e)
         {
-            if (App.appSettings.BarSpotterSettings.TestMode)
+            if (App.appSettings.BarSpotterSettings.IsInTestMode)
             {
                 leftFill.Height = App.appSettings.BarSpotterSettings.BarLength;
                 rightFill.Height = App.appSettings.BarSpotterSettings.BarLength;
             }
         }
 
-        private void settings_TestMode(object sender, EventArgs e)
+        private void settings_TestMode(object? sender, EventArgs e)
         {
-            HandleTestMode(App.appSettings.BarSpotterSettings.TestMode);
+            HandleTestMode(App.appSettings.BarSpotterSettings.IsInTestMode);
 
         }
         private void InitializeBar(Rectangle rect)
@@ -81,17 +79,16 @@ namespace SharpOverlay
             rect.Width = App.appSettings.BarSpotterSettings.BarWidth;
             rect.Fill = App.appSettings.BarSpotterSettings.BarColor;
         }
-        private void iracingWrapper_SessionInfoUpdated(object sender, SdkWrapper.SessionUpdatedEventArgs e)
+        private void iracingWrapper_SessionInfoUpdated(object? sender, SdkWrapper.SessionUpdatedEventArgs e)
         {
             trackLen = (float) (e.SessionInfo.WeekendInfo.TrackLength * 1000f);
 
             isUpdatingDrivers = true;
             this.ParseDrivers(e.SessionInfo);
-            Driver? me = drivers.Find(d => d.Id == iracingWrapper.DriverId);
             isUpdatingDrivers = false;
         }
 
-        private void iracingWrapper_TelemetryUpdated(object sender, SdkWrapper.TelemetryUpdatedEventArgs e)
+        private void iracingWrapper_TelemetryUpdated(object? sender, SdkWrapper.TelemetryUpdatedEventArgs e)
         {
             if (isUpdatingDrivers) return;
 
@@ -102,45 +99,20 @@ namespace SharpOverlay
 
         private void ParseDrivers(SessionInfo sessionInfo)
         {
-            int id = 0;
-            Driver? driver;
-
-            var newDrivers = new List<Driver>();
-
-            do
-            {
-                driver = null;
-                var racer = sessionInfo.Drivers.FirstOrDefault(d => d.CarIdx == id);
-
-                string name = racer?.UserName;
-
-                if (name != null && name != "Pace Car")
-                {
-                    if (drivers.Any())
-                    {
-                        driver = drivers.Find(d => d.Name == name);
-                    }
-
-                    if (driver == null)
-                    {
-                        driver = new Driver();
-                        driver.Id = id;
-                        driver.Name = name;
-                        driver.Number = racer.CarNumber.ToString();
-
-                    }
-                    newDrivers.Add(driver);
-
-                    id++;
-                }
-            } while (driver != null);
-
             drivers.Clear();
-            drivers.AddRange(newDrivers);
+            drivers = sessionInfo.Drivers
+                .Where(d => d.UserName != "Pace Car")
+                .Select(d => new Driver()
+                {
+                    CarIdx = d.CarIdx,
+                    Name = d.UserName,
+                    Number = d.CarNumber.ToString(),
+                })
+                .ToList();
         }
         private void UpdateDriversTelemetry(TelemetryInfo info)
         {
-            Driver? me = drivers.Find(d => d.Id == iracingWrapper.DriverId);
+            Driver? me = drivers.FirstOrDefault(r => r.CarIdx == info.PlayerCarIdx.Value);
 
             var laps = info.CarIdxLap.Value;
             var lapDistances = info.CarIdxLapDistPct.Value;
@@ -150,10 +122,10 @@ namespace SharpOverlay
             
             foreach (Driver driver in drivers)
             {
-                driver.LapDistance = lapDistances[driver.Id];
-                driver.TrackSurface = trackSurfaces[driver.Id];
+                driver.LapDistance = lapDistances[driver.CarIdx];
+                driver.TrackSurface = trackSurfaces[driver.CarIdx];
 
-                if (me != null && driver.TrackSurface != TrackSurfaces.NotInWorld && driver.Id != me.Id)
+                if (me != null && driver.TrackSurface != TrackSurfaces.NotInWorld && driver.CarIdx != me.CarIdx)
                 {
                     var relative = driver.LapDistance - me.LapDistance;
 
@@ -167,7 +139,7 @@ namespace SharpOverlay
                     }
 
                     driver.RelativeLapDistance = relative;
-                    relatives[driver] = relative;
+                    relatives[driver.CarIdx] = relative;
 
                     var closestDriver = relatives.OrderBy(e => Math.Abs(e.Value - 0)).FirstOrDefault();
                     closestCar = closestDriver.Value;
@@ -187,43 +159,42 @@ namespace SharpOverlay
                     driver.RelativeLapDistance = -1;
                 }
             }
-            if (!App.appSettings.BarSpotterSettings.TestMode)
+            if (!App.appSettings.BarSpotterSettings.IsInTestMode)
             {
                 leftFill.Visibility = Visibility.Hidden;
                 rightFill.Visibility = Visibility.Hidden;
 
-                carLeftRight = (Enums.CarLeftRight)iracingWrapper.GetData("CarLeftRight");
+                carLeftRight = (Enums.CarLeftRight) info.CarLeftRight.Value;
 
                 if (carLeftRight == Enums.CarLeftRight.irsdk_LRClear)
                 {
                     leftFill.Visibility = Visibility.Hidden;
                     rightFill.Visibility = Visibility.Hidden;
                 }
-                if (carLeftRight == Enums.CarLeftRight.irsdk_LRCarLeft)
+                else if (carLeftRight == Enums.CarLeftRight.irsdk_LRCarLeft)
                 {
                     var normalizedDistance = Math.Max(-1, Math.Min(1, closestCar / (5 / trackLen)));
                     UpdateBar(leftFill, normalizedDistance, App.appSettings.BarSpotterSettings.BarColor);
 
+                    Debug.Print($"closestCar: {closestCar}, trackLen: {trackLen}, scale: {5 / trackLen}");
                 }
-                if (carLeftRight == Enums.CarLeftRight.irsdk_LRCarRight)
+                else if (carLeftRight == Enums.CarLeftRight.irsdk_LRCarRight)
                 {
                     var normalizedDistance = Math.Max(-1, Math.Min(1, closestCar / (5 / trackLen)));
                     UpdateBar(rightFill, normalizedDistance, App.appSettings.BarSpotterSettings.BarColor);
 
+                    Debug.Print($"closestCar: {closestCar}, trackLen: {trackLen}, scale: {5 / trackLen}");
                 }
-
-                if (carLeftRight == Enums.CarLeftRight.irsdk_LRCarLeftRight)
+                else if (carLeftRight == Enums.CarLeftRight.irsdk_LRCarLeftRight)
                 {
                     UpdateBar(rightFill, 10f, App.appSettings.BarSpotterSettings.ThreeWideBarColor);
                     UpdateBar(leftFill, 10f, App.appSettings.BarSpotterSettings.ThreeWideBarColor);
                 }
-
-                if (carLeftRight == Enums.CarLeftRight.irsdk_LR2CarsLeft)
+                else if (carLeftRight == Enums.CarLeftRight.irsdk_LR2CarsLeft)
                 {
                     UpdateBar(leftFill, 10f, App.appSettings.BarSpotterSettings.ThreeWideBarColor);
                 }
-
-                if (carLeftRight == Enums.CarLeftRight.irsdk_LR2CarsRight)
+                else if (carLeftRight == Enums.CarLeftRight.irsdk_LR2CarsRight)
                 {
                     UpdateBar(rightFill, 10f, App.appSettings.BarSpotterSettings.ThreeWideBarColor);
                 }
@@ -256,19 +227,19 @@ namespace SharpOverlay
             Canvas.SetTop(rect, topPos);
         }
 
-        private void Window_MouseDown(object sender, MouseButtonEventArgs e)
+        private void Window_MouseDown(object? sender, MouseButtonEventArgs e)
         {
             if (e.ChangedButton == MouseButton.Left)
                 DragMove();
         }
 
-        private void iracingWrapper_Disconnected(object sender, EventArgs e)
+        private void iracingWrapper_Disconnected(object? sender, EventArgs e)
         {
             leftFill.Height = 0;
             rightFill.Height = 0;
         }
 
-        private void iracingWrapper_Connected(object sender, EventArgs e)
+        private void iracingWrapper_Connected(object? sender, EventArgs e)
         {
             drivers.Clear();
             relatives.Clear();

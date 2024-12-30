@@ -1,6 +1,7 @@
 ﻿using iRacingSdkWrapper;
+using System;
 
-namespace SharpOverlay.Services
+namespace SharpOverlay.Services.FuelServices.PitServices
 {
     public class PitManager : IClear
     {

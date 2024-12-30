@@ -1,6 +1,6 @@
 ﻿using iRacingSdkWrapper;
 using SharpOverlay.Models;
-using SharpOverlay.Services;
+using SharpOverlay.Services.Base;
 using System;
 using System.ComponentModel;
 using System.Windows;
@@ -14,7 +14,8 @@ namespace SharpOverlay
     /// </summary>
     public partial class Wind : Window
     {
-        private SdkWrapper iracingWrapper = iRacingDataService.Wrapper;
+        private const int _defaultTickRate = 10;
+        private readonly SimReader _simReader = new SimReader(_defaultTickRate);
         private Settings appSettings = App.appSettings;
 
         private readonly Color StartColor = Color.FromArgb(255, 0, 255, 0);
@@ -30,7 +31,7 @@ namespace SharpOverlay
             InitializeComponent();
             Services.JotService.tracker.Track(this);
 
-            iracingWrapper.TelemetryUpdated += Wrapper_TelemetryUpdated;
+            _simReader.OnTelemetryUpdated += Wrapper_TelemetryUpdated;
             appSettings.WindSettings.PropertyChanged += settings_TestMode;
 
             WindSpeedLabel.Foreground = new SolidColorBrush(StartColor);
@@ -39,7 +40,7 @@ namespace SharpOverlay
 
         private void settings_TestMode(object? sender, PropertyChangedEventArgs e)
         {
-            if (appSettings.WindSettings.TestMode)
+            if (appSettings.WindSettings.IsInTestMode)
             {
                 WindWindow.BorderThickness = new Thickness(5);
             }
@@ -53,8 +54,8 @@ namespace SharpOverlay
         {
 
             windDir = (e.TelemetryInfo.WindDir.Value + Math.PI / 180);
-            yawNorth = iracingWrapper.GetTelemetryValue<float>("YawNorth").Value;
-            windSpeed = iracingWrapper.GetTelemetryValue<float>("WindVel").Value * 3.6f;
+            yawNorth = e.TelemetryInfo.YawNorth.Value;
+            windSpeed = e.TelemetryInfo.WindVel.Value * 3.6f;
 
             double finalAngle = (windDir - yawNorth) * 57.2958 + 180;
             ((RotateTransform)((TransformGroup)WindDirIcon.RenderTransform).Children[0]).Angle = finalAngle;

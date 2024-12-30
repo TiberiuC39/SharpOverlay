@@ -1,6 +1,6 @@
 ﻿using SharpOverlay.Utilities.Enums;
 
-namespace SharpOverlay.Services
+namespace SharpOverlay.Services.FuelServices
 {
     public class FinishLineLocator : IClear
     {

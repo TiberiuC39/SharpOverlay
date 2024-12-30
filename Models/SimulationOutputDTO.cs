@@ -1,4 +1,5 @@
 ﻿using iRacingSdkWrapper;
+using iRacingSdkWrapper.Bitfields;
 using System;
 
 namespace SharpOverlay.Models
@@ -23,6 +24,7 @@ namespace SharpOverlay.Models
             CarIdxLastLapTime = telemetry.CarIdxLastLapTime.Value;
             CarIdxLapCompleted = telemetry.CarIdxLapCompleted.Value;
             IsOnTrack = telemetry.IsOnTrack.Value;
+            SessionFlag = (SessionFlags) telemetry.SessionFlags.Value.Value;
         }
 
         public double FuelLevel { get; }
@@ -38,5 +40,6 @@ namespace SharpOverlay.Models
         public float[] CarIdxLastLapTime { get; }
         public int[] CarIdxLapCompleted { get; }
         public bool IsOnTrack { get; }
+        public SessionFlags SessionFlag { get; }
     }
 }

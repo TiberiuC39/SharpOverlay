@@ -1,8 +1,9 @@
-﻿using SharpOverlay.Models;
-using SharpOverlay.Services;
-using iRacingSdkWrapper;
+﻿using iRacingSdkWrapper;
 using ScottPlot.Plottables;
-using System;
+using SharpOverlay.Events;
+using SharpOverlay.Models;
+using SharpOverlay.Services.Base;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -22,12 +23,17 @@ namespace SharpOverlay
         private bool absActive;
         private ScottPlot.Color currentBgColor;
 
-        private SdkWrapper iracingWrapper = iRacingDataService.Wrapper;
+        private readonly SimReader _simReader = new SimReader();
+        private readonly WindowStateService _stateService;
+
         public InputGraph()
         {
+            _stateService = new WindowStateService();
             InitializeComponent();
             Services.JotService.tracker.Track(this);
-            iracingWrapper.TelemetryUpdated += iracingWrapper_TelemetryUpdated;
+            _simReader.OnTelemetryUpdated += iracingWrapper_TelemetryUpdated;
+            _simReader.OnTelemetryUpdated += _stateService.ExecuteOnTelemetry;
+            _stateService.WindowStateChanged += ExecuteOnStateChange;
             App.appSettings.InputGraphSettings.PropertyChanged += graph_HandleSettingUpdated;
             HookStreamer(ref throttleStreamer, App.appSettings.InputGraphSettings.ThrottleColor, true);
             HookStreamer(ref brakeStreamer, App.appSettings.InputGraphSettings.BrakeColor, true);
@@ -35,7 +41,19 @@ namespace SharpOverlay
             PlotSetup();
         }
 
-        private void graph_HandleSettingUpdated(object sender, EventArgs e)
+        private void ExecuteOnStateChange(object? sender, WindowStateEventArgs args)
+        {
+            if (args.IsOpen)
+            {
+                Show();
+            }
+            else
+            {
+                Hide();
+            }
+        }
+
+        private void graph_HandleSettingUpdated(object? sender, PropertyChangedEventArgs e)
         {
             SetStreamerColorAndWidth(ref throttleStreamer, App.appSettings.InputGraphSettings.ThrottleColor);
             SetStreamerColorAndWidth(ref brakeStreamer, App.appSettings.InputGraphSettings.BrakeColor);
@@ -59,9 +77,9 @@ namespace SharpOverlay
 
             if (App.appSettings.InputGraphSettings.UseRawValues)
             {
-                input.Brake = iracingWrapper.GetTelemetryValue<float>("BrakeRaw").Value * 100;
-                input.Throttle = iracingWrapper.GetTelemetryValue<float>("ThrottleRaw").Value * 100;
-                input.Clutch = (1 - iracingWrapper.GetTelemetryValue<float>("ClutchRaw").Value) * 100;
+                input.Brake = telemetryInfo.BrakeRaw.Value * 100;
+                input.Throttle = telemetryInfo.ThrottleRaw.Value * 100;
+                input.Clutch = (1 - telemetryInfo.ClutchRaw.Value) * 100;
 
             }
             else
@@ -82,20 +100,20 @@ namespace SharpOverlay
             }
         }
 
-        private void iracingWrapper_TelemetryUpdated(object sender, SdkWrapper.TelemetryUpdatedEventArgs e)
+        private void iracingWrapper_TelemetryUpdated(object? sender, SdkWrapper.TelemetryUpdatedEventArgs e)
         {
             UpdateInputs(e.TelemetryInfo);
             AddInputsToStreamers(input);
             InputPlot.Refresh();
 
-            absActive = iracingWrapper.GetTelemetryValue<bool>("BrakeABSactive").Value;
+            absActive = e.TelemetryInfo.BrakeABSactive.Value;
             if (App.appSettings.InputGraphSettings.ShowABS)
             {
                 ABSFlash();
             }
         }
 
-        private void Window_MouseDown(object sender, MouseButtonEventArgs e)
+        private void Window_MouseDown(object? sender, MouseButtonEventArgs e)
         {
             if (e.ChangedButton == MouseButton.Left)
                 DragMove();
@@ -128,7 +146,6 @@ namespace SharpOverlay
             ds.ManageAxisLimits = false;
 
             ds.IsVisible = isVisible;
-
         }
 
         private void SetStreamerColorAndWidth(ref DataStreamer dataStreamer, SolidColorBrush color)

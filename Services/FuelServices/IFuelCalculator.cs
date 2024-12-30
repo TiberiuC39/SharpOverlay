@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SharpOverlay.Services
+namespace SharpOverlay.Services.FuelServices
 {
     public interface IFuelCalculator
     {

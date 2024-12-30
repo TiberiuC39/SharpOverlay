@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace SharpOverlay.Services.LapServices
+namespace SharpOverlay.Services.FuelServices.LapServices
 {
     public class LapTracker : IClear
     {

@@ -28,6 +28,9 @@ namespace SharpOverlay.Models
         public float FiveLapLapsOfFuelRemaining { get; set; }
 
 
+        public bool IsOpen { get; set; }
+
+
         public Lap? CurrentLap { get; set; }
         public double LapsRemainingInRace { get; set; }
         public bool IsInService { get; set; }
