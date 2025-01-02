@@ -6,8 +6,14 @@ namespace SharpOverlay.Services.Base
 {
     public class WindowStateService
     {
-        private readonly FuelWindowState _windowState = new();
+        private readonly FuelWindowState _windowState;
         public event EventHandler<WindowStateEventArgs>? WindowStateChanged;
+
+        public WindowStateService()
+        {
+            bool startingState = App.appSettings.FuelSettings.IsOpen;
+            _windowState = new(startingState);
+        }
 
         public void ExecuteOnTelemetry(object? sender, SdkWrapper.TelemetryUpdatedEventArgs args)
         {
@@ -18,7 +24,7 @@ namespace SharpOverlay.Services.Base
 
         private void UpdateWindowState(SdkWrapper.TelemetryUpdatedEventArgs args)
         {
-            _windowState.Update(args);
+            _windowState.UpdateOnEvent(args);
         }
 
         private void RaiseEventIfNewData()

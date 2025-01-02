@@ -1,6 +1,8 @@
 ﻿using iRacingSdkWrapper;
+using SharpOverlay.Events;
 using SharpOverlay.Models;
 using SharpOverlay.Services.Base;
+using SharpOverlay.Utilities;
 using System;
 using System.ComponentModel;
 using System.Windows;
@@ -14,8 +16,8 @@ namespace SharpOverlay
     /// </summary>
     public partial class Wind : Window
     {
-        private const int _defaultTickRate = 10;
-        private readonly SimReader _simReader = new SimReader(_defaultTickRate);
+        private readonly SimReader _simReader = new SimReader(DefaultTickRates.Wind);
+        private readonly WindowStateService _windowStateService = new();
         private Settings appSettings = App.appSettings;
 
         private readonly Color StartColor = Color.FromArgb(255, 0, 255, 0);
@@ -32,10 +34,24 @@ namespace SharpOverlay
             Services.JotService.tracker.Track(this);
 
             _simReader.OnTelemetryUpdated += Wrapper_TelemetryUpdated;
+            _simReader.OnTelemetryUpdated += _windowStateService.ExecuteOnTelemetry;
             appSettings.WindSettings.PropertyChanged += settings_TestMode;
+            _windowStateService.WindowStateChanged += OnWindowStateChanged;
 
             WindSpeedLabel.Foreground = new SolidColorBrush(StartColor);
             WindDirIcon.Foreground = new SolidColorBrush(StartColor);
+        }
+
+        private void OnWindowStateChanged(object? sender, WindowStateEventArgs e)
+        {
+            if (e.IsOpen)
+            {
+                Show();
+            }
+            else
+            {
+                Hide();
+            }
         }
 
         private void settings_TestMode(object? sender, PropertyChangedEventArgs e)

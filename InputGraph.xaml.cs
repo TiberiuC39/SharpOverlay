@@ -3,6 +3,7 @@ using ScottPlot.Plottables;
 using SharpOverlay.Events;
 using SharpOverlay.Models;
 using SharpOverlay.Services.Base;
+using SharpOverlay.Utilities;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
@@ -23,7 +24,7 @@ namespace SharpOverlay
         private bool absActive;
         private ScottPlot.Color currentBgColor;
 
-        private readonly SimReader _simReader = new SimReader();
+        private readonly SimReader _simReader = new SimReader(DefaultTickRates.InputGraph);
         private readonly WindowStateService _stateService;
 
         public InputGraph()

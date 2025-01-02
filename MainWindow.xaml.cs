@@ -65,6 +65,8 @@ namespace SharpOverlay
                     var showMethod = o.Window.GetType().GetMethod("Show");
                     showMethod.Invoke(o.Window, null);
                     o.IsOpen = true;
+
+                    o.Window.Visibility = Visibility.Hidden;
                 }
                 if (!o.IsEnabled && o.IsOpen)
                 {
@@ -78,7 +80,7 @@ namespace SharpOverlay
 
         private void windowToggle(object sender, RoutedEventArgs e)
         {
-            HandleOverlayStatus();
+            //HandleOverlayStatus();
         }
 
         private void Hyperlink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)

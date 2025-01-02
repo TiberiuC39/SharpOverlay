@@ -273,7 +273,7 @@ namespace SharpOverlay.Services.FuelServices
                     var playerAverageLapTime = _lapAnalyzer.GetLapTime(_telemetryParser.PlayerCarIdx);
 
                     _lapsRemainingInRace = _lapCountCalculator.CalculateLapsRemainingMultiClass(simulationOutput.SessionTimeRemaining,
-                        raceLeaderPctOnTrack, simulationOutput.PlayerTrackDistPct, leaderAverageLapTime, playerAverageLapTime);
+                        raceLeaderPctOnTrack, simulationOutput.PlayerTrackDistPct, leaderAverageLapTime, playerAverageLapTime, simulationOutput.SessionFlag);
                 }
                 else if (leaderIdx >= 0)
                 {
@@ -329,9 +329,8 @@ namespace SharpOverlay.Services.FuelServices
                     CurrentFuelLevel = simulationOutput.FuelLevel,
                     RaceLapsRemaining = _lapsRemainingInRace,
 
-                    IsOpen = simulationOutput.IsOnTrack,
-
                     IsRollingStart = _sessionParser.StartType == StartType.Rolling,
+                    SessionFlag = simulationOutput.SessionFlag,
                     IsRaceStart = _isRaceStart,
                     CurrentSessionNumber = _telemetryParser.CurrentSessionNumber,
                     CurrentLap = _lapTracker.GetCurrentLap(),
@@ -352,9 +351,8 @@ namespace SharpOverlay.Services.FuelServices
                 LapsCompleted = completedLaps.Count,
                 RaceLapsRemaining = _lapsRemainingInRace,
 
-                IsOpen = simulationOutput.IsOnTrack,
-
                 IsRollingStart = _sessionParser.StartType == StartType.Rolling,
+                SessionFlag = simulationOutput.SessionFlag,
                 IsRaceStart = _isRaceStart,
                 CurrentSessionNumber = _telemetryParser.CurrentSessionNumber,
                 CurrentLap = _lapTracker.GetCurrentLap(),

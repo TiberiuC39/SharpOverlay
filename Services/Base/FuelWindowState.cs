@@ -4,24 +4,34 @@ namespace SharpOverlay.Services.Base
 {
     public class FuelWindowState 
     {
+        public FuelWindowState(bool startingState)
+        {
+            Update(startingState);
+        }
+
         public bool State { get; private set; }
 
         public bool RequiresChange { get; private set; }
 
-        public void Update(SdkWrapper.TelemetryUpdatedEventArgs eventArgs)
+        public void UpdateOnEvent(SdkWrapper.TelemetryUpdatedEventArgs eventArgs)
         {
             bool isCarOnTrack = eventArgs.TelemetryInfo.IsOnTrack.Value;
 
-            if (State == !isCarOnTrack)
-            {
-                RequiresChange = true;
-                State = isCarOnTrack;
-            }
+            Update(isCarOnTrack);
         }
 
         public void ConfirmChange()
         {
             RequiresChange = false;
+        }
+
+        private void Update(bool state)
+        {
+            if (State == !state)
+            {
+                RequiresChange = true;
+                State = state;
+            }
         }
     }
 }

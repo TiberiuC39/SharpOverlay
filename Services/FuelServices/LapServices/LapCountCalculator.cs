@@ -1,4 +1,5 @@
-﻿using System;
+﻿using iRacingSdkWrapper.Bitfields;
+using System;
 
 namespace SharpOverlay.Services.FuelServices.LapServices
 {
@@ -24,7 +25,7 @@ namespace SharpOverlay.Services.FuelServices.LapServices
 
         public int CalculateLapsRemainingMultiClass(TimeSpan timeLeftInSession,
             float raceLeaderPctOnTrack, float playerPctOnTrack,
-            TimeSpan avgTimeRaceLeader, TimeSpan avgTimePlayer)
+            TimeSpan avgTimeRaceLeader, TimeSpan avgTimePlayer, SessionFlags flag)
         {
             var timeToCompleteLapLeader = (1 - raceLeaderPctOnTrack) * avgTimeRaceLeader;
 
@@ -36,7 +37,12 @@ namespace SharpOverlay.Services.FuelServices.LapServices
             }
             else if (timeRemainingAfterLineCross < TimeSpan.Zero)
             {
-                return -30;
+                if (flag == SessionFlags.Green)
+                {
+                    return 2;
+                }
+
+                return 1;
             }
             else if (avgTimeRaceLeader > timeRemainingAfterLineCross)
             {

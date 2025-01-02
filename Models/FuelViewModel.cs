@@ -1,4 +1,5 @@
 ﻿using iRacingSdkWrapper;
+using iRacingSdkWrapper.Bitfields;
 using SharpOverlay.Strategies;
 using System;
 using System.Collections.ObjectModel;
@@ -28,9 +29,6 @@ namespace SharpOverlay.Models
         public float FiveLapLapsOfFuelRemaining { get; set; }
 
 
-        public bool IsOpen { get; set; }
-
-
         public Lap? CurrentLap { get; set; }
         public double LapsRemainingInRace { get; set; }
         public bool IsInService { get; set; }
@@ -50,5 +48,6 @@ namespace SharpOverlay.Models
         public bool IsOnPitRoad { get; set; }
         public TrackSurfaces TrackSurface { get; set; }
         public SessionStates SessionState { get; set; }
+        public SessionFlags SessionFlag { get; internal set; }
     }
 }

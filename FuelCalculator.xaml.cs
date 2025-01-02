@@ -2,6 +2,7 @@
 using SharpOverlay.Services;
 using SharpOverlay.Services.Base;
 using SharpOverlay.Services.FuelServices;
+using SharpOverlay.Utilities;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
@@ -13,9 +14,8 @@ namespace SharpOverlay
     /// </summary>
     public partial class FuelCalculatorWindow : Window
     {
-        private const int _defaultTickRate = 4;
         private readonly IFuelCalculator _fuelCalculator;
-        private readonly SimReader _simReader = new SimReader(_defaultTickRate);
+        private readonly SimReader _simReader = new SimReader(DefaultTickRates.FuelCalculator);
         private readonly WindowStateService _windowStateService = new();
         private FuelDebugWindow? _fuelDebugWindow;
 
