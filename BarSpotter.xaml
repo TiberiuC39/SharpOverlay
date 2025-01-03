@@ -23,34 +23,36 @@
             
         </TextBlock>
 
-        <Canvas Grid.Column="0" Width="{Binding Path=ActualWidth,ElementName=leftFill}">
-            <Rectangle x:Name="leftFill" Height="{Binding Path=ActualHeight, ElementName=barSpotterWindow}" Width="{Binding BarWidth, Mode=OneWay}" Fill="{Binding BarColor, Mode=OneWay}" HorizontalAlignment="Center" VerticalAlignment="Top">
-                <Rectangle.RenderTransform>
-                    <TransformGroup>
-                        <ScaleTransform x:Name="leftFillScaleTransform" ScaleY="1"/>
-                        <SkewTransform/>
-                        <RotateTransform/>
-                        <TranslateTransform/>
-                    </TransformGroup>
-                </Rectangle.RenderTransform>
-            </Rectangle>
-        </Canvas>
+        <Border x:Name="leftCanvas" Grid.Column="0" CornerRadius="5" Background="#AA2E2E2E" ClipToBounds="True" BorderBrush="OrangeRed" BorderThickness="0.5px">
+            <Canvas Width="{Binding Path=ActualWidth,ElementName=leftFill}">
+                <Rectangle x:Name="leftFill" Height="{Binding Path=ActualHeight, ElementName=barSpotterWindow}" Width="{Binding BarWidth, Mode=OneWay}" Fill="{Binding BarColor, Mode=OneWay}" HorizontalAlignment="Center" VerticalAlignment="Top" >
+                    <Rectangle.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform x:Name="leftFillScaleTransform" ScaleY="1"/>
+                            <SkewTransform/>
+                            <RotateTransform/>
+                            <TranslateTransform/>
+                        </TransformGroup>
+                    </Rectangle.RenderTransform>
+                </Rectangle>
+            </Canvas>
+        </Border>
+        
         <Border Grid.Column="1"></Border>
 
-        <Canvas Grid.Column="2" Width="{Binding Path=ActualWidth, ElementName=rightFill}">
-            <Rectangle x:Name="rightFill" Height="{Binding Path=ActualHeight,ElementName=barSpotterWindow}" Width="{Binding BarWidth, Mode=OneWay}" Fill="{Binding BarColor, Mode=OneWay}" HorizontalAlignment="Center" VerticalAlignment="Top" Canvas.Top="0">
-                <Rectangle.RenderTransform>
-                    <TransformGroup>
-                        <ScaleTransform x:Name="rightFillScaleTransform" ScaleY="1"/>
-                        <SkewTransform/>
-                        <RotateTransform/>
-                        <TranslateTransform/>
-                    </TransformGroup>
-                </Rectangle.RenderTransform>
-            </Rectangle>
-        </Canvas>
-
-
-
+        <Border x:Name="rightCanvas" Grid.Column="2" CornerRadius="5" Background="#AA2E2E2E" ClipToBounds="True" BorderBrush="OrangeRed" BorderThickness="0.5px">
+            <Canvas Width="{Binding Path=ActualWidth, ElementName=rightFill}">
+                <Rectangle x:Name="rightFill" Height="{Binding Path=ActualHeight,ElementName=barSpotterWindow}" Width="{Binding BarWidth, Mode=OneWay}" Fill="{Binding BarColor, Mode=OneWay}" HorizontalAlignment="Center" VerticalAlignment="Top" Canvas.Top="0">
+                    <Rectangle.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform x:Name="rightFillScaleTransform" ScaleY="1"/>
+                            <SkewTransform/>
+                            <RotateTransform/>
+                            <TranslateTransform/>
+                        </TransformGroup>
+                    </Rectangle.RenderTransform>
+                </Rectangle>
+            </Canvas>
+        </Border>
     </Grid>
 </Window>

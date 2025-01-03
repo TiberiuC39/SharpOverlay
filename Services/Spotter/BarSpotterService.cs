@@ -10,6 +10,7 @@ namespace SharpOverlay.Services.Spotter
     public class BarSpotterService : IClear
     {
         private const int _carLengthInM = 5;
+        private const int _outOfFrameOffset = 1;
         private readonly List<Driver> _drivers = [];
         private Driver _me = new Driver();
         private double _trackLengthInM;
@@ -28,7 +29,7 @@ namespace SharpOverlay.Services.Spotter
             _me = new Driver();
             _trackLengthInM = 0;
             _closest = null;
-            _centerOffset = 1;
+            _centerOffset = _outOfFrameOffset;
         }
 
         private void OnSession(object? sender, SdkWrapper.SessionUpdatedEventArgs e)
@@ -38,6 +39,11 @@ namespace SharpOverlay.Services.Spotter
                 _trackLengthInM = e.SessionInfo.WeekendInfo.TrackLength * 1000;
             }
 
+            ParseDrivers(e);
+        }
+
+        private void ParseDrivers(SdkWrapper.SessionUpdatedEventArgs e)
+        {
             _drivers.Clear();
 
             foreach (var racer in e.SessionInfo.Drivers)
@@ -51,7 +57,7 @@ namespace SharpOverlay.Services.Spotter
                 if (driver.CarIdx == e.SessionInfo.Player.DriverCarIdx)
                 {
                     _me = driver;
-                } 
+                }
                 else if (driver.Name != "Pace Car")
                 {
                     _drivers.Add(driver);
@@ -61,34 +67,49 @@ namespace SharpOverlay.Services.Spotter
 
         private void OnTelemetry(object? sender, SdkWrapper.TelemetryUpdatedEventArgs e)
         {
-            var driverLapPct = e.TelemetryInfo.CarIdxLapDistPct.Value;
+            var driverTrackPct = e.TelemetryInfo.CarIdxLapDistPct.Value;
 
-            _me.LapDistance = driverLapPct[_me.CarIdx];
+            CalculateRelativeDistanceForAllDrivers(driverTrackPct);
 
-            foreach (var driver in _drivers)
-            {
-                driver.LapDistance = driverLapPct[driver.CarIdx];
-                driver.RelativeLapDistance = driver.LapDistance - _me.LapDistance;
-            }
-
-            _closest = _drivers.MinBy(d => Math.Abs(d.RelativeLapDistance)) ?? new Driver()
-            {
-                RelativeLapDistance = 2
-            };
+            _closest = FindClosest();
 
             var distancePerPercentOfTrack = _trackLengthInM / 100;
 
-            var distanceToClosestInM = _closest.RelativeLapDistance * distancePerPercentOfTrack;
+            _centerOffset = CalculateOffset(_closest.RelativeLapDistancePct, distancePerPercentOfTrack);
+        }
+
+        private double CalculateOffset(float closestRelativePct, double distancePerPercentOfTrack)
+        {
+            var distanceToClosestInM = closestRelativePct * distancePerPercentOfTrack;
             var absoluteDistanceToClosest = Math.Abs(distanceToClosestInM);
 
             if (absoluteDistanceToClosest <= _carLengthInM)
             {
-                _centerOffset = distanceToClosestInM / _carLengthInM;
+                return distanceToClosestInM / _carLengthInM;
             }
-            else
+
+            return _outOfFrameOffset;
+        }
+
+        private Driver FindClosest()
+        {
+            var closest = _drivers.MinBy(d => Math.Abs(d.RelativeLapDistancePct));
+            
+            return closest ?? new Driver()
             {
-                _centerOffset = 1;
-            }            
+                RelativeLapDistancePct = 2
+            };
+        }
+
+        private void CalculateRelativeDistanceForAllDrivers(float[] driverTrackPct)
+        {
+            _me.LapDistancePct = driverTrackPct[_me.CarIdx];
+
+            foreach (var driver in _drivers)
+            {
+                driver.LapDistancePct = driverTrackPct[driver.CarIdx];
+                driver.RelativeLapDistancePct = driver.LapDistancePct - _me.LapDistancePct;
+            }
         }
 
         public double CenterOffset()

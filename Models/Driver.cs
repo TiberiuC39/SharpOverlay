@@ -40,12 +40,12 @@ namespace SharpOverlay.Models
         /// <summary>
         /// The distance along the current lap of this driver (in percentage)
         /// </summary>
-        public float LapDistance { get; set; }
+        public float LapDistancePct { get; set; }
 
         /// <summary>
         /// The relative distance between you and this driver (in percentage).
         /// </summary>
-        public float RelativeLapDistance { get; set; }
+        public float RelativeLapDistancePct { get; set; }
 
     }
 }

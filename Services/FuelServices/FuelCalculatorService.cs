@@ -178,6 +178,11 @@ namespace SharpOverlay.Services.FuelServices
 
             if (currentLap is null)
             {
+                if (simulationOutput.FuelLevel == 0)
+                {
+                    return;
+                }
+
                 _lapTracker.StartNewLap(simulationOutput.CurrentLapNumber, simulationOutput.FuelLevel);
 
                 var sessionState = simulationOutput.SessionState;

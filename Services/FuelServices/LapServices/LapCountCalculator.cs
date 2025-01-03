@@ -7,14 +7,11 @@ namespace SharpOverlay.Services.FuelServices.LapServices
     {
         public int CalculateLapsRemaining(float driverPctOnTrack, TimeSpan timeRemainingInSession, TimeSpan averageLapTime)
         {
-            if (timeRemainingInSession <= TimeSpan.Zero)
-            {
-                return 1;
-            }
-            else if (averageLapTime > TimeSpan.Zero)
+            if (averageLapTime > TimeSpan.Zero && 
+                timeRemainingInSession > TimeSpan.Zero)
             {
                 TimeSpan timeToCompleteLap = (1 - driverPctOnTrack) * averageLapTime;
-                return (int)Math.Ceiling((timeRemainingInSession - timeToCompleteLap) / averageLapTime) + 1;
+                return (int) Math.Ceiling((timeRemainingInSession - timeToCompleteLap) / averageLapTime) + 1;
             }
 
             return default;
@@ -27,15 +24,16 @@ namespace SharpOverlay.Services.FuelServices.LapServices
             float raceLeaderPctOnTrack, float playerPctOnTrack,
             TimeSpan avgTimeRaceLeader, TimeSpan avgTimePlayer, SessionFlags flag)
         {
+            if (avgTimeRaceLeader <= TimeSpan.Zero)
+            {
+                return 0;
+            }
+
             var timeToCompleteLapLeader = (1 - raceLeaderPctOnTrack) * avgTimeRaceLeader;
 
             var timeRemainingAfterLineCross = timeLeftInSession - timeToCompleteLapLeader;
-
-            if (timeRemainingAfterLineCross == TimeSpan.Zero)
-            {
-                return -15;
-            }
-            else if (timeRemainingAfterLineCross < TimeSpan.Zero)
+            
+            if (timeRemainingAfterLineCross <= TimeSpan.Zero)
             {
                 if (flag == SessionFlags.Green)
                 {

@@ -24,8 +24,7 @@ namespace SharpOverlay
         private readonly WindowStateService _windowStateService = new WindowStateService();
         private readonly BarSpotterService _service;
 
-        private readonly Brush _defaultColor;
-        private readonly Brush _threeWideColor;
+        private readonly BarSpotterSettings _settings = App.appSettings.BarSpotterSettings;
 
         private List<Driver> drivers = new List<Driver>();
         private Driver? _me;
@@ -40,9 +39,6 @@ namespace SharpOverlay
             InitializeComponent();
             this.DataContext = App.appSettings.BarSpotterSettings;
             Services.JotService.tracker.Track(this);
-
-            _defaultColor = App.appSettings.BarSpotterSettings.BarColor;
-            _threeWideColor = App.appSettings.BarSpotterSettings.ThreeWideBarColor;
 
             _service = new BarSpotterService(_simReader);
 
@@ -74,12 +70,13 @@ namespace SharpOverlay
             Canvas.SetTop(leftFill, grid.ActualHeight);
             Canvas.SetTop(rightFill, grid.ActualHeight);
 
-            leftFill.Visibility = Visibility.Visible;
-            rightFill.Visibility = Visibility.Visible;
+            leftCanvas.Visibility = Visibility.Hidden;
+            rightCanvas.Visibility = Visibility.Hidden;
         }
 
         private void OnDisconnected(object? sender, EventArgs e)
         {
+            _service.Clear();
         }
 
         private void Window_MouseDown(object? sender, MouseButtonEventArgs e)
@@ -130,56 +127,89 @@ namespace SharpOverlay
 
             if (carLeftRight == Enums.CarLeftRight.irsdk_LRClear)
             {
-                RenderBar(leftFill, grid.ActualHeight, App.appSettings.BarSpotterSettings.BarColor);
-                RenderBar(rightFill, grid.ActualHeight, App.appSettings.BarSpotterSettings.BarColor);
-            }
-            if (carLeftRight == Enums.CarLeftRight.irsdk_LRCarLeft)
-            {
-                double offset = _service.CenterOffset();
+                RenderLeftBar(grid.ActualHeight);
+                RenderRightBar(grid.ActualHeight);
 
-                var pixelOffset = grid.ActualHeight * -offset;
+                leftCanvas.Visibility = Visibility.Hidden;
+                rightCanvas.Visibility = Visibility.Hidden;
+            } 
+            else
+            {
+                if (carLeftRight == Enums.CarLeftRight.irsdk_LRCarLeft)
+                {
+                    double offset = _service.CenterOffset();
 
-                RenderLeftBar(pixelOffset);
-            }
-            else if (carLeftRight == Enums.CarLeftRight.irsdk_LRCarRight)
-            {
-                double offset = _service.CenterOffset();
+                    var pixelOffset = grid.ActualHeight * -offset;
 
-                var pixelOffset = grid.ActualHeight * -offset;
+                    RenderLeftBar(pixelOffset);
 
-                RenderRightBar(pixelOffset);
-            }
-            else if (carLeftRight == Enums.CarLeftRight.irsdk_LRCarLeftRight)
-            {
-                RenderBothBars();
-            }
-            else if (carLeftRight == Enums.CarLeftRight.irsdk_LR2CarsLeft)
-            {
-                UpdateBar(leftFill, 10f, App.appSettings.BarSpotterSettings.ThreeWideBarColor);
-            }
-            else if (carLeftRight == Enums.CarLeftRight.irsdk_LR2CarsRight)
-            {
-                UpdateBar(rightFill, 10f, App.appSettings.BarSpotterSettings.ThreeWideBarColor);
+                    rightCanvas.Visibility = Visibility.Hidden;
+                    leftCanvas.Visibility = Visibility.Visible;
+                }
+                else if (carLeftRight == Enums.CarLeftRight.irsdk_LRCarRight)
+                {
+                    double offset = _service.CenterOffset();
+
+                    var pixelOffset = grid.ActualHeight * -offset;
+
+                    RenderRightBar(pixelOffset);
+                    rightCanvas.Visibility = Visibility.Visible;
+                    leftCanvas.Visibility = Visibility.Hidden;
+                }
+                else if (carLeftRight == Enums.CarLeftRight.irsdk_LRCarLeftRight)
+                {
+                    RenderBothBars();
+                    leftCanvas.Visibility = Visibility.Visible;
+                    rightCanvas.Visibility = Visibility.Visible;
+                }
+                else if (carLeftRight == Enums.CarLeftRight.irsdk_LR2CarsLeft)
+                {
+                    RenderLeftBar(0, _settings.ThreeWideBarColor);
+                    leftCanvas.Visibility = Visibility.Visible;
+                    rightCanvas.Visibility = Visibility.Hidden;
+                }
+                else if (carLeftRight == Enums.CarLeftRight.irsdk_LR2CarsRight)
+                {
+                    RenderRightBar(0, _settings.ThreeWideBarColor);
+                    rightCanvas.Visibility = Visibility.Visible;
+                    leftCanvas.Visibility = Visibility.Hidden;
+                }
+
+                
             }
         }
 
         private void RenderLeftBar(double offset)
         {
-            RenderBar(leftFill, offset, _defaultColor);
+            RenderBar(leftFill, offset);
+        }
+
+        private void RenderLeftBar(double offset, Brush color)
+        {
+            RenderBar(leftFill, offset, color);
+        }
+        private void RenderRightBar(double offset, Brush color)
+        {
+            RenderBar(rightFill, offset, color);
         }
 
         private void RenderRightBar(double offset)
         {
-            RenderBar(rightFill, offset, _defaultColor);
+            RenderBar(rightFill, offset);
         }
 
         private void RenderBothBars()
         {
-            leftFill.Fill = _threeWideColor;
-            rightFill.Fill = _threeWideColor;
+            leftFill.Fill = _settings.ThreeWideBarColor;
+            rightFill.Fill = _settings.ThreeWideBarColor;
 
             Canvas.SetTop(leftFill, 0);
             Canvas.SetTop(rightFill, 0);
+        }
+
+        private void RenderBar(Rectangle rect, double offset)
+        {
+            RenderBar(rect, offset, _settings.BarColor);
         }
 
         private void RenderBar(Rectangle rect, double offset, Brush color)
@@ -194,12 +224,12 @@ namespace SharpOverlay
 
             foreach (Driver driver in drivers)
             {
-                driver.LapDistance = lapDistances[driver.CarIdx];
+                driver.LapDistancePct = lapDistances[driver.CarIdx];
                 driver.TrackSurface = trackSurfaces[driver.CarIdx];
 
                 if (me != null && driver.TrackSurface != TrackSurfaces.NotInWorld && driver.CarIdx != me.CarIdx)
                 {
-                    var relative = driver.LapDistance - me.LapDistance;
+                    var relative = driver.LapDistancePct - me.LapDistancePct;
 
                     if (relative > 0.5)
                     {
@@ -210,7 +240,7 @@ namespace SharpOverlay
                         relative += 1;
                     }
 
-                    driver.RelativeLapDistance = relative;
+                    driver.RelativeLapDistancePct = relative;
                     relatives[driver.CarIdx] = relative;
 
                     var closestDriver = relatives.OrderBy(e => Math.Abs(e.Value - 0)).FirstOrDefault();
@@ -228,7 +258,7 @@ namespace SharpOverlay
                 }
                 else
                 {
-                    driver.RelativeLapDistance = -1;
+                    driver.RelativeLapDistancePct = -1;
                 }
             }
         }
