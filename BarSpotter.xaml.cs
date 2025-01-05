@@ -89,21 +89,9 @@ namespace SharpOverlay
         {
             if (test)
             {
-                leftFill.Height = App.appSettings.BarSpotterSettings.BarLength;
-                rightFill.Height = App.appSettings.BarSpotterSettings.BarLength;
-                leftFill.Visibility = Visibility.Visible;
-                rightFill.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                leftFill.Height = grid.ActualHeight;
-                rightFill.Height = grid.ActualHeight;
-
-                leftFill.Width = App.appSettings.BarSpotterSettings.BarWidth;
-                rightFill.Width = App.appSettings.BarSpotterSettings.BarWidth;
-
-                leftFill.Visibility = Visibility.Visible;
-                rightFill.Visibility = Visibility.Visible;
+                RenderBothBars();
+                leftCanvas.Visibility = Visibility.Visible;
+                rightCanvas.Visibility = Visibility.Visible;
             }
         }
 
@@ -123,59 +111,60 @@ namespace SharpOverlay
 
         private void OnTelemetryUpdated(object? sender, SdkWrapper.TelemetryUpdatedEventArgs e)
         {
-            carLeftRight = (Enums.CarLeftRight)e.TelemetryInfo.CarLeftRight.Value;
-
-            if (carLeftRight == Enums.CarLeftRight.irsdk_LRClear)
+            if (!App.appSettings.BarSpotterSettings.IsInTestMode)
             {
-                RenderLeftBar(grid.ActualHeight);
-                RenderRightBar(grid.ActualHeight);
+                carLeftRight = (Enums.CarLeftRight)e.TelemetryInfo.CarLeftRight.Value;
 
-                leftCanvas.Visibility = Visibility.Hidden;
-                rightCanvas.Visibility = Visibility.Hidden;
-            } 
-            else
-            {
-                if (carLeftRight == Enums.CarLeftRight.irsdk_LRCarLeft)
+                if (carLeftRight == Enums.CarLeftRight.irsdk_LRClear)
                 {
-                    double offset = _service.CenterOffset();
+                    RenderLeftBar(grid.ActualHeight);
+                    RenderRightBar(grid.ActualHeight);
 
-                    var pixelOffset = grid.ActualHeight * -offset;
-
-                    RenderLeftBar(pixelOffset);
-
-                    rightCanvas.Visibility = Visibility.Hidden;
-                    leftCanvas.Visibility = Visibility.Visible;
-                }
-                else if (carLeftRight == Enums.CarLeftRight.irsdk_LRCarRight)
-                {
-                    double offset = _service.CenterOffset();
-
-                    var pixelOffset = grid.ActualHeight * -offset;
-
-                    RenderRightBar(pixelOffset);
-                    rightCanvas.Visibility = Visibility.Visible;
                     leftCanvas.Visibility = Visibility.Hidden;
-                }
-                else if (carLeftRight == Enums.CarLeftRight.irsdk_LRCarLeftRight)
-                {
-                    RenderBothBars();
-                    leftCanvas.Visibility = Visibility.Visible;
-                    rightCanvas.Visibility = Visibility.Visible;
-                }
-                else if (carLeftRight == Enums.CarLeftRight.irsdk_LR2CarsLeft)
-                {
-                    RenderLeftBar(0, _settings.ThreeWideBarColor);
-                    leftCanvas.Visibility = Visibility.Visible;
                     rightCanvas.Visibility = Visibility.Hidden;
                 }
-                else if (carLeftRight == Enums.CarLeftRight.irsdk_LR2CarsRight)
+                else
                 {
-                    RenderRightBar(0, _settings.ThreeWideBarColor);
-                    rightCanvas.Visibility = Visibility.Visible;
-                    leftCanvas.Visibility = Visibility.Hidden;
-                }
+                    if (carLeftRight == Enums.CarLeftRight.irsdk_LRCarLeft)
+                    {
+                        double offset = _service.CenterOffset();
 
-                
+                        var pixelOffset = grid.ActualHeight * -offset;
+
+                        RenderLeftBar(pixelOffset);
+
+                        rightCanvas.Visibility = Visibility.Hidden;
+                        leftCanvas.Visibility = Visibility.Visible;
+                    }
+                    else if (carLeftRight == Enums.CarLeftRight.irsdk_LRCarRight)
+                    {
+                        double offset = _service.CenterOffset();
+
+                        var pixelOffset = grid.ActualHeight * -offset;
+
+                        RenderRightBar(pixelOffset);
+                        rightCanvas.Visibility = Visibility.Visible;
+                        leftCanvas.Visibility = Visibility.Hidden;
+                    }
+                    else if (carLeftRight == Enums.CarLeftRight.irsdk_LRCarLeftRight)
+                    {
+                        RenderBothBars();
+                        leftCanvas.Visibility = Visibility.Visible;
+                        rightCanvas.Visibility = Visibility.Visible;
+                    }
+                    else if (carLeftRight == Enums.CarLeftRight.irsdk_LR2CarsLeft)
+                    {
+                        RenderLeftBar(0, _settings.ThreeWideBarColor);
+                        leftCanvas.Visibility = Visibility.Visible;
+                        rightCanvas.Visibility = Visibility.Hidden;
+                    }
+                    else if (carLeftRight == Enums.CarLeftRight.irsdk_LR2CarsRight)
+                    {
+                        RenderRightBar(0, _settings.ThreeWideBarColor);
+                        rightCanvas.Visibility = Visibility.Visible;
+                        leftCanvas.Visibility = Visibility.Hidden;
+                    }
+                }
             }
         }
 
@@ -323,7 +312,8 @@ namespace SharpOverlay
             {
                 rect.Height = grid.ActualHeight;
             }
-            else {
+            else
+            {
                 rect.Height = grid.ActualHeight * (1 - Math.Abs(barSize));
 
             }
