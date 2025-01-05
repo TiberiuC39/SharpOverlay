@@ -1,10 +1,9 @@
 ﻿using System;
 
-namespace SharpOverlay.Services
+namespace SharpOverlay.Services.FuelServices
 {
     public interface IFuelCalculator
     {
         event EventHandler<FuelEventArgs> FuelUpdated;
-        public bool IsInCar { get; }
     }
 }

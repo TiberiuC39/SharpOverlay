@@ -1,50 +1,48 @@
 ﻿using iRacingSdkWrapper;
+using iRacingSdkWrapper.Bitfields;
 using SharpOverlay.Models;
-using SharpOverlay.Services.LapServices;
+using SharpOverlay.Services.Base;
+using SharpOverlay.Services.FuelServices.LapServices;
+using SharpOverlay.Services.FuelServices.PitServices;
 using SharpOverlay.Strategies;
+using SharpOverlay.Utilities.Sessions;
+using SharpOverlay.Utilities.Telemetries;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Threading;
 
-namespace SharpOverlay.Services
+namespace SharpOverlay.Services.FuelServices
 {
     public class FuelCalculatorService : IFuelCalculator
     {
-        private const int _defaultTickRate = 2;
         private const double _fuelCutOff = 0.3;
-
-        private readonly iRacingDataService _iRacingService;
         private readonly ISessionParser _sessionParser;
         private readonly ITelemetryParser _telemetryParser;
 
         private readonly List<IFuelStrategy> _strategyList;
 
-        private readonly ILapTracker _lapTracker;
-        private readonly ILapTimeCalculator _lapTimeCalculator;
-        private readonly ILapCountCalculator _lapCountCalculator;
-        private readonly ILapDataAnalyzer _lapAnalyzer;
+        private readonly LapTracker _lapTracker;
+        private readonly LapCountCalculator _lapCountCalculator;
+        private readonly LapAnalyzer _lapAnalyzer;
 
-        private readonly IPitManager _pitManager;
+        private readonly PitManager _pitManager;
+        private readonly PitTimeTracker _pitTimeTracker;
+        private readonly FinishLineLocator _finishLineLocator;
 
         private int _lapsRemainingInRace;
         private bool _isRaceStart;
-        private TrackSurfaces _trackSurface;
 
-        public bool IsInCar { get; private set; }
-        
-
-        public FuelCalculatorService(int tickRate = _defaultTickRate)
+        public FuelCalculatorService(SimReader simReader)
         {
-            _iRacingService = new iRacingDataService();
             _sessionParser = new SessionParser();
             _telemetryParser = new TelemetryParser();
             _lapTracker = new LapTracker();
-            _lapTimeCalculator = new LapTimeCalculator();
             _lapCountCalculator = new LapCountCalculator();
-            _lapAnalyzer = new LapDataAnalyzer();
+            _lapAnalyzer = new LapAnalyzer();
             _pitManager = new PitManager();
+            _pitTimeTracker = new PitTimeTracker();
+            _finishLineLocator = new FinishLineLocator();
 
             _strategyList = new List<IFuelStrategy>
             {
@@ -52,23 +50,27 @@ namespace SharpOverlay.Services
                 new LastLapStrategy(_fuelCutOff),
                 new FiveLapStrategy(_fuelCutOff)
             };
-            
-            _iRacingService.HookUpToConnectedEvent(ExecuteOnConnected);
-            _iRacingService.HookUpToSessionEvent(ExecuteOnSessionEvent);
-            _iRacingService.HookUpToTelemetryEvent(ExecuteOnTelemetryEvent);
-            _iRacingService.HookUpToDisconnectedEvent(ExecuteOnDisconnected);
+
+            simReader.OnConnected += ExecuteOnConnected;
+            simReader.OnDisconnected += ExecuteOnDisconnected;
+            simReader.OnTelemetryUpdated += ExecuteOnTelemetryEvent;
+            simReader.OnSessionUpdated += ExecuteOnSessionEvent;
         }
 
         private void ExecuteOnDisconnected(object? sender, EventArgs args)
         {
             Clear();
+            RaiseEvent();
+        }
 
+        private void RaiseEvent()
+        {
             FuelUpdated(this, new FuelEventArgs(GetViewModel(new SimulationOutputDTO())));
         }
 
         private void ExecuteOnConnected(object? sender, EventArgs args)
         {
-            FuelUpdated(this, new FuelEventArgs(GetViewModel(new SimulationOutputDTO())));
+            RaiseEvent();
         }
 
         public event EventHandler<FuelEventArgs> FuelUpdated = null!;
@@ -82,6 +84,7 @@ namespace SharpOverlay.Services
             _lapTracker.Clear();
             _lapAnalyzer.Clear();
             _pitManager.Clear();
+            _finishLineLocator.Clear();
 
             _strategyList.ForEach(s => s.Clear());
         }
@@ -95,19 +98,18 @@ namespace SharpOverlay.Services
             _telemetryParser.ParsePlayerCarClassId(telemetry);
             _telemetryParser.ParsePlayerPctOnTrack(telemetry);
             _telemetryParser.ParsePositionCarIdxInPlayerClass(telemetry, _sessionParser.PaceCarIdx);
+            _telemetryParser.ParsePositionCarIdxForWholeRace(telemetry, _sessionParser.PaceCarIdx);
             _telemetryParser.ParseCarIdxOnTrack(telemetry);
-
-            _trackSurface = telemetry.PlayerTrackSurface.Value;
-
-            IsInCar = telemetry.IsOnTrack.Value;
 
             var simulationOutput = new SimulationOutputDTO(telemetry);
 
             if (IsSessionStateValid(simulationOutput.SessionState))
             {
-                _lapAnalyzer.CollectAllDriversLaps(_sessionParser.Drivers,
-                    TelemetryParser.GetDriversLastLapTime(_sessionParser.PaceCarIdx, simulationOutput.CarIdxLastLapTime),
-                    simulationOutput.CarIdxLapCompleted);
+                var driversDict = _sessionParser.Drivers;
+                var driversLastLapTime = TelemetryParser.GetDriversLastLapTime(_sessionParser.PaceCarIdx, simulationOutput.CarIdxLastLapTime);
+                var lapsCompletedByCarIdx = simulationOutput.CarIdxLapCompleted;
+
+                _lapAnalyzer.CollectAllDriversLaps(driversDict, driversLastLapTime, lapsCompletedByCarIdx);
 
                 RunFuelCalculations(simulationOutput);
             }
@@ -115,7 +117,7 @@ namespace SharpOverlay.Services
             {
                 Clear();
             }
-            else if (!IsInCar
+            else if (!simulationOutput.IsOnTrack
                 && telemetry.IsReplayPlaying.Value
                 && _lapTracker.GetCurrentLap() is not null)
             {
@@ -129,10 +131,10 @@ namespace SharpOverlay.Services
 
         private bool IsSessionStateValid(SessionStates sessionState)
         {
-            return (sessionState == SessionStates.Racing
+            return sessionState == SessionStates.Racing
                             || sessionState == SessionStates.GetInCar
                             || sessionState == SessionStates.ParadeLaps
-                            || sessionState == SessionStates.Checkered);
+                            || sessionState == SessionStates.Checkered;
         }
 
         private bool IsSessionStateInvalid(SessionStates sessionState)
@@ -147,23 +149,40 @@ namespace SharpOverlay.Services
         {
             var sessionInfo = eventArgs.SessionInfo;
 
+            _sessionParser.ParseSectors(sessionInfo);
+
             _sessionParser.ParseLapsInSession(sessionInfo, _telemetryParser.CurrentSessionNumber);
             _sessionParser.ParseCurrentSessionType(sessionInfo, _telemetryParser.CurrentSessionNumber);
             _sessionParser.ParseStartType(sessionInfo);
             _sessionParser.ParseDrivers(sessionInfo);
             _sessionParser.ParsePaceCarIdx(sessionInfo);
             _sessionParser.ParseSessions(sessionInfo);
+            _sessionParser.ParseRaceType(sessionInfo);
         }
 
         private void RunFuelCalculations(SimulationOutputDTO simulationOutput)
         {
-            _pitManager.UpdatePitRoadStatus(simulationOutput.IsOnPitRoad);
-            _pitManager.UpdatePitServiceStatus(simulationOutput.IsReceivingService);
+            _pitManager.SetPitRoadStatus(simulationOutput.IsOnPitRoad, simulationOutput.TrackSurface);
+            _pitManager.SetPitServiceStatus(simulationOutput.IsReceivingService);
+
+            if (simulationOutput.TrackSurface == TrackSurfaces.AproachingPits && !_pitTimeTracker.IsTrackingTime)
+            {
+                _pitTimeTracker.StartPitDurationTracking(simulationOutput.SessionTimeRemaining);
+            }
+            else if (_pitTimeTracker.IsTrackingTime && _sessionParser.Sectors[1].StartPct - simulationOutput.PlayerTrackDistPct < 0.005)
+            {
+                _pitTimeTracker.StopPitDurationTracking(simulationOutput.SessionTimeRemaining);
+            }
 
             var currentLap = _lapTracker.GetCurrentLap();
 
             if (currentLap is null)
             {
+                if (simulationOutput.FuelLevel == 0)
+                {
+                    return;
+                }
+
                 _lapTracker.StartNewLap(simulationOutput.CurrentLapNumber, simulationOutput.FuelLevel);
 
                 var sessionState = simulationOutput.SessionState;
@@ -175,11 +194,11 @@ namespace SharpOverlay.Services
                 }
             }
             else if (_isRaceStart && simulationOutput.CurrentLapNumber == 2) // Simulator flickers quickly to lap 2 in Race
-                                                                            // after the going through start finish line on lap 0 to 1
+                                                                             // after the going through start finish line on lap 0 to 1
             {
                 _isRaceStart = false;
             }
-            else if (_pitManager.HasResetToPits(simulationOutput.EnterExitResetButton) && IsInCar)
+            else if (_pitManager.HasResetToPits(simulationOutput.EnterExitResetButton) && simulationOutput.IsOnTrack)
             {
                 currentLap.StartingFuel = simulationOutput.FuelLevel;
 
@@ -187,7 +206,10 @@ namespace SharpOverlay.Services
             }
             else if (_pitManager.HasBegunService())
             {
-                _lapTracker.CompleteCurrentLap(simulationOutput.FuelLevel, simulationOutput.LastLapTime);
+                if (simulationOutput.SessionFlag != SessionFlags.Repair)
+                {
+                    _lapTracker.CompleteCurrentLap(simulationOutput.FuelLevel, simulationOutput.LastLapTime);
+                }
 
                 CalculateFuelAndLapData(simulationOutput);
 
@@ -195,25 +217,35 @@ namespace SharpOverlay.Services
             }
             else if (_pitManager.HasFinishedService())
             {
-                int lastLapnumber = _lapTracker.GetCompletedLaps().Last().Number;
+                int lastLapnumber = _lapTracker.GetPlayerLaps().Last().Number;
 
-                _lapTracker.StartNewLap(simulationOutput.CurrentLapNumber, simulationOutput.FuelLevel);
+                _lapTracker.StartNewLap(++lastLapnumber, simulationOutput.FuelLevel);
 
-                if (lastLapnumber == simulationOutput.CurrentLapNumber)
-                {
-                    currentLap.Number++;
-                }
+                currentLap = _lapTracker.GetCurrentLap()!;
 
                 _strategyList.ForEach(s => s.UpdateRefuel(currentLap.StartingFuel, _lapsRemainingInRace));
 
                 _pitManager.ResetFinishedServiceStatus();
             }
             else if (IsCrossingFinishLine(simulationOutput.CurrentLapNumber, currentLap.Number)
-                && !_pitManager.IsOnPitRoad()
                 && simulationOutput.SessionState != SessionStates.ParadeLaps)
             {
-                _lapTracker.CompleteCurrentLap(simulationOutput.FuelLevel, simulationOutput.LastLapTime);
-                _lapTracker.StartNewLap(simulationOutput.CurrentLapNumber, simulationOutput.FuelLevel);
+                if (!_finishLineLocator.IsFinishLineKnown() && _pitManager.IsComingOutOfPits())
+                {
+                    _finishLineLocator.DetermineFinishLineLocation(simulationOutput.PlayerTrackDistPct);
+                }
+
+                if (_finishLineLocator.IsFinishLineAfterPits() && _pitManager.IsComingOutOfPits())
+                {
+                    currentLap.Number++;
+
+                    _pitManager.ResetIsComingOutOfPits();
+                }
+                else if (!_pitManager.IsOnPitRoad())
+                {
+                    _lapTracker.CompleteCurrentLap(simulationOutput.FuelLevel, simulationOutput.LastLapTime);
+                    _lapTracker.StartNewLap(simulationOutput.CurrentLapNumber, simulationOutput.FuelLevel);
+                }
 
                 CalculateFuelAndLapData(simulationOutput);
             }
@@ -230,44 +262,54 @@ namespace SharpOverlay.Services
 
         private void CalculateFuelAndLapData(SimulationOutputDTO simulationOutput)
         {
-            int leaderIdx;
-
-            if (_sessionParser.SessionType == SessionType.Practice)
-            {
-                leaderIdx = _telemetryParser.PlayerCarIdx;
-            }
-            else
-            {
-                leaderIdx = _lapAnalyzer.FindLeaderIdxInClass(_telemetryParser.PositionCarIdxInClass);
-            }
+            int leaderIdx = FindLeader();
 
             if (_sessionParser.SessionLaps > 0)
             {
                 _lapsRemainingInRace = _lapCountCalculator.CalculateLapsRemaining(_sessionParser.SessionLaps, simulationOutput.CarIdxLapCompleted[leaderIdx]);
             }
-            else if (leaderIdx >= 0)
+            else
             {
-                var averageLapTime = GetAverageLapTime(leaderIdx);
+                var leaderAverageLapTime = _lapAnalyzer.GetLapTime(leaderIdx);
 
-                _lapsRemainingInRace = _lapCountCalculator.CalculateLapsRemaining(_telemetryParser.CarIdxPctOnTrack[leaderIdx], simulationOutput.SessionTimeRemaining, averageLapTime);
+                if (_sessionParser.IsMultiClassRace)
+                {
+                    var raceLeaderPctOnTrack = _telemetryParser.CarIdxPctOnTrack[leaderIdx];
+                    var playerAverageLapTime = _lapAnalyzer.GetLapTime(_telemetryParser.PlayerCarIdx);
+
+                    _lapsRemainingInRace = _lapCountCalculator.CalculateLapsRemainingMultiClass(simulationOutput.SessionTimeRemaining,
+                        raceLeaderPctOnTrack, simulationOutput.PlayerTrackDistPct, leaderAverageLapTime, playerAverageLapTime, simulationOutput.SessionFlag);
+                }
+                else if (leaderIdx >= 0)
+                {
+                    _lapsRemainingInRace = _lapCountCalculator.CalculateLapsRemaining(_telemetryParser.CarIdxPctOnTrack[leaderIdx], simulationOutput.SessionTimeRemaining, leaderAverageLapTime);
+                }
             }
 
             foreach (var strategy in _strategyList)
             {
-                strategy.Calculate(_lapTracker.GetCompletedLaps(), _lapsRemainingInRace);
+                strategy.Calculate(_lapTracker.GetPlayerLaps(), _lapsRemainingInRace);
             }
         }
 
-        private TimeSpan GetAverageLapTime(int driverIdx)
+        private int FindLeader()
         {
-            if (driverIdx < 0)
+            int leaderIdx;
+
+            if (_sessionParser.SessionType != SessionType.Race)
             {
-                return TimeSpan.Zero;
+                leaderIdx = _telemetryParser.PlayerCarIdx;
+            }
+            else if (_sessionParser.IsMultiClassRace)
+            {
+                leaderIdx = _lapAnalyzer.GetLeaderIdx(_telemetryParser.PositionCarIdxInRace);
+            }
+            else
+            {
+                leaderIdx = _lapAnalyzer.GetLeaderIdx(_telemetryParser.PositionCarIdxInClass);
             }
 
-            var driverLaps = _lapAnalyzer.GetDriversLaps()[driverIdx];
-
-            return _lapTimeCalculator.CalculateLapTime(driverLaps);
+            return leaderIdx;
         }
 
         private FuelViewModel GetViewModel(SimulationOutputDTO simulationOutput)
@@ -279,7 +321,7 @@ namespace SharpOverlay.Services
                 _strategyList[2].GetView()
             };
 
-            var completedLaps = _lapTracker.GetCompletedLaps();
+            var completedLaps = _lapTracker.GetPlayerLaps();
 
             if (completedLaps.Count > 1)
             {
@@ -293,11 +335,15 @@ namespace SharpOverlay.Services
                     RaceLapsRemaining = _lapsRemainingInRace,
 
                     IsRollingStart = _sessionParser.StartType == StartType.Rolling,
+                    SessionFlag = simulationOutput.SessionFlag,
                     IsRaceStart = _isRaceStart,
                     CurrentSessionNumber = _telemetryParser.CurrentSessionNumber,
                     CurrentLap = _lapTracker.GetCurrentLap(),
-                    TrackSurface = _trackSurface,
-                    SessionState = simulationOutput.SessionState
+                    TrackSurface = simulationOutput.TrackSurface,
+                    SessionState = simulationOutput.SessionState,
+                    IsOnPitRoad = _pitManager.IsOnPitRoad(),
+                    HasBegunService = _pitManager.HasBegunService(),
+                    HasCompletedService = _pitManager.HasFinishedService(),
                 };
             }
 
@@ -311,11 +357,15 @@ namespace SharpOverlay.Services
                 RaceLapsRemaining = _lapsRemainingInRace,
 
                 IsRollingStart = _sessionParser.StartType == StartType.Rolling,
+                SessionFlag = simulationOutput.SessionFlag,
                 IsRaceStart = _isRaceStart,
                 CurrentSessionNumber = _telemetryParser.CurrentSessionNumber,
                 CurrentLap = _lapTracker.GetCurrentLap(),
-                TrackSurface = _trackSurface,
-                SessionState = simulationOutput.SessionState
+                TrackSurface = simulationOutput.TrackSurface,
+                SessionState = simulationOutput.SessionState,
+                IsOnPitRoad = _pitManager.IsOnPitRoad(),
+                HasBegunService = _pitManager.HasBegunService(),
+                HasCompletedService = _pitManager.HasFinishedService(),
             };
         }
     }

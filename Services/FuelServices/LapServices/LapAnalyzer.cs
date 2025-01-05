@@ -4,9 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SharpOverlay.Services.LapServices
+namespace SharpOverlay.Services.FuelServices.LapServices
 {
-    public class LapDataAnalyzer : ILapDataAnalyzer
+    public class LapAnalyzer : IClear
     {
         private readonly Dictionary<int, List<Lap>> _driversLaps = [];
 
@@ -36,15 +36,15 @@ namespace SharpOverlay.Services.LapServices
             }
         }
 
-        public int FindLeaderIdxInClass(Dictionary<int, int> positionIdxInClass)
+        public int GetLeaderIdx(Dictionary<int, int> positionIdx)
         {
             const int invalidLeaderPosition = -1;
 
-            int leaderInClassPosition = positionIdxInClass.Keys.Count > 0 ? positionIdxInClass.Keys.Min() : invalidLeaderPosition;
+            int leaderPosition = positionIdx.Keys.Count > 0 ? positionIdx.Keys.Min() : invalidLeaderPosition;
 
-            if (leaderInClassPosition > invalidLeaderPosition)
+            if (leaderPosition > invalidLeaderPosition)
             {
-                return positionIdxInClass[leaderInClassPosition];
+                return positionIdx[leaderPosition];
             }
 
             return -1;
@@ -52,5 +52,24 @@ namespace SharpOverlay.Services.LapServices
 
         public Dictionary<int, List<Lap>> GetDriversLaps()
             => _driversLaps;
+
+        public TimeSpan GetLapTime(int carIdx)
+        {
+            if (!_driversLaps.ContainsKey(carIdx) ||
+                carIdx < 0)
+            {
+                return TimeSpan.Zero;
+            }
+
+            var validLaps = _driversLaps[carIdx].Where(l => l.Time > TimeSpan.Zero);
+
+            if (validLaps.Any())
+            {
+                return TimeSpan.FromSeconds(validLaps
+                    .Average(l => l.Time.TotalSeconds));
+            }
+
+            return TimeSpan.Zero;
+        }
     }
 }

@@ -2,9 +2,9 @@
 using System;
 using System.Collections.Generic;
 
-namespace SharpOverlay.Services.LapServices
+namespace SharpOverlay.Services.FuelServices.LapServices
 {
-    public class LapTracker : ILapTracker
+    public class LapTracker : IClear
     {
         private readonly List<Lap> _completedLaps = [];
         private Lap? _currentLap;
@@ -34,7 +34,7 @@ namespace SharpOverlay.Services.LapServices
             _currentLap = null;
         }
 
-        public List<Lap> GetCompletedLaps()
+        public List<Lap> GetPlayerLaps()
             => _completedLaps;
 
         public int GetCompletedLapsCount()

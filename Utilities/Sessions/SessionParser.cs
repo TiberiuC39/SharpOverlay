@@ -7,7 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 
-namespace SharpOverlay.Services
+namespace SharpOverlay.Utilities.Sessions
 {
     public class SessionParser : ISessionParser
     {
@@ -17,6 +17,13 @@ namespace SharpOverlay.Services
         public SessionType SessionType { get; private set; }
         public int SessionLaps { get; private set; }
         public int PaceCarIdx { get; private set; }
+        public bool IsMultiClassRace { get; private set; }
+        public List<Sector> Sectors { get; private set; }
+
+        public void ParseSectors(SessionInfo sessionInfo)
+        {
+            Sectors = sessionInfo.Sectors;
+        }
 
         public void ParseDrivers(SessionInfo sessionInfo)
         {
@@ -86,7 +93,7 @@ namespace SharpOverlay.Services
             {
                 SessionType = sessionType;
             }
-        }        
+        }
 
         public void ParseLapsInSession(SessionInfo sessionInfo, int currentSessionNumber = default)
         {
@@ -123,6 +130,11 @@ namespace SharpOverlay.Services
             SessionLaps = -1;
             SessionType = SessionType.Invalid;
             StartType = StartType.Unknown;
+        }
+
+        public void ParseRaceType(SessionInfo sessionInfo)
+        {
+            IsMultiClassRace = sessionInfo.WeekendInfo.NumCarClasses > 1;
         }
     }
 }

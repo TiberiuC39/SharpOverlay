@@ -16,7 +16,6 @@ namespace SharpOverlay
     /// </summary>
     public partial class MainWindow : System.Windows.Window
     {
-        public SdkWrapper iracingWrapper = iRacingDataService.Wrapper;
         public UpdateManager mgr = new UpdateManager(new GithubSource("https://github.com/tiberiuc39/sharpoverlay", null, false));
         public MainWindow()
         {
@@ -26,7 +25,6 @@ namespace SharpOverlay
             InitializeComponent();
             HandleOverlayStatus();
             this.DataContext = App.appSettings;
-            iracingWrapper.Start();
             if(App.appSettings.IsUpdate)
             {
                 updateButton.Visibility = Visibility.Visible;  
@@ -67,6 +65,8 @@ namespace SharpOverlay
                     var showMethod = o.Window.GetType().GetMethod("Show");
                     showMethod.Invoke(o.Window, null);
                     o.IsOpen = true;
+
+                    o.Window.Visibility = Visibility.Hidden;
                 }
                 if (!o.IsEnabled && o.IsOpen)
                 {
@@ -80,7 +80,7 @@ namespace SharpOverlay
 
         private void windowToggle(object sender, RoutedEventArgs e)
         {
-            HandleOverlayStatus();
+            //HandleOverlayStatus();
         }
 
         private void Hyperlink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)

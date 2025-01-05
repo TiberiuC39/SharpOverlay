@@ -1,10 +1,8 @@
 ﻿using iRacingSdkWrapper;
 using iRacingSdkWrapper.Bitfields;
-using SharpOverlay.Models;
-using System;
 using System.Collections.Generic;
 
-namespace SharpOverlay.Services
+namespace SharpOverlay.Utilities.Telemetries
 {
     public interface ITelemetryParser
     {
@@ -23,6 +21,7 @@ namespace SharpOverlay.Services
         void ParsePlayerCarIdx(TelemetryInfo telemetry);
         void ParsePlayerPctOnTrack(TelemetryInfo telemetry);
         void ParsePositionCarIdxInPlayerClass(TelemetryInfo telemetry, int paceCarIdx);
+        void ParsePositionCarIdxForWholeRace(TelemetryInfo telemetry, int paceCarIdx);
         SessionFlags GetSessionFlag(TelemetryInfo telemetry);
         void ParseCarIdxOnTrack(TelemetryInfo telemetry);
     }

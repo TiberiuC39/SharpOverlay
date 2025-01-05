@@ -4,7 +4,7 @@ using SharpOverlay.Models;
 using System;
 using System.Collections.Generic;
 
-namespace SharpOverlay.Services
+namespace SharpOverlay.Utilities.Sessions
 {
     public interface ISessionParser
     {
@@ -14,14 +14,18 @@ namespace SharpOverlay.Services
         StartType StartType { get; }
         int SessionLaps { get; }
         int PaceCarIdx { get; }
+        bool IsMultiClassRace { get; }
+        List<Sector> Sectors { get; }
 
         void Clear();
         TimeSpan GetBestLapTime(int leaderIdx, int currentSessionNumber);
         void ParseCurrentSessionType(SessionInfo sessionInfo, int currentSessionNumber);
+        void ParseRaceType(SessionInfo sessionInfo);
         void ParseDrivers(SessionInfo sessionInfo);
         void ParsePaceCarIdx(SessionInfo sessionInfo);
         void ParseLapsInSession(SessionInfo sessionInfo, int currentSessionNumber);
         void ParseSessions(SessionInfo sessionInfo);
         void ParseStartType(SessionInfo sessionInfo);
+        void ParseSectors(SessionInfo sessionInfo);
     }
 }

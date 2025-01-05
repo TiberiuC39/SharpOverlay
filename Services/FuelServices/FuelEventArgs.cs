@@ -1,7 +1,7 @@
 ﻿using SharpOverlay.Models;
 using System;
 
-namespace SharpOverlay.Services
+namespace SharpOverlay.Services.FuelServices
 {
     public class FuelEventArgs : EventArgs
     {
