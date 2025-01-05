@@ -24,27 +24,33 @@ namespace SharpOverlay
         private bool absActive;
         private ScottPlot.Color currentBgColor;
 
+        private readonly InputGraphSettings _settings = App.appSettings.InputGraphSettings;
         private readonly SimReader _simReader = new SimReader(DefaultTickRates.InputGraph);
-        private readonly WindowStateService _stateService;
+        private readonly WindowStateService _windowStateService;
 
         public InputGraph()
         {
-            _stateService = new WindowStateService();
             InitializeComponent();
             Services.JotService.tracker.Track(this);
+
+            _windowStateService = new WindowStateService(_simReader, _settings);
+
             _simReader.OnTelemetryUpdated += iracingWrapper_TelemetryUpdated;
-            _simReader.OnTelemetryUpdated += _stateService.ExecuteOnTelemetry;
-            _stateService.WindowStateChanged += ExecuteOnStateChange;
-            App.appSettings.InputGraphSettings.PropertyChanged += graph_HandleSettingUpdated;
-            HookStreamer(ref throttleStreamer, App.appSettings.InputGraphSettings.ThrottleColor, true);
-            HookStreamer(ref brakeStreamer, App.appSettings.InputGraphSettings.BrakeColor, true);
-            HookStreamer(ref clutchStreamer, App.appSettings.InputGraphSettings.ClutchColor, App.appSettings.InputGraphSettings.ShowClutch);
+
+            _windowStateService.WindowStateChanged += ExecuteOnStateChange;
+
+            _settings.PropertyChanged += graph_HandleSettingUpdated;
+
+            HookStreamer(ref throttleStreamer, _settings.ThrottleColor, true);
+            HookStreamer(ref brakeStreamer, _settings.BrakeColor, true);
+            HookStreamer(ref clutchStreamer, _settings.ClutchColor, _settings.ShowClutch);
+
             PlotSetup();
         }
 
         private void ExecuteOnStateChange(object? sender, WindowStateEventArgs args)
         {
-            if (args.IsOpen)
+            if (args.IsOpen && args.IsEnabled)
             {
                 Show();
             }
@@ -56,27 +62,26 @@ namespace SharpOverlay
 
         private void graph_HandleSettingUpdated(object? sender, PropertyChangedEventArgs e)
         {
-            SetStreamerColorAndWidth(ref throttleStreamer, App.appSettings.InputGraphSettings.ThrottleColor);
-            SetStreamerColorAndWidth(ref brakeStreamer, App.appSettings.InputGraphSettings.BrakeColor);
-            SetStreamerColorAndWidth(ref clutchStreamer, App.appSettings.InputGraphSettings.ClutchColor);
+            SetStreamerColorAndWidth(ref throttleStreamer, _settings.ThrottleColor);
+            SetStreamerColorAndWidth(ref brakeStreamer, _settings.BrakeColor);
+            SetStreamerColorAndWidth(ref clutchStreamer, _settings.ClutchColor);
 
             //InputPlot.Plot.DataBackground.Color = TransformColor(App.appSettings.InputGraphSettings.BackgroundColor);
-            InputPlot.Plot.FigureBackground.Color = TransformColor(App.appSettings.InputGraphSettings.BackgroundColor);
+            InputPlot.Plot.FigureBackground.Color = TransformColor(_settings.BackgroundColor);
             InputPlot.Refresh();
 
-            if (App.appSettings.InputGraphSettings.ShowClutch)
+            if (_settings.ShowClutch)
             {
                 clutchStreamer.IsVisible = true;
             }
-            else if (!App.appSettings.InputGraphSettings.ShowClutch)
+            else if (!_settings.ShowClutch)
             {
                 clutchStreamer.IsVisible = false;
             }
         }
         private void UpdateInputs(TelemetryInfo telemetryInfo)
         {
-
-            if (App.appSettings.InputGraphSettings.UseRawValues)
+            if (_settings.UseRawValues)
             {
                 input.Brake = telemetryInfo.BrakeRaw.Value * 100;
                 input.Throttle = telemetryInfo.ThrottleRaw.Value * 100;
@@ -95,7 +100,7 @@ namespace SharpOverlay
         {
             throttleStreamer.Add(input.Throttle);
             brakeStreamer.Add(input.Brake);
-            if (App.appSettings.InputGraphSettings.ShowClutch)
+            if (_settings.ShowClutch)
             {
                 clutchStreamer.Add(input.Clutch);
             }
@@ -108,7 +113,7 @@ namespace SharpOverlay
             InputPlot.Refresh();
 
             absActive = e.TelemetryInfo.BrakeABSactive.Value;
-            if (App.appSettings.InputGraphSettings.ShowABS)
+            if (_settings.ShowABS)
             {
                 ABSFlash();
             }
@@ -124,7 +129,7 @@ namespace SharpOverlay
         {
             InputPlot.Menu.Clear();
 
-            InputPlot.Plot.FigureBackground.Color = TransformColor(App.appSettings.InputGraphSettings.BackgroundColor);
+            InputPlot.Plot.FigureBackground.Color = TransformColor(_settings.BackgroundColor);
             InputPlot.Plot.Axes.Frameless();
 
             InputPlot.Plot.Axes.SetLimitsY(-5, 105);
@@ -140,7 +145,7 @@ namespace SharpOverlay
 
             ds.Color = TransformColor(color);
 
-            ds.LineWidth = App.appSettings.InputGraphSettings.LineWidth;
+            ds.LineWidth = _settings.LineWidth;
 
             ds.ViewScrollLeft();
 
@@ -153,7 +158,7 @@ namespace SharpOverlay
         {
             dataStreamer.Color = TransformColor(color);
 
-            dataStreamer.LineWidth = App.appSettings.InputGraphSettings.LineWidth;
+            dataStreamer.LineWidth = _settings.LineWidth;
         }
         private ScottPlot.Color TransformColor(SolidColorBrush color)
         {
@@ -162,15 +167,15 @@ namespace SharpOverlay
 
         private void ABSFlash()
         {
-            if (absActive && currentBgColor == TransformColor(App.appSettings.InputGraphSettings.BackgroundColor))
+            if (absActive && currentBgColor == TransformColor(_settings.BackgroundColor))
             {
-                InputPlot.Plot.FigureBackground.Color = TransformColor(App.appSettings.InputGraphSettings.ABSColor);
+                InputPlot.Plot.FigureBackground.Color = TransformColor(_settings.ABSColor);
                 currentBgColor = InputPlot.Plot.DataBackground.Color;
             }
-            else if(currentBgColor != TransformColor(App.appSettings.InputGraphSettings.BackgroundColor))
+            else if(currentBgColor != TransformColor(_settings.BackgroundColor))
             {
-                InputPlot.Plot.FigureBackground.Color = TransformColor(App.appSettings.InputGraphSettings.BackgroundColor);
-                currentBgColor = TransformColor(App.appSettings.InputGraphSettings.BackgroundColor);
+                InputPlot.Plot.FigureBackground.Color = TransformColor(_settings.BackgroundColor);
+                currentBgColor = TransformColor(_settings.BackgroundColor);
             }
         }
     }

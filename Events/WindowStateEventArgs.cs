@@ -5,11 +5,15 @@ namespace SharpOverlay.Events
 {
     public class WindowStateEventArgs : EventArgs
     {
-        public WindowStateEventArgs(FuelWindowState windowState)
+        public WindowStateEventArgs(WindowState windowState)
         {
-            IsOpen = windowState.State;
+            IsOpen = windowState.IsOpen;
+            IsEnabled = windowState.IsEnabled;
+            IsInTestMode = windowState.IsInTestMode;
         }
 
-        public bool IsOpen { get; set; }
+        public bool IsOpen { get; }
+        public bool IsEnabled { get; }
+        public bool IsInTestMode { get; }
     }
 }

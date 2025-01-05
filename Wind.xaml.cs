@@ -17,8 +17,8 @@ namespace SharpOverlay
     public partial class Wind : Window
     {
         private readonly SimReader _simReader = new SimReader(DefaultTickRates.Wind);
-        private readonly WindowStateService _windowStateService = new();
-        private Settings appSettings = App.appSettings;
+        private readonly WindowStateService _windowStateService;
+        private WindSettings _settings = App.appSettings.WindSettings;
 
         private readonly Color StartColor = Color.FromArgb(255, 0, 255, 0);
         private readonly Color CenterColor = Color.FromArgb(255, 255, 255, 0);
@@ -33,9 +33,11 @@ namespace SharpOverlay
             InitializeComponent();
             Services.JotService.tracker.Track(this);
 
+            _windowStateService = new WindowStateService(_simReader, _settings);
+
             _simReader.OnTelemetryUpdated += Wrapper_TelemetryUpdated;
-            _simReader.OnTelemetryUpdated += _windowStateService.ExecuteOnTelemetry;
-            appSettings.WindSettings.PropertyChanged += settings_TestMode;
+
+            _settings.PropertyChanged += settings_TestMode;
             _windowStateService.WindowStateChanged += OnWindowStateChanged;
 
             WindSpeedLabel.Foreground = new SolidColorBrush(StartColor);
@@ -44,7 +46,7 @@ namespace SharpOverlay
 
         private void OnWindowStateChanged(object? sender, WindowStateEventArgs e)
         {
-            if (e.IsOpen)
+            if (e.IsOpen && e.IsEnabled)
             {
                 Show();
             }
@@ -56,7 +58,7 @@ namespace SharpOverlay
 
         private void settings_TestMode(object? sender, PropertyChangedEventArgs e)
         {
-            if (appSettings.WindSettings.IsInTestMode)
+            if (_settings.IsInTestMode)
             {
                 WindWindow.BorderThickness = new Thickness(5);
             }
@@ -79,7 +81,7 @@ namespace SharpOverlay
             {
                 lastWindSpeed = windSpeed;
                 SetColor(windSpeed / 40);
-                if (appSettings.WindSettings.UseMph)
+                if (_settings.UseMph)
                 {
                     WindSpeedLabel.Content = (int)(windSpeed * 0.62);
                 }
