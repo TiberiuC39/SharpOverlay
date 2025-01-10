@@ -23,7 +23,10 @@ namespace SharpOverlay.Services.Base
         {
             bool isCarOnTrack = eventArgs.TelemetryInfo.IsOnTrack.Value;
 
-            UpdateIsOpen(isCarOnTrack);
+            if (!IsInTestMode)
+            {
+                UpdateIsOpen(isCarOnTrack);
+            }
         }
 
         public void Update(PropertyChangedEventArgs eventArgs)
@@ -32,18 +35,15 @@ namespace SharpOverlay.Services.Base
 
             if (propertyName == nameof(IsEnabled))
             {
-                IsEnabled = !IsEnabled;
-                RaiseChange();
+                UpdateIsEnabled(!IsEnabled);
             }
             else if (propertyName == nameof(IsOpen))
             {
-                IsOpen = !IsOpen;
-                RaiseChange();
+                UpdateIsOpen(!IsOpen);
             }
             else if (propertyName == nameof(IsInTestMode))
             {
-                IsInTestMode = !IsInTestMode;
-                RaiseChange();
+                UpdateIsInTestMode(!IsInTestMode);
             }
         }
 
@@ -74,7 +74,7 @@ namespace SharpOverlay.Services.Base
         {
             if (IsInTestMode == !isInTestMode)
             {
-                IsEnabled = isInTestMode;
+                IsInTestMode = isInTestMode;
                 RaiseChange();
             }
         }

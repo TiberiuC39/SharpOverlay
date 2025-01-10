@@ -16,8 +16,6 @@ namespace SharpOverlay.Services.Base
             windowStateService.WindowStateChanged += OnWindowStateChanged;
         }
 
-        public Window Window => _window;
-
         private void OnWindowStateChanged(object? sender, WindowStateEventArgs eventArgs)
         {
             if (eventArgs.IsOpen && eventArgs.IsEnabled)
