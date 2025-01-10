@@ -1,44 +1,50 @@
 ﻿using iRacingSdkWrapper;
 using SharpOverlay.Events;
+using SharpOverlay.Models;
 using System;
+using System.ComponentModel;
 
 namespace SharpOverlay.Services.Base
 {
     public class WindowStateService
     {
-        private readonly FuelWindowState _windowState;
+        private readonly WindowState _windowState;
         public event EventHandler<WindowStateEventArgs>? WindowStateChanged;
 
-        public WindowStateService()
+        public WindowStateService(SimReader reader, BaseSettings settings)
         {
-            bool startingState = App.appSettings.FuelSettings.IsOpen;
-            _windowState = new(startingState);
+            settings.PropertyChanged += ExecuteOnProperty;
+
+            reader.OnTelemetryUpdated += ExecuteOnTelemetry;
+
+            _windowState = new WindowState(settings);
         }
 
         public void ExecuteOnTelemetry(object? sender, SdkWrapper.TelemetryUpdatedEventArgs args)
         {
-            UpdateWindowState(args);
+            _windowState.Update(args);
 
             RaiseEventIfNewData();
         }
 
-        private void UpdateWindowState(SdkWrapper.TelemetryUpdatedEventArgs args)
+        public void ExecuteOnProperty(object? sender, PropertyChangedEventArgs args)
         {
-            _windowState.UpdateOnEvent(args);
-        }
+            _windowState.Update(args);
+
+            RaiseEventIfNewData();
+        }        
 
         private void RaiseEventIfNewData()
         {
             if (_windowState.RequiresChange)
             {
                 RaiseEvent();
-                _windowState.ConfirmChange();
+                _windowState.CompleteChange();
             }
         }
         private void RaiseEvent()
         {
             WindowStateChanged?.Invoke(this, new WindowStateEventArgs(_windowState));
         }
-
     }
 }

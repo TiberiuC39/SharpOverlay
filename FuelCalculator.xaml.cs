@@ -1,4 +1,5 @@
 ﻿using SharpOverlay.Events;
+using SharpOverlay.Models;
 using SharpOverlay.Services;
 using SharpOverlay.Services.Base;
 using SharpOverlay.Services.FuelServices;
@@ -14,20 +15,23 @@ namespace SharpOverlay
     /// </summary>
     public partial class FuelCalculatorWindow : Window
     {
+        private readonly FuelSettings _settings = App.appSettings.FuelSettings;
+
         private readonly IFuelCalculator _fuelCalculator;
-        private readonly SimReader _simReader = new SimReader(DefaultTickRates.FuelCalculator);
-        private readonly WindowStateService _windowStateService = new();
+        private readonly SimReader _simReader = new(DefaultTickRates.FuelCalculator);
+        private readonly WindowStateService _windowStateService;
         private FuelDebugWindow? _fuelDebugWindow;
 
         public FuelCalculatorWindow()
         {
+            _windowStateService = new WindowStateService(_simReader, _settings);
             _fuelCalculator = new FuelCalculatorService(_simReader);
+
             _fuelCalculator.FuelUpdated += OnFuelUpdate;
 
-            _simReader.OnTelemetryUpdated += _windowStateService.ExecuteOnTelemetry;
             _windowStateService.WindowStateChanged += _windowStateService_WindowStateChanged;
 
-            App.appSettings.FuelSettings.PropertyChanged += OnPropertyChange;
+            _settings.PropertyChanged += OnPropertyChange;
 
             JotService.tracker.Track(this);
 
@@ -38,7 +42,7 @@ namespace SharpOverlay
 
         private void _windowStateService_WindowStateChanged(object? sender, WindowStateEventArgs e)
         {
-            if (e.IsOpen)
+            if (e.IsOpen && e.IsEnabled)
             {
                 Show();
             }
@@ -61,7 +65,7 @@ namespace SharpOverlay
 
         private void OnPropertyChange(object? sender, PropertyChangedEventArgs e)
         {
-            if (App.appSettings.FuelSettings.IsInTestMode)
+            if (_settings.IsInTestMode)
             {
                 _fuelDebugWindow = new FuelDebugWindow(_fuelCalculator);
                 _fuelDebugWindow.Show();
