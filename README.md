@@ -10,6 +10,7 @@ SharpOverlay is a set of iRacing overlays built on .NET & WPF. It aims to provid
 * Input Graph
 * Bar Spotter
 * Wind Direction & Speed
+* Fuel Calculator (new!)
 
 
 https://github.com/user-attachments/assets/5c3325ea-c5ea-44e9-9ca9-cda07f0411b7

@@ -183,9 +183,9 @@ Grid.Column="1" Margin="204,-22,10,406" IsChecked="{Binding IsEnabled, Mode=TwoW
             Margin="204,408,10,-24" IsChecked="{Binding IsInTestMode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" materialDesign:ToggleButtonAssist.SwitchTrackOnBackground="DarkGreen" materialDesign:ToggleButtonAssist.SwitchTrackOffBackground="Red" Grid.Column="1"/>
                     </Grid>
                 </TabItem>
-                
-                
-                <TabItem Header="FuelCalculator" FontFamily="pack://application:,,,/SharpOverlay;component/Fonts/#EurostileExtendedBlack">
+
+
+                <TabItem Header="Fuel Calculator" FontFamily="pack://application:,,,/SharpOverlay;component/Fonts/#EurostileExtendedBlack">
                     <Grid DataContext="{Binding FuelSettings}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
@@ -213,10 +213,10 @@ Grid.Column="1" Margin="204,-22,10,406" IsChecked="{Binding IsEnabled, Mode=TwoW
                             ToolTip="Toggle to render the debug fuel View"
                             Style="{StaticResource MaterialDesignSwitchToggleButton}"
                             Margin="104,308,10,-24" IsChecked="{Binding IsInTestMode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                            materialDesign:ToggleButtonAssist.SwitchTrackOnBackground="DarkGreen"
-                            materialDesign:ToggleButtonAssist.SwitchTrackOffBackground="Red" Grid.Column="1"/>
+                                      materialDesign:ToggleButtonAssist.SwitchTrackOnBackground="DarkGreen"
+                                      materialDesign:ToggleButtonAssist.SwitchTrackOffBackground="Red" Grid.Column="1"/>
                         <Label Grid.Column="1" Content="Debug" HorizontalAlignment="Left" Margin="50,0,0,66" VerticalAlignment="Bottom"/>
-                        
+
                     </Grid>
                 </TabItem>
             </TabControl>
@@ -234,7 +234,7 @@ Grid.Column="1" Margin="204,-22,10,406" IsChecked="{Binding IsEnabled, Mode=TwoW
             </Hyperlink>
 
         </TextBlock>
-        <TextBlock Grid.Column="1" HorizontalAlignment="Left" Margin="26,105,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="340"><Run Text="Changelog:"/><LineBreak/><Run Text="v0.2.3"/><LineBreak/><Run Text="- Input graph now moves slower"/><LineBreak/><Run Text="- Small updates to bar spotter algorithm"/><LineBreak/><Run Text="v0.2.2"/><LineBreak/><Run Text="- Added background color setting for input graph"/><LineBreak/><Run Text="- Added new setting for hardware acceleration, default is off to help with performance "/><LineBreak/><Run Text="when GPU usage is high."/><LineBreak/><Run Text="v0.2.1"/><LineBreak/><Run Text="- Replaced color pickers with new control, fixing issue with default selected color being set to #FFFFFF. (Thanks @rouyng!)"/><LineBreak/><Run Text="v0.2.0"/><LineBreak/><Run Text="- Added new Wind direction &amp; speed overlay"/><LineBreak/><Run Text="&#x9;- Shows wind direction relative to your car (i.e. arrow pointing down is a headwind)"/><LineBreak/><Run Text="&#x9;- Dynamic color based on wind speed (green is no wind, red is very windy)"/><LineBreak/><Run Text="- Added new ABS flash feature to input graph"/><LineBreak/><Run Text="&#x9;- Input graph now changes background color when ABS is engaged, enable this feature and change the color in the settings. "/><LineBreak/><Run Text="v0.1.1:"/><LineBreak/><Run Text="- Moved tab strip to the side to accomodate future overlays"/><LineBreak/><Run Text="- Fixed an issue with the bar spotter breaking when changing sessions. (Thanks /u/z4ckm0rris!)"/></TextBlock>
+        <TextBlock Grid.Column="1" HorizontalAlignment="Left" Margin="26,105,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="340"><Run Text="Changelog:"/><LineBreak/><Run Text="v0.3.0 (Special thanks to @BatMicho)"/><LineBreak/><Run Text="- Added fuel calculator overlay"/><LineBreak/><Run Text="- Overlays will only appear when you are on track"/><LineBreak/><Run Text="- Bar spotter should be more reliable"/></TextBlock>
     </Grid>
 
 </Window>
