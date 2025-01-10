@@ -48,8 +48,25 @@ namespace SharpOverlay
             PlotSetup();
         }
 
+        private void HandleTestMode()
+        {
+
+            if (_settings.IsInTestMode && _settings.IsEnabled)
+            {
+                Show();
+            }
+            else
+            {
+                Hide();
+            }
+        }
+
         private void ExecuteOnStateChange(object? sender, WindowStateEventArgs args)
         {
+            if (args.IsInTestMode && args.IsEnabled)
+            {
+                HandleTestMode();
+            }
             if (args.IsOpen && args.IsEnabled)
             {
                 Show();

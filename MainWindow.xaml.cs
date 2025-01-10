@@ -80,7 +80,7 @@ namespace SharpOverlay
 
         private void windowToggle(object sender, RoutedEventArgs e)
         {
-            //HandleOverlayStatus();
+            HandleOverlayStatus();
         }
 
         private void Hyperlink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
