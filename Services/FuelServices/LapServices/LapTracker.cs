@@ -38,12 +38,18 @@ namespace SharpOverlay.Services.FuelServices.LapServices
             => _completedLaps;
 
         public int GetCompletedLapsCount()
-            => _completedLaps.Count;
+            => _completedLaps.Count - 1;
 
         public void Clear()
         {
             _completedLaps.Clear();
             ResetCurrentLap();
+        }
+
+        public void StartWithHistory(int lapNumber, FuelModel entry)
+        {
+            StartNewLap(lapNumber, entry.Consumption);
+            CompleteCurrentLap(0, TimeSpan.FromSeconds(entry.LapTime));
         }
     }
 }
