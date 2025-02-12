@@ -211,6 +211,39 @@ namespace SharpOverlay.Models
             }
         }
 
+        private bool _showPercentageBrake;
+        public bool ShowPercentageBrake
+        {
+            get => _showPercentageBrake;
+            set
+            {
+                _showPercentageBrake = value;
+                OnPropertyChanged(nameof(ShowPercentageBrake));
+            }
+        }
+
+        private bool _showPercentageThrottle;
+        public bool ShowPercentageThrottle
+        {
+            get => _showPercentageThrottle;
+            set
+            {
+                _showPercentageThrottle = value;
+                OnPropertyChanged(nameof(_showPercentageThrottle));
+            }
+        }
+
+        private bool _showPercentageClutch;
+        public bool ShowPercentageClutch
+        {
+            get => _showPercentageClutch;
+            set
+            {
+                _showPercentageClutch = value;
+                OnPropertyChanged(nameof(ShowPercentageClutch));
+            }
+        }
+
         public InputGraphSettings()
         {
             ThrottleColor = new SolidColorBrush(Colors.Green);
@@ -218,6 +251,9 @@ namespace SharpOverlay.Models
             ClutchColor = new SolidColorBrush(Colors.Blue);
             UseRawValues = true;
             ShowClutch = true;
+            ShowPercentageThrottle = true;
+            ShowPercentageBrake = true;
+            ShowPercentageClutch = true;
         }
     }
 

@@ -4,6 +4,7 @@ using SharpOverlay.Events;
 using SharpOverlay.Models;
 using SharpOverlay.Services.Base;
 using SharpOverlay.Utilities;
+using System;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
@@ -46,6 +47,7 @@ namespace SharpOverlay
             HookStreamer(ref clutchStreamer, _settings.ClutchColor, _settings.ShowClutch);
 
             PlotSetup();
+            SetColorPercentageLabels();
         }
 
         private void ExecuteOnStateChange(object? sender, WindowStateEventArgs args)
@@ -78,7 +80,10 @@ namespace SharpOverlay
             {
                 clutchStreamer.IsVisible = false;
             }
+
+            SetColorPercentageLabels();
         }
+
         private void UpdateInputs(TelemetryInfo telemetryInfo)
         {
             if (_settings.UseRawValues)
@@ -94,6 +99,15 @@ namespace SharpOverlay
                 input.Throttle = telemetryInfo.Throttle.Value * 100;
                 input.Clutch = (1 - telemetryInfo.Clutch.Value) * 100;
             }
+
+            if (BrakePercentage.IsVisible)
+                BrakePercentage.Content = $"Brake: {Math.Round(input.Brake, 0)} %";
+
+            if (ThrottlePercentage.IsVisible)
+                ThrottlePercentage.Content = $"Throttle: {Math.Round(input.Brake, 0)} %";
+
+            if (ClutchPercentage.IsVisible)
+                ClutchPercentage.Content = $"Clutch: {Math.Round(input.Brake, 0)} %";
         }
 
         private void AddInputsToStreamers(Input input)
@@ -160,6 +174,7 @@ namespace SharpOverlay
 
             dataStreamer.LineWidth = _settings.LineWidth;
         }
+
         private ScottPlot.Color TransformColor(SolidColorBrush color)
         {
             return new ScottPlot.Color(color.Color.R, color.Color.G, color.Color.B, color.Color.A);
@@ -178,6 +193,17 @@ namespace SharpOverlay
                 currentBgColor = TransformColor(_settings.BackgroundColor);
             }
         }
+
+        private void SetColorPercentageLabels()
+        {
+            ThrottlePercentage.Visibility = _settings.ShowPercentageThrottle ? Visibility.Visible : Visibility.Hidden;
+            ThrottlePercentage.Foreground = _settings.ThrottleColor;
+
+            BrakePercentage.Visibility = _settings.ShowPercentageBrake ? Visibility.Visible : Visibility.Hidden;
+            BrakePercentage.Foreground = _settings.BrakeColor;
+
+            ClutchPercentage.Visibility = _settings.ShowPercentageClutch ? Visibility.Visible : Visibility.Hidden;
+            ClutchPercentage.Foreground = _settings.ClutchColor;
+        }
     }
 }
-

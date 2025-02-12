@@ -9,5 +9,12 @@
         Title="InputGraph" Height="450" Width="800" WindowStyle="None" ResizeMode="CanResizeWithGrip" AllowsTransparency="True" Topmost="True" MouseDown="Window_MouseDown" Background="Transparent">
     <Grid MouseDown="Window_MouseDown" Background="Transparent">
         <ScottPlot:WpfPlot x:Name="InputPlot"/>
+        <Canvas>
+            <StackPanel Orientation="Horizontal" Background="Transparent" Canvas.Left="10" Canvas.Top="10">
+                <Label x:Name="BrakePercentage" Background="Transparent" />
+                <Label x:Name="ThrottlePercentage" Background="Transparent" Margin="10,0,0,0"/>
+                <Label x:Name="ClutchPercentage" Background="Transparent" Margin="10,0,0,0"/>
+            </StackPanel>
+        </Canvas>
     </Grid>
 </Window>

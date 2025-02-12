@@ -33,6 +33,9 @@ namespace SharpOverlay.Services
                 .Property(p => p.InputGraphSettings.ABSColor, new SolidColorBrush(Color.FromArgb(200, 68, 68, 68)))
                 .Property(p => p.InputGraphSettings.ShowABS, false)
                 .Property(p => p.InputGraphSettings.LineWidth, 3)
+                .Property(p => p.InputGraphSettings.ShowPercentageThrottle, true)
+                .Property(p => p.InputGraphSettings.ShowPercentageBrake, true)
+                .Property(p => p.InputGraphSettings.ShowPercentageClutch, true)
                 .Property(p => p.WindSettings.IsEnabled, false)
                 .Property(p => p.WindSettings.UseMph, false)
               
