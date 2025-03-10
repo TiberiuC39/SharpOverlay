@@ -104,10 +104,10 @@ namespace SharpOverlay
                 BrakePercentage.Content = $"Brake: {Math.Round(input.Brake, 0)} %";
 
             if (ThrottlePercentage.IsVisible)
-                ThrottlePercentage.Content = $"Throttle: {Math.Round(input.Brake, 0)} %";
+                ThrottlePercentage.Content = $"Throttle: {Math.Round(input.Throttle, 0)} %";
 
             if (ClutchPercentage.IsVisible)
-                ClutchPercentage.Content = $"Clutch: {Math.Round(input.Brake, 0)} %";
+                ClutchPercentage.Content = $"Clutch: {Math.Round(input.Clutch, 0)} %";
         }
 
         private void AddInputsToStreamers(Input input)
