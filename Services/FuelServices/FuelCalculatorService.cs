@@ -32,7 +32,7 @@ namespace SharpOverlay.Services.FuelServices
         private readonly PitManager _pitManager;
         private readonly PitTimeTracker _pitTimeTracker;
         private readonly FinishLineLocator _finishLineLocator;
-
+        private readonly SetupChangeTracker _setupTracker;
         private int _lapsRemainingInRace;
         private bool _isRaceStart;
 
@@ -46,7 +46,9 @@ namespace SharpOverlay.Services.FuelServices
             _pitManager = new PitManager();
             _pitTimeTracker = new PitTimeTracker();
             _finishLineLocator = new FinishLineLocator();
-            
+
+            _setupTracker = new SetupChangeTracker();
+
             _repository = new FuelRepository();
 
             _strategyList = new List<IFuelStrategy>
@@ -137,6 +139,17 @@ namespace SharpOverlay.Services.FuelServices
 
             var simulationOutput = new SimulationOutputDTO(telemetry);
 
+            if (_setupTracker.IsSetupChanged)
+            {
+                var currentLap = _lapTracker.GetCurrentLap();
+
+                if (currentLap is not null && simulationOutput.FuelLevel != 0)
+                {
+                    currentLap.StartingFuel = simulationOutput.FuelLevel;
+                    _setupTracker.Reset();
+                }
+            }
+
             if (IsSessionStateValid(simulationOutput.SessionState))
             {
                 var driversDict = _sessionParser.Drivers;
@@ -195,6 +208,8 @@ namespace SharpOverlay.Services.FuelServices
 
             _sessionParser.ParseCarId(sessionInfo);
             _sessionParser.ParseTrackId(sessionInfo);
+
+            _setupTracker.UpdateSetupName(sessionInfo.Player.DriverSetupName);
         }
 
         private void RunFuelCalculations(SimulationOutputDTO simulationOutput)
@@ -225,14 +240,21 @@ namespace SharpOverlay.Services.FuelServices
 
                 var entry = _repository.Get(trackId, carId);
 
-                _lapTracker.StartNewLap(simulationOutput.CurrentLapNumber - 1, simulationOutput.FuelLevel + entry.Consumption);
-                _lapTracker.CompleteCurrentLap(simulationOutput.FuelLevel, TimeSpan.FromSeconds(entry.LapTime));
-
-                _lapsRemainingInRace = _lapCountCalculator.CalculateLapsRemaining(simulationOutput.PlayerTrackDistPct, simulationOutput.SessionTimeRemaining, TimeSpan.FromSeconds(entry.LapTime));
-
-                foreach (var strategy in _strategyList)
+                if (entry is not null)
                 {
-                    strategy.Calculate(_lapTracker.GetPlayerLaps(), _lapsRemainingInRace);
+                    _lapTracker.StartNewLap(simulationOutput.CurrentLapNumber - 1, simulationOutput.FuelLevel + entry.Consumption);
+                    _lapTracker.CompleteCurrentLap(simulationOutput.FuelLevel, TimeSpan.FromSeconds(entry.LapTime));
+
+                    _lapsRemainingInRace = _lapCountCalculator.CalculateLapsRemaining(simulationOutput.PlayerTrackDistPct, simulationOutput.SessionTimeRemaining, TimeSpan.FromSeconds(entry.LapTime));
+
+                    foreach (var strategy in _strategyList)
+                    {
+                        strategy.Calculate(_lapTracker.GetPlayerLaps(), _lapsRemainingInRace);
+                    }
+                }
+                else
+                {
+                    _lapTracker.StartNewLap(simulationOutput.CurrentLapNumber, simulationOutput.FuelLevel);
                 }
 
                 var sessionState = simulationOutput.SessionState;
@@ -242,13 +264,13 @@ namespace SharpOverlay.Services.FuelServices
                 {
                     _isRaceStart = true;
                 }
-            }
+            }            
             else if (_isRaceStart && simulationOutput.CurrentLapNumber == 2) // Simulator flickers quickly to lap 2 in Race
                                                                              // after the going through start finish line on lap 0 to 1
             {
                 _isRaceStart = false;
             }
-            else if (_pitManager.HasResetToPits(simulationOutput.EnterExitResetButton) && simulationOutput.IsOnTrack)
+            else if (_pitManager.HasResetToPits(simulationOutput.EnterExitResetButton))
             {
                 currentLap.StartingFuel = simulationOutput.FuelLevel;
 
@@ -407,6 +429,7 @@ namespace SharpOverlay.Services.FuelServices
                     CurrentFuelLevel = simulationOutput.FuelLevel,
                     RaceLapsRemaining = _lapsRemainingInRace,
 
+                    HasResetToPits = _pitManager.HasResetToPits(simulationOutput.EnterExitResetButton),
                     IsRollingStart = _sessionParser.StartType == StartType.Rolling,
                     SessionFlag = simulationOutput.SessionFlag,
                     IsRaceStart = _isRaceStart,
@@ -429,6 +452,7 @@ namespace SharpOverlay.Services.FuelServices
                 LapsCompleted = completedLaps.Count,
                 RaceLapsRemaining = _lapsRemainingInRace,
 
+                HasResetToPits = _pitManager.HasResetToPits(simulationOutput.EnterExitResetButton),
                 IsRollingStart = _sessionParser.StartType == StartType.Rolling,
                 SessionFlag = simulationOutput.SessionFlag,
                 IsRaceStart = _isRaceStart,

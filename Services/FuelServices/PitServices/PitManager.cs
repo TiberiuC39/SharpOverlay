@@ -29,7 +29,7 @@ namespace SharpOverlay.Services.FuelServices.PitServices
             => _isOnPitRoad;
 
         public bool HasResetToPits(int enterExitResetButton)
-            => enterExitResetButton == 0;
+            => enterExitResetButton == 1;
 
         public void SetPitRoadStatus(bool isOnPitRoad, TrackSurfaces trackSurface)
         {

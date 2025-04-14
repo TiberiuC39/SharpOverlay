@@ -22,6 +22,8 @@ namespace SharpOverlay.Utilities.Sessions
         public int TrackId { get; private set; }
         public int CarId { get; private set; }
 
+        public bool IsSetupChanged { get; private set; }
+
         public void ParseSectors(SessionInfo sessionInfo)
         {
             Sectors = sessionInfo.Sectors;

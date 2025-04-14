@@ -1,5 +1,6 @@
 ﻿using iRacingSdkWrapper;
 using iRacingSdkWrapper.JsonModels;
+using ScottPlot.Finance;
 using SharpOverlay.Models;
 using System;
 using System.Collections.Generic;
