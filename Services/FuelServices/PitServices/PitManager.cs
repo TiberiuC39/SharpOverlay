@@ -8,6 +8,7 @@ namespace SharpOverlay.Services.FuelServices.PitServices
         private bool _isInService;
         private bool _hasBegunService;
         private bool _hasCompletedService;
+        private bool _hasEnteredPits;
         private bool _isOnPitRoad;
         private bool _isComingOutOfPits;
 
@@ -28,18 +29,23 @@ namespace SharpOverlay.Services.FuelServices.PitServices
         public bool IsOnPitRoad()
             => _isOnPitRoad;
 
+        public bool HasEnteredPits()
+            => _hasEnteredPits;
+
         public bool HasResetToPits(int enterExitResetButton)
-            => enterExitResetButton == 1;
+            => enterExitResetButton == 1 && !_isInService && _hasEnteredPits;
 
         public void SetPitRoadStatus(bool isOnPitRoad, TrackSurfaces trackSurface)
         {
             if (!_isOnPitRoad && (isOnPitRoad || trackSurface == TrackSurfaces.AproachingPits))
             {
                 _isOnPitRoad = true;
+                _hasEnteredPits = true;
             }
             else if (_isOnPitRoad && !isOnPitRoad && trackSurface != TrackSurfaces.AproachingPits)
             {
                 _isOnPitRoad = false;
+                _hasEnteredPits = false;
                 _isComingOutOfPits = true;
             }
         }

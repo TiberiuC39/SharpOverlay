@@ -14,6 +14,7 @@ namespace SharpOverlay.Utilities.Sessions
         public List<Session> Sessions { get; private set; } = [];
         public Dictionary<int, Racer> Drivers { get; private set; } = [];
         public StartType StartType { get; private set; }
+        public string EventType { get; private set; }
         public SessionType SessionType { get; private set; }
         public int SessionLaps { get; private set; }
         public int PaceCarIdx { get; private set; }
@@ -154,6 +155,11 @@ namespace SharpOverlay.Utilities.Sessions
             {
                 CarId = driver.CarID;
             }
+        }
+
+        public void ParseEventType(SessionInfo sessionInfo)
+        {
+            EventType = sessionInfo.WeekendInfo.EventType;
         }
     }
 }

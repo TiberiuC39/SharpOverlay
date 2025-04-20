@@ -196,6 +196,8 @@ namespace SharpOverlay.Services.FuelServices
         {
             var sessionInfo = eventArgs.SessionInfo;
 
+            _sessionParser.ParseEventType(sessionInfo);
+
             _sessionParser.ParseSectors(sessionInfo);
 
             _sessionParser.ParseLapsInSession(sessionInfo, _telemetryParser.CurrentSessionNumber);
@@ -273,6 +275,12 @@ namespace SharpOverlay.Services.FuelServices
             else if (_pitManager.HasResetToPits(simulationOutput.EnterExitResetButton))
             {
                 currentLap.StartingFuel = simulationOutput.FuelLevel;
+
+                // need to bump current lap number by 1 if it's not test drive. How to tell if it's test drive?
+                if (_sessionParser.EventType != "Test" && simulationOutput.CurrentLapNumber > currentLap.Number)
+                {
+                    currentLap.Number++;
+                }
 
                 _strategyList.ForEach(s => s.UpdateRefuel(currentLap.StartingFuel, _lapsRemainingInRace));
             }

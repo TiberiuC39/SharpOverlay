@@ -1,6 +1,5 @@
 ﻿using iRacingSdkWrapper;
 using iRacingSdkWrapper.JsonModels;
-using ScottPlot.Finance;
 using SharpOverlay.Models;
 using System;
 using System.Collections.Generic;
@@ -10,6 +9,7 @@ namespace SharpOverlay.Utilities.Sessions
     public interface ISessionParser
     {
         Dictionary<int, Racer> Drivers { get; }
+        string EventType { get; }
         SessionType SessionType { get; }
         List<Session> Sessions { get; }
         StartType StartType { get; }
@@ -32,5 +32,6 @@ namespace SharpOverlay.Utilities.Sessions
         void ParseSectors(SessionInfo sessionInfo);
         void ParseTrackId(SessionInfo sessionInfo);
         void ParseCarId(SessionInfo sessionInfo);
+        void ParseEventType(SessionInfo sessionInfo);
     }
 }

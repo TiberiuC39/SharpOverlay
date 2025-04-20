@@ -11,7 +11,12 @@ namespace SharpOverlay.Services.FuelServices.LapServices
                 timeRemainingInSession > TimeSpan.Zero)
             {
                 TimeSpan timeToCompleteLap = (1 - driverPctOnTrack) * averageLapTime;
-                return (int) Math.Ceiling((timeRemainingInSession - timeToCompleteLap) / averageLapTime) + 1;
+
+                double lapsBeforeRounding = (timeRemainingInSession - timeToCompleteLap) / averageLapTime + 1;
+
+                int lapsRemaining = (int) Math.Ceiling(lapsBeforeRounding);
+
+                return lapsRemaining;
             }
 
             return default;
