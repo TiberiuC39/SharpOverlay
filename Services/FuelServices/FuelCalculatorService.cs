@@ -32,7 +32,6 @@ namespace SharpOverlay.Services.FuelServices
         private readonly PitManager _pitManager;
         private readonly PitTimeTracker _pitTimeTracker;
         private readonly FinishLineLocator _finishLineLocator;
-        private readonly SetupChangeTracker _setupTracker;
         private int _lapsRemainingInRace;
         private bool _isRaceStart;
 
@@ -46,8 +45,6 @@ namespace SharpOverlay.Services.FuelServices
             _pitManager = new PitManager();
             _pitTimeTracker = new PitTimeTracker();
             _finishLineLocator = new FinishLineLocator();
-
-            _setupTracker = new SetupChangeTracker();
 
             _repository = new FuelRepository();
 
@@ -139,17 +136,6 @@ namespace SharpOverlay.Services.FuelServices
 
             var simulationOutput = new SimulationOutputDTO(telemetry);
 
-            if (_setupTracker.IsSetupChanged)
-            {
-                var currentLap = _lapTracker.GetCurrentLap();
-
-                if (currentLap is not null && simulationOutput.FuelLevel != 0)
-                {
-                    currentLap.StartingFuel = simulationOutput.FuelLevel;
-                    _setupTracker.Reset();
-                }
-            }
-
             if (IsSessionStateValid(simulationOutput.SessionState))
             {
                 var driversDict = _sessionParser.Drivers;
@@ -210,8 +196,6 @@ namespace SharpOverlay.Services.FuelServices
 
             _sessionParser.ParseCarId(sessionInfo);
             _sessionParser.ParseTrackId(sessionInfo);
-
-            _setupTracker.UpdateSetupName(sessionInfo.Player.DriverSetupName);
         }
 
         private void RunFuelCalculations(SimulationOutputDTO simulationOutput)
