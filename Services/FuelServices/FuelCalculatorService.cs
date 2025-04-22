@@ -276,7 +276,6 @@ namespace SharpOverlay.Services.FuelServices
             {
                 currentLap.StartingFuel = simulationOutput.FuelLevel;
 
-                // need to bump current lap number by 1 if it's not test drive. How to tell if it's test drive?
                 if (_sessionParser.EventType != "Test" && simulationOutput.CurrentLapNumber > currentLap.Number)
                 {
                     currentLap.Number++;
