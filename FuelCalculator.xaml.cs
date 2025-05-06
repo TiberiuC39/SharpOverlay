@@ -29,7 +29,7 @@ namespace SharpOverlay
 
             _fuelCalculator.FuelUpdated += OnFuelUpdate;
 
-            _windowStateService.WindowStateChanged += _windowStateService_WindowStateChanged;
+            _windowStateService.WindowStateChanged += OnWindowStateChange;
 
             _settings.PropertyChanged += OnPropertyChange;
 
@@ -40,7 +40,7 @@ namespace SharpOverlay
             InitializeComponent();
         }
 
-        private void _windowStateService_WindowStateChanged(object? sender, WindowStateEventArgs e)
+        private void OnWindowStateChange(object? sender, WindowStateEventArgs e)
         {
             if (e.IsOpen && e.IsEnabled)
             {

@@ -1,0 +1,22 @@
+{
+  "ByTrack": {
+    "192": {
+      "ByCarId": {
+        "169": {
+          "Consumption": 3.3064637121700096,
+          "LapTime": 127.4894027,
+          "LapCount": 3
+        }
+      }
+    },
+    "341": {
+      "ByCarId": {
+        "169": {
+          "Consumption": 0,
+          "LapTime": 121.927803,
+          "LapCount": -1
+        }
+      }
+    }
+  }
+}

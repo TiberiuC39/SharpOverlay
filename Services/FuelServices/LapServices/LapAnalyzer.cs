@@ -47,7 +47,7 @@ namespace SharpOverlay.Services.FuelServices.LapServices
                 return positionIdx[leaderPosition];
             }
 
-            return -1;
+            return invalidLeaderPosition;
         }
 
         public Dictionary<int, List<Lap>> GetDriversLaps()
@@ -55,8 +55,7 @@ namespace SharpOverlay.Services.FuelServices.LapServices
 
         public TimeSpan GetLapTime(int carIdx)
         {
-            if (!_driversLaps.ContainsKey(carIdx) ||
-                carIdx < 0)
+            if (!_driversLaps.ContainsKey(carIdx) || carIdx < 0)
             {
                 return TimeSpan.Zero;
             }

@@ -1,5 +1,4 @@
 ﻿using iRacingSdkWrapper;
-using System;
 
 namespace SharpOverlay.Services.FuelServices.PitServices
 {
@@ -8,6 +7,7 @@ namespace SharpOverlay.Services.FuelServices.PitServices
         private bool _isInService;
         private bool _hasBegunService;
         private bool _hasCompletedService;
+        private bool _hasEnteredPits;
         private bool _isOnPitRoad;
         private bool _isComingOutOfPits;
 
@@ -16,6 +16,7 @@ namespace SharpOverlay.Services.FuelServices.PitServices
             _isInService = false;
             _hasBegunService = false;
             _hasCompletedService = false;
+            _hasEnteredPits = false;
             _isOnPitRoad = false;
             _isComingOutOfPits = false;
         }
@@ -28,18 +29,26 @@ namespace SharpOverlay.Services.FuelServices.PitServices
         public bool IsOnPitRoad()
             => _isOnPitRoad;
 
+        public bool HasEnteredPits()
+            => _hasEnteredPits;
+
         public bool HasResetToPits(int enterExitResetButton)
-            => enterExitResetButton == 0;
+            => enterExitResetButton == 1 && !_hasEnteredPits;
 
         public void SetPitRoadStatus(bool isOnPitRoad, TrackSurfaces trackSurface)
         {
-            if (!_isOnPitRoad && (isOnPitRoad || trackSurface == TrackSurfaces.AproachingPits))
+            if (!_hasEnteredPits && trackSurface == TrackSurfaces.AproachingPits)
+            {
+                _hasEnteredPits = true;
+            }
+            else if (!_isOnPitRoad && isOnPitRoad)
             {
                 _isOnPitRoad = true;
             }
-            else if (_isOnPitRoad && !isOnPitRoad && trackSurface != TrackSurfaces.AproachingPits)
+            else if (_isOnPitRoad && !isOnPitRoad && trackSurface != TrackSurfaces.InPitStall)
             {
                 _isOnPitRoad = false;
+                _hasEnteredPits = false;
                 _isComingOutOfPits = true;
             }
         }

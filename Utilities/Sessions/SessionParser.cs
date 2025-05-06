@@ -14,11 +14,16 @@ namespace SharpOverlay.Utilities.Sessions
         public List<Session> Sessions { get; private set; } = [];
         public Dictionary<int, Racer> Drivers { get; private set; } = [];
         public StartType StartType { get; private set; }
+        public string EventType { get; private set; }
         public SessionType SessionType { get; private set; }
         public int SessionLaps { get; private set; }
         public int PaceCarIdx { get; private set; }
         public bool IsMultiClassRace { get; private set; }
         public List<Sector> Sectors { get; private set; }
+        public int TrackId { get; private set; }
+        public int CarId { get; private set; }
+
+        public bool IsSetupChanged { get; private set; }
 
         public void ParseSectors(SessionInfo sessionInfo)
         {
@@ -135,6 +140,26 @@ namespace SharpOverlay.Utilities.Sessions
         public void ParseRaceType(SessionInfo sessionInfo)
         {
             IsMultiClassRace = sessionInfo.WeekendInfo.NumCarClasses > 1;
+        }
+
+        public void ParseTrackId(SessionInfo sessionInfo)
+        {
+            TrackId = sessionInfo.WeekendInfo.TrackID;
+        }
+
+        public void ParseCarId(SessionInfo sessionInfo)
+        {
+            var driver = sessionInfo.Drivers.FirstOrDefault(d => d.CarIdx == sessionInfo.Player.DriverCarIdx);
+
+            if (driver != null)
+            {
+                CarId = driver.CarID;
+            }
+        }
+
+        public void ParseEventType(SessionInfo sessionInfo)
+        {
+            EventType = sessionInfo.WeekendInfo.EventType;
         }
     }
 }

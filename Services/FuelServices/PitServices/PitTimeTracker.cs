@@ -12,13 +12,13 @@ namespace SharpOverlay.Services.FuelServices.PitServices
         public TimeSpan GetPitDuration()
             => _pitDuration;
 
-        public void StartPitDurationTracking(TimeSpan timeLeft)
+        public void Start(TimeSpan timeLeft)
         {
             _timeAtPitStart = timeLeft;
             IsTrackingTime = true;
         }
 
-        public void StopPitDurationTracking(TimeSpan timeLeft)
+        public void Stop(TimeSpan timeLeft)
         {
             if (_timeAtPitStart > TimeSpan.Zero)
             {
