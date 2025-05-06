@@ -147,6 +147,12 @@
                         <Label Content="ABS Flash" HorizontalAlignment="Left" Margin="10,294,0,0" VerticalAlignment="Top"/>
                         <Label Content="Show ABS" HorizontalAlignment="Left" Margin="10,334,0,0" VerticalAlignment="Top"/>
                         <CheckBox Content="" HorizontalAlignment="Left" Margin="186,340,0,0" VerticalAlignment="Top" IsChecked="{Binding ShowABS, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  IsEnabled="{Binding IsEnabled, Mode=OneWay}"/>
+                        <Label Content="Show Throttle %" HorizontalAlignment="Left" Margin="10,374,0,0" VerticalAlignment="Top"/>
+                        <CheckBox Content="" HorizontalAlignment="Left" Margin="200,374,0,0" VerticalAlignment="Top" IsChecked="{Binding ShowPercentageThrottle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  IsEnabled="{Binding IsEnabled, Mode=OneWay}"/>
+                        <Label Content="Show Brake %" HorizontalAlignment="Left" Margin="10,404,0,0" VerticalAlignment="Top"/>
+                        <CheckBox Content="" HorizontalAlignment="Left" Margin="200,404,0,0" VerticalAlignment="Top" IsChecked="{Binding ShowPercentageBrake, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  IsEnabled="{Binding IsEnabled, Mode=OneWay}"/>
+                        <Label Content="Show Clutch %" HorizontalAlignment="Left" Margin="10,434,0,0" VerticalAlignment="Top"/>
+                        <CheckBox Content="" HorizontalAlignment="Left" Margin="200,434,0,0" VerticalAlignment="Top" IsChecked="{Binding ShowPercentageClutch, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  IsEnabled="{Binding IsEnabled, Mode=OneWay}"/>
                         <colorpicker:PortableColorPicker SmallChange="5" Style="{StaticResource DefaultColorPickerStyle}"
                             FontSize="12"
                             UseHintColor="True" HintColor="Transparent"
