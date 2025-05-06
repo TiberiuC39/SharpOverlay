@@ -11,9 +11,9 @@
         <ScottPlot:WpfPlot x:Name="InputPlot"/>
         <Canvas>
             <StackPanel Orientation="Horizontal" Background="Transparent" Canvas.Left="10" Canvas.Top="10">
-                <Label x:Name="BrakePercentage" Background="Transparent" />
-                <Label x:Name="ThrottlePercentage" Background="Transparent" Margin="10,0,0,0"/>
-                <Label x:Name="ClutchPercentage" Background="Transparent" Margin="10,0,0,0"/>
+                <Label x:Name="BrakePercentage" Background="Transparent" FontSize="32"/>
+                <Label x:Name="ThrottlePercentage" Background="Transparent" FontSize="32" Margin="10,0,0,0"/>
+                <Label x:Name="ClutchPercentage" Background="Transparent" FontSize="32" Margin="10,0,0,0"/>
             </StackPanel>
         </Canvas>
     </Grid>
