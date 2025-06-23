@@ -200,7 +200,13 @@ namespace SharpOverlay.Services.FuelServices
 
         private void RunFuelCalculations(SimulationOutputDTO simulationOutput)
         {
-            _pitManager.SetPitRoadStatus(simulationOutput.IsOnPitRoad, simulationOutput.TrackSurface);
+            var trackSurface = simulationOutput.TrackSurface;
+
+            if (trackSurface == TrackSurfaces.AproachingPits && simulationOutput.PlayerTrackDistPct > 0)
+            {
+                trackSurface = TrackSurfaces.OnTrack; // EXITING PITS GETS REPORTED AS APPROACHING PITS ?????????????????????????
+            }
+            _pitManager.SetPitRoadStatus(simulationOutput.IsOnPitRoad, trackSurface);
             _pitManager.SetPitServiceStatus(simulationOutput.IsReceivingService);
 
             if (simulationOutput.TrackSurface == TrackSurfaces.AproachingPits && !_pitTimeTracker.IsTrackingTime)
@@ -408,31 +414,6 @@ namespace SharpOverlay.Services.FuelServices
             };
 
             var completedLaps = _lapTracker.GetPlayerLaps();
-
-            if (completedLaps.Count > 1)
-            {
-                return new FuelViewModel()
-                {
-                    Strategies = strategies,
-
-                    ConsumedFuel = completedLaps.Sum(l => l.FuelUsed),
-                    LapsCompleted = completedLaps.Count,
-                    CurrentFuelLevel = simulationOutput.FuelLevel,
-                    RaceLapsRemaining = _lapsRemainingInRace,
-
-                    HasResetToPits = _pitManager.HasResetToPits(simulationOutput.EnterExitResetButton),
-                    IsRollingStart = _sessionParser.StartType == StartType.Rolling,
-                    SessionFlag = simulationOutput.SessionFlag,
-                    IsRaceStart = _isRaceStart,
-                    CurrentSessionNumber = _telemetryParser.CurrentSessionNumber,
-                    CurrentLap = _lapTracker.GetCurrentLap(),
-                    TrackSurface = simulationOutput.TrackSurface,
-                    SessionState = simulationOutput.SessionState,
-                    IsOnPitRoad = _pitManager.IsOnPitRoad(),
-                    HasBegunService = _pitManager.HasBegunService(),
-                    HasCompletedService = _pitManager.HasFinishedService(),
-                };
-            }
 
             return new FuelViewModel()
             {
