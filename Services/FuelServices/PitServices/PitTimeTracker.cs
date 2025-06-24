@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SharpOverlay.Services.FuelServices.PitServices
 {
@@ -6,6 +8,7 @@ namespace SharpOverlay.Services.FuelServices.PitServices
     {
         private TimeSpan _pitDuration = TimeSpan.Zero;
         private TimeSpan _timeAtPitStart = TimeSpan.Zero;
+        private List<TimeSpan> _pitStopDurations = new List<TimeSpan>();
 
         public bool IsTrackingTime { get; private set; }
 
@@ -24,9 +27,16 @@ namespace SharpOverlay.Services.FuelServices.PitServices
             {
                 _pitDuration = _timeAtPitStart - timeLeft;
                 _timeAtPitStart = TimeSpan.Zero;
+
+                _pitStopDurations.Add(timeLeft);
             }
 
             IsTrackingTime = false;
+        }
+
+        public TimeSpan GetAvgPitStopTime()
+        {
+            return TimeSpan.FromSeconds(_pitStopDurations.Average(t => t.TotalSeconds));
         }
     }
 }

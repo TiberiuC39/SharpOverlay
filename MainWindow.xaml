@@ -4,11 +4,15 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:converter="clr-namespace:SharpOverlay.Converters"
-    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" xmlns:hc="https://handyorg.github.io/handycontrol" xmlns:models="clr-namespace:SharpOverlay.Models" xmlns:colorpicker="clr-namespace:ColorPicker;assembly=ColorPicker" x:Class="SharpOverlay.MainWindow"
-    mc:Ignorable="d"
-        Title="Sharp Overlay" Height="507" Width="1189" ResizeMode="CanMinimize" Style="{StaticResource MaterialDesignWindow}" SizeToContent="WidthAndHeight" Icon="/Media/sharpoverlayicon.png" Loaded="Window_Loaded" >
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:hc="https://handyorg.github.io/handycontrol"
+        xmlns:models="clr-namespace:SharpOverlay.Models"
+        xmlns:colorpicker="clr-namespace:ColorPicker;assembly=ColorPicker"
+        x:Class="SharpOverlay.MainWindow"
+        mc:Ignorable="d"
+        Title="Sharp Overlay" Height="507" Width="1189" ResizeMode="CanMinimize" Style="{StaticResource MaterialDesignWindow}" SizeToContent="WidthAndHeight" Icon="/Media/sharpoverlayicon.png" Loaded="Window_Loaded">
 
-    <Grid Margin="0,0,0,-6" Width="1200" Height="500">
+    <Grid Margin="0,0,0,-6" Width="1600" Height="500">
         <Grid.RowDefinitions>
             <RowDefinition/>
         </Grid.RowDefinitions>
@@ -24,7 +28,7 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <TabControl FontSize="25" Grid.ColumnSpan="2" TabStripPlacement="Left" FontFamily="Bahnschrift SemiBold">
-                <TabItem  Header="General">
+                <TabItem Header="General">
                     <Grid DataContext="{Binding GeneralSettings}">
                         <Label HorizontalAlignment="Left" Margin="10,18,0,0" VerticalAlignment="Top">
                             <Label Content="Use hardware acceleration" HorizontalAlignment="Center" VerticalAlignment="Center"/>
@@ -32,9 +36,7 @@
                         <ToggleButton
                             Style="{StaticResource MaterialDesignSwitchToggleButton}" Margin="326,-21,135,405" IsChecked="{Binding UseHardwareAcceleration, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" materialDesign:ToggleButtonAssist.SwitchTrackOnBackground="Green" materialDesign:ToggleButtonAssist.SwitchTrackOffBackground="Red"/>
                         <Label FontSize="13" Content="Restart SharpOverlay to apply general settings." HorizontalAlignment="Left" VerticalAlignment="Top" Margin="209,470,0,0" Width="286" Height="30" RenderTransformOrigin="0.5,0.5">
-
                         </Label>
-
                     </Grid>
                 </TabItem>
                 <TabItem Header="Bar Spotter">
@@ -44,123 +46,136 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <Label Content="Bar Width" HorizontalAlignment="Left" Margin="6,118,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.044,-0.259" Height="40" Width="132"/>
-                        <Slider x:Name="barSpotter_barWidth" Maximum="100" 
+                        <Slider x:Name="barSpotter_barWidth" Maximum="100"
                             Minimum="1"
                             Value="{Binding BarWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                            Grid.ColumnSpan="2" Margin="142,127,198,232" 
+                            Grid.ColumnSpan="1" Margin="142,127,198,232"
                             TickFrequency="1.0"
                             Style="{StaticResource MaterialDesignDiscreteSlider}"
                             FontSize="10" Panel.ZIndex="1"
                             IsEnabled="{Binding IsEnabled, Mode=OneWay}"/>
                         <Label x:Name="barColorLabel" Content="Bar Color" HorizontalAlignment="Left" Margin="10,16,0,0" VerticalAlignment="Top" Height="40" Width="132"/>
                         <colorpicker:PortableColorPicker SmallChange="5" Style="{StaticResource DefaultColorPickerStyle}"
-                                                         FontSize="12"
-                                                     UseHintColor="True" HintColor="Transparent"
-                                                     SelectedColor="{Binding BarColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BrushToColorConverter}}"
-                                                     ShowFractionalPart="False"
-                                                     ShowAlpha="True" Margin="210,18,211,447" Grid.ColumnSpan="2" />
+                                                    FontSize="12"
+                                                    UseHintColor="True" HintColor="Transparent"
+                                                    SelectedColor="{Binding BarColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BrushToColorConverter}}"
+                                                    ShowFractionalPart="False"
+                                                    ShowAlpha="True" Margin="210,18,211,447" Grid.ColumnSpan="2"
+                                                    Width="40" HorizontalAlignment="Left"/>
                         <Label x:Name="threeWideBarLabel" Content="3 Wide Bar Color" HorizontalAlignment="Left" Margin="6,73,0,0" VerticalAlignment="Top" Height="40" Width="199"/>
                         <colorpicker:PortableColorPicker SmallChange="5" Style="{StaticResource DefaultColorPickerStyle}"
-                                                         FontSize="12"
-                                                     UseHintColor="True" HintColor="Transparent"
-                                                     SelectedColor="{Binding ThreeWideBarColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BrushToColorConverter}}"
-                                                     ShowFractionalPart="False"
-                                                     ShowAlpha="True" Margin="210,73,211,392" Grid.ColumnSpan="2" />
+                                                    FontSize="12"
+                                                    UseHintColor="True" HintColor="Transparent"
+                                                    SelectedColor="{Binding ThreeWideBarColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BrushToColorConverter}}"
+                                                    ShowFractionalPart="False"
+                                                    ShowAlpha="True" Margin="210,73,211,392" Grid.ColumnSpan="2"
+                                                    Width="40" HorizontalAlignment="Left"/>
                         <ToggleButton x:Name="barSpotterToggleButton"
-                      Style="{StaticResource MaterialDesignSwitchToggleButton}"
-                      Grid.Column="1" Margin="204,-22,10,406" IsChecked="{Binding IsEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                      Checked="windowToggle" Unchecked="windowToggle">
+                            Style="{StaticResource MaterialDesignSwitchToggleButton}"
+                            Grid.Column="2" Margin="204,-22,10,406" IsChecked="{Binding IsEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            Checked="windowToggle" Unchecked="windowToggle">
                             <materialDesign:ToggleButtonAssist.SwitchTrackOnBackground>
                                 <SolidColorBrush Color="Green" />
                             </materialDesign:ToggleButtonAssist.SwitchTrackOnBackground>
-
                             <materialDesign:ToggleButtonAssist.SwitchTrackOffBackground>
                                 <SolidColorBrush Color="Red" />
                             </materialDesign:ToggleButtonAssist.SwitchTrackOffBackground>
                         </ToggleButton>
                         <Label Grid.Column="1" Content="Active" HorizontalAlignment="Left" Margin="123,18,0,0" VerticalAlignment="Top"/>
                         <Label Content="Positioning mode" HorizontalAlignment="Left" Margin="67,446,0,0" VerticalAlignment="Top"
-                               RenderTransformOrigin="-0.044,-0.259" Height="40" Width="132" Grid.Column="1"/>
+                                RenderTransformOrigin="-0.044,-0.259" Height="40" Width="132" Grid.Column="1"/>
                         <ToggleButton x:Name="testModeToggle"
-             ToolTip="Toggle to render the bars and position them"
-            Style="{StaticResource MaterialDesignSwitchToggleButton}"
-            Margin="204,408,10,-24" IsChecked="{Binding IsInTestMode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                                      materialDesign:ToggleButtonAssist.SwitchTrackOnBackground="DarkGreen"
-                                      materialDesign:ToggleButtonAssist.SwitchTrackOffBackground="Red" Grid.Column="1"/>
-                        <ToggleButton x:Name="barSpotterToggleButton_Copy"
+                            ToolTip="Toggle to render the bars and position them"
                             Style="{StaticResource MaterialDesignSwitchToggleButton}"
-                            Grid.Column="1" Margin="204,-22,9,406" IsChecked="{Binding IsEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                      Checked="windowToggle" Unchecked="windowToggle" materialDesign:ToggleButtonAssist.SwitchTrackOnBackground="Green" 
-                                      materialDesign:ToggleButtonAssist.SwitchTrackOffBackground="Red"/>
-
+                            Margin="204,408,10,-24" IsChecked="{Binding IsInTestMode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            materialDesign:ToggleButtonAssist.SwitchTrackOnBackground="DarkGreen"
+                            materialDesign:ToggleButtonAssist.SwitchTrackOffBackground="Red" Grid.Column="1"/>
                     </Grid>
                 </TabItem>
                 <TabItem Header="Input Graph">
-                    <Grid DataContext="{Binding InputGraphSettings}">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <ToggleButton x:Name="inputGraphToggleButton"
-                            Style="{StaticResource MaterialDesignSwitchToggleButton}"
-                           Grid.Column="1" Margin="204,-22,10,406"  materialDesign:ToggleButtonAssist.SwitchTrackOnBackground="DarkGreen" materialDesign:ToggleButtonAssist.SwitchTrackOffBackground="Red" IsChecked="{Binding IsEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Click="windowToggle"/>
-                        <Label Grid.Column="1" Content="Active" HorizontalAlignment="Left" Margin="123,18,0,0" VerticalAlignment="Top"/>
-                        <colorpicker:PortableColorPicker SmallChange="5" Style="{StaticResource DefaultColorPickerStyle}"
-                                                  FontSize="12"
-                                              UseHintColor="True" HintColor="Transparent"
-                                              SelectedColor="{Binding BackgroundColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BrushToColorConverter}}"
-                                              ShowFractionalPart="False"
-                                              ShowAlpha="True" Margin="224,18,197,447" Grid.ColumnSpan="2" RenderTransformOrigin="1.111,0.446" />
-                        <Label Content="Throttle Color" HorizontalAlignment="Left" Margin="10,56,0,0" VerticalAlignment="Top"/>
-                        <Label Content="Brake Color" HorizontalAlignment="Left" Margin="10,99,0,0" VerticalAlignment="Top"/>
-                        <colorpicker:PortableColorPicker SmallChange="5" Style="{StaticResource DefaultColorPickerStyle}"
-                                                  FontSize="12"
-                                              UseHintColor="True" HintColor="Transparent"
-                                              SelectedColor="{Binding ThrottleColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BrushToColorConverter}}"
-                                              ShowFractionalPart="False"
-                                              ShowAlpha="True" Margin="186,58,235,407" Grid.ColumnSpan="2" />
-                        <Label Content="Clutch Color" HorizontalAlignment="Left" Margin="8,142,0,0" VerticalAlignment="Top"/>
-                        <colorpicker:PortableColorPicker SmallChange="5" Style="{StaticResource DefaultColorPickerStyle}"
-                                                  FontSize="12"
-                                              UseHintColor="True" HintColor="Transparent"
-                                              SelectedColor="{Binding ClutchColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BrushToColorConverter}}"
-                                              ShowFractionalPart="False"
-                                              ShowAlpha="True" Margin="186,147,235,318" Grid.ColumnSpan="2" />
-                        <Slider x:Name="inputGraph_lineWidthSlider" Maximum="10" 
-                            Minimum="1"
-                            Value="{Binding LineWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="146,225,50,165" 
-                            TickFrequency="1.0"
-                            Style="{StaticResource MaterialDesignDiscreteSlider}"
-                            FontSize="10" Panel.ZIndex="1"
-                            IsEnabled="{Binding IsEnabled, Mode=OneWay}"/>
-                        <Label Content="Show Clutch" HorizontalAlignment="Left" Margin="10,176,0,0" VerticalAlignment="Top"/>
-                        <CheckBox Content="" HorizontalAlignment="Left" Margin="186,182,0,0" VerticalAlignment="Top" IsChecked="{Binding ShowClutch, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  IsEnabled="{Binding IsEnabled, Mode=OneWay}"/>
-                        <Label Content="Raw Values" HorizontalAlignment="Left" Margin="10,256,0,0" VerticalAlignment="Top"/>
-                        <CheckBox Content="" HorizontalAlignment="Left" Margin="157,260,0,0" VerticalAlignment="Top" IsChecked="{Binding UseRawValues, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  IsEnabled="{Binding IsEnabled, Mode=OneWay}"/>
-                        <Label Content="Line Width" HorizontalAlignment="Left" Margin="10,217,0,0" VerticalAlignment="Top"/>
-                        <colorpicker:PortableColorPicker SmallChange="5" Style="{StaticResource DefaultColorPickerStyle}"
-                                                  FontSize="12"
-                                              UseHintColor="True" HintColor="Transparent"
-                                              SelectedColor="{Binding ABSColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BrushToColorConverter}}"
-                                              ShowFractionalPart="False"
-                                              ShowAlpha="True" Margin="186,299,235,165" Grid.ColumnSpan="2" />
-                        <Label Content="ABS Flash" HorizontalAlignment="Left" Margin="10,294,0,0" VerticalAlignment="Top"/>
-                        <Label Content="Show ABS" HorizontalAlignment="Left" Margin="10,334,0,0" VerticalAlignment="Top"/>
-                        <CheckBox Content="" HorizontalAlignment="Left" Margin="186,340,0,0" VerticalAlignment="Top" IsChecked="{Binding ShowABS, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  IsEnabled="{Binding IsEnabled, Mode=OneWay}"/>
-                        <Label Content="Show Throttle %" HorizontalAlignment="Left" Margin="10,374,0,0" VerticalAlignment="Top"/>
-                        <CheckBox Content="" HorizontalAlignment="Left" Margin="200,374,0,0" VerticalAlignment="Top" IsChecked="{Binding ShowPercentageThrottle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  IsEnabled="{Binding IsEnabled, Mode=OneWay}"/>
-                        <Label Content="Show Brake %" HorizontalAlignment="Left" Margin="10,404,0,0" VerticalAlignment="Top"/>
-                        <CheckBox Content="" HorizontalAlignment="Left" Margin="200,404,0,0" VerticalAlignment="Top" IsChecked="{Binding ShowPercentageBrake, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  IsEnabled="{Binding IsEnabled, Mode=OneWay}"/>
-                        <Label Content="Show Clutch %" HorizontalAlignment="Left" Margin="10,434,0,0" VerticalAlignment="Top"/>
-                        <CheckBox Content="" HorizontalAlignment="Left" Margin="200,434,0,0" VerticalAlignment="Top" IsChecked="{Binding ShowPercentageClutch, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  IsEnabled="{Binding IsEnabled, Mode=OneWay}"/>
-                        <colorpicker:PortableColorPicker SmallChange="5" Style="{StaticResource DefaultColorPickerStyle}"
-                            FontSize="12"
-                            UseHintColor="True" HintColor="Transparent"
-                            SelectedColor="{Binding BrakeColor, Converter={StaticResource BrushToColorConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                            ShowFractionalPart="False"
-                            ShowAlpha="True" Margin="186,102,235,363" Grid.ColumnSpan="2" />
-                        <Label Content="Background Color" HorizontalAlignment="Left" Margin="10,18,0,0" VerticalAlignment="Top"/>
-                    </Grid>
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <Grid DataContext="{Binding InputGraphSettings}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <ToggleButton x:Name="inputGraphToggleButton"
+                                Style="{StaticResource MaterialDesignSwitchToggleButton}"
+                               Grid.Column="2" Margin="145,20,40,496" materialDesign:ToggleButtonAssist.SwitchTrackOnBackground="DarkGreen" materialDesign:ToggleButtonAssist.SwitchTrackOffBackground="Red" IsChecked="{Binding IsEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Click="windowToggle"/>
+                            <Label Grid.Column="2" Content="Active" HorizontalAlignment="Left" Margin="63,18,0,0" VerticalAlignment="Top"/>
+                            <Label Content="Background Color" HorizontalAlignment="Left" Margin="10,18,0,0" VerticalAlignment="Top"/>
+                            <colorpicker:PortableColorPicker SmallChange="5" Style="{StaticResource DefaultColorPickerStyle}"
+                                                        FontSize="12"
+                                                        UseHintColor="True" HintColor="Transparent"
+                                                        SelectedColor="{Binding BackgroundColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BrushToColorConverter}}"
+                                                        ShowFractionalPart="False"
+                                                        ShowAlpha="True" Margin="146,18,0,0" Grid.Column="1" RenderTransformOrigin="1.111,0.446"
+                                                        Width="40" Height="40" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                            <Label Content="Throttle Color" HorizontalAlignment="Left" Margin="10,56,0,0" VerticalAlignment="Top"/>
+                            <colorpicker:PortableColorPicker SmallChange="5" Style="{StaticResource DefaultColorPickerStyle}"
+                                                        FontSize="12"
+                                                        UseHintColor="True" HintColor="Transparent"
+                                                        SelectedColor="{Binding ThrottleColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BrushToColorConverter}}"
+                                                        ShowFractionalPart="False"
+                                                        ShowAlpha="True" Margin="146,58,0,0" Grid.Column="1"
+                                                        Width="40" Height="40" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                            <Label Content="Brake Color" HorizontalAlignment="Left" Margin="10,99,0,0" VerticalAlignment="Top"/>
+                            <colorpicker:PortableColorPicker SmallChange="5" Style="{StaticResource DefaultColorPickerStyle}"
+                                                        FontSize="12"
+                                                        UseHintColor="True" HintColor="Transparent"
+                                                        SelectedColor="{Binding BrakeColor, Converter={StaticResource BrushToColorConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                        ShowFractionalPart="False"
+                                                        ShowAlpha="True" Margin="146,102,0,0" Grid.Column="1"
+                                                        Width="40" Height="40" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                            <Label Content="Clutch Color" HorizontalAlignment="Left" Margin="8,142,0,0" VerticalAlignment="Top"/>
+                            <colorpicker:PortableColorPicker SmallChange="5" Style="{StaticResource DefaultColorPickerStyle}"
+                                                        FontSize="12"
+                                                        UseHintColor="True" HintColor="Transparent"
+                                                        SelectedColor="{Binding ClutchColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BrushToColorConverter}}"
+                                                        ShowFractionalPart="False"
+                                                        ShowAlpha="True" Margin="146,147,0,0" Grid.Column="1"
+                                                        Width="40" Height="40" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                            <Label Content="Steering Color" HorizontalAlignment="Left" Margin="10,184,0,0" VerticalAlignment="Top"/>
+                            <colorpicker:PortableColorPicker SmallChange="5" Style="{StaticResource DefaultColorPickerStyle}"
+                                                        FontSize="12"
+                                                        UseHintColor="True" HintColor="Transparent"
+                                                        SelectedColor="{Binding SteeringColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BrushToColorConverter}}"
+                                                        ShowFractionalPart="False"
+                                                        ShowAlpha="True" Margin="146,189,0,0" Grid.Column="1"
+                                                        Width="40" Height="40" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                            <Label Content="Line Width" HorizontalAlignment="Left" Margin="10,227,0,0" VerticalAlignment="Top"/>
+                            <Slider x:Name="inputGraph_lineWidthSlider" Maximum="10"
+                                Minimum="1"
+                                Value="{Binding LineWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="146,236,50,0" VerticalAlignment="Top"
+                                TickFrequency="1.0"
+                                Style="{StaticResource MaterialDesignDiscreteSlider}"
+                                FontSize="10" Panel.ZIndex="1"
+                                IsEnabled="{Binding IsEnabled, Mode=OneWay}"/>
+                            <Label Content="Show Clutch" HorizontalAlignment="Left" Margin="10,266,0,0" VerticalAlignment="Top"/>
+                            <CheckBox Content="" HorizontalAlignment="Left" Margin="186,270,0,0" VerticalAlignment="Top" IsChecked="{Binding ShowClutch, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsEnabled, Mode=OneWay}"/>
+                            <Label Content="Show Steering" HorizontalAlignment="Left" Margin="10,300,0,0" VerticalAlignment="Top"/>
+                            <CheckBox Content="" HorizontalAlignment="Left" Margin="186,304,0,0" VerticalAlignment="Top" IsChecked="{Binding ShowSteering, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsEnabled, Mode=OneWay}"/>
+                            <Label Content="Raw Values" HorizontalAlignment="Left" Margin="10,334,0,0" VerticalAlignment="Top"/>
+                            <CheckBox Content="" HorizontalAlignment="Left" Margin="157,338,0,0" VerticalAlignment="Top" IsChecked="{Binding UseRawValues, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsEnabled, Mode=OneWay}"/>
+                            <colorpicker:PortableColorPicker SmallChange="5" Style="{StaticResource DefaultColorPickerStyle}"
+                                                        FontSize="12"
+                                                        UseHintColor="True" HintColor="Transparent"
+                                                        SelectedColor="{Binding ABSColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BrushToColorConverter}}"
+                                                        ShowFractionalPart="False"
+                                                        ShowAlpha="True" Margin="146,373,0,0" Grid.Column="1"
+                                                        Width="40" Height="40" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                            <Label Content="ABS Flash" HorizontalAlignment="Left" Margin="10,368,0,0" VerticalAlignment="Top"/>
+                            <Label Content="Show ABS" HorizontalAlignment="Left" Margin="10,408,0,0" VerticalAlignment="Top"/>
+                            <CheckBox Content="" HorizontalAlignment="Left" Margin="16,412,0,0" VerticalAlignment="Top" IsChecked="{Binding ShowABS, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsEnabled, Mode=OneWay}"/>
+                            <Label Content="Show Throttle %" HorizontalAlignment="Left" Margin="10,448,0,0" VerticalAlignment="Top"/>
+                            <CheckBox Content="" HorizontalAlignment="Left" Margin="200,452,0,0" VerticalAlignment="Top" IsChecked="{Binding ShowPercentageThrottle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsEnabled, Mode=OneWay}"/>
+                            <Label Content="Show Brake %" HorizontalAlignment="Left" Margin="10,482,0,0" VerticalAlignment="Top"/>
+                            <CheckBox Content="" HorizontalAlignment="Left" Margin="200,486,0,0" VerticalAlignment="Top" IsChecked="{Binding ShowPercentageBrake, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsEnabled, Mode=OneWay}"/>
+                            <Label Content="Show Clutch %" HorizontalAlignment="Left" Margin="10,516,0,0" VerticalAlignment="Top"/>
+                            <CheckBox Content="" HorizontalAlignment="Left" Margin="200,520,0,0" VerticalAlignment="Top" IsChecked="{Binding ShowPercentageClutch, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsEnabled, Mode=OneWay}"/>
+                        </Grid>
+                    </ScrollViewer>
                 </TabItem>
                 <TabItem Header="Wind">
                     <Grid DataContext="{Binding WindSettings}">
@@ -169,24 +184,23 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <ToggleButton x:Name="windToggleButton"
-Style="{StaticResource MaterialDesignSwitchToggleButton}"
-Grid.Column="1" Margin="204,-22,10,406" IsChecked="{Binding IsEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Checked="windowToggle" Unchecked="windowToggle">
+                            Style="{StaticResource MaterialDesignSwitchToggleButton}"
+                            Grid.Column="1" Margin="204,-22,10,406" IsChecked="{Binding IsEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Checked="windowToggle" Unchecked="windowToggle">
                             <materialDesign:ToggleButtonAssist.SwitchTrackOnBackground>
                                 <SolidColorBrush Color="Green" />
                             </materialDesign:ToggleButtonAssist.SwitchTrackOnBackground>
-
                             <materialDesign:ToggleButtonAssist.SwitchTrackOffBackground>
                                 <SolidColorBrush Color="Red" />
                             </materialDesign:ToggleButtonAssist.SwitchTrackOffBackground>
                         </ToggleButton>
                         <Label Grid.Column="1" Content="Active" HorizontalAlignment="Left" Margin="123,17,0,0" VerticalAlignment="Top"/>
-                        <CheckBox Content="" HorizontalAlignment="Left" Margin="124,12,0,0" VerticalAlignment="Top" IsChecked="{Binding UseMph, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  IsEnabled="{Binding IsEnabled, Mode=OneWay}" RenderTransformOrigin="-0.772,0.56"/>
+                        <CheckBox Content="" HorizontalAlignment="Left" Margin="124,12,0,0" VerticalAlignment="Top" IsChecked="{Binding UseMph, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsEnabled, Mode=OneWay}" RenderTransformOrigin="-0.772,0.56"/>
                         <Label Content="Use MPH" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
                         <Label Content="Positioning mode" HorizontalAlignment="Left" Margin="67,446,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.044,-0.259" Height="40" Width="132" Grid.Column="1"/>
                         <ToggleButton x:Name="windTestModeToggle"
-             ToolTip="Toggle to render window border to allow for easier resizing"
-            Style="{StaticResource MaterialDesignSwitchToggleButton}"
-            Margin="204,408,10,-24" IsChecked="{Binding IsInTestMode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" materialDesign:ToggleButtonAssist.SwitchTrackOnBackground="DarkGreen" materialDesign:ToggleButtonAssist.SwitchTrackOffBackground="Red" Grid.Column="1"/>
+                            ToolTip="Toggle to render window border to allow for easier resizing"
+                            Style="{StaticResource MaterialDesignSwitchToggleButton}"
+                            Margin="204,408,10,-24" IsChecked="{Binding IsInTestMode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" materialDesign:ToggleButtonAssist.SwitchTrackOnBackground="DarkGreen" materialDesign:ToggleButtonAssist.SwitchTrackOffBackground="Red" Grid.Column="1"/>
                     </Grid>
                 </TabItem>
 
@@ -208,21 +222,13 @@ Grid.Column="1" Margin="204,-22,10,406" IsChecked="{Binding IsEnabled, Mode=TwoW
                             </materialDesign:ToggleButtonAssist.SwitchTrackOffBackground>
                         </ToggleButton>
                         <Label Grid.Column="1" Content="Active" HorizontalAlignment="Left" Margin="74,17,0,0" VerticalAlignment="Top"/>
-                        <!--<ToggleButton x:Name="fuelPositioningModeToggle"
-                                ToolTip="Toggle to render the positioning View"
-                                Style="{StaticResource MaterialDesignSwitchToggleButton}"
-                                Margin="90,0,0,-136" IsChecked="{Binding PositioningMode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                                materialDesign:ToggleButtonAssist.SwitchTrackOnBackground="DarkGreen"
-                                materialDesign:ToggleButtonAssist.SwitchTrackOffBackground="Red" Grid.Column="1"/>
-                        <Label Grid.Column="1" Content="Reposition" HorizontalAlignment="Left" Margin="10,0,0,166" VerticalAlignment="Bottom"/>-->
                         <ToggleButton x:Name="fuelTestModeToggle"
                             ToolTip="Toggle to render the debug fuel View"
                             Style="{StaticResource MaterialDesignSwitchToggleButton}"
-                            Margin="104,308,10,-24" IsChecked="{Binding IsInTestMode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                                      materialDesign:ToggleButtonAssist.SwitchTrackOnBackground="DarkGreen"
-                                      materialDesign:ToggleButtonAssist.SwitchTrackOffBackground="Red" Grid.Column="1"/>
+                            Margin="104,308,10,-24" IsChecked="{Binding IsInTestMode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            materialDesign:ToggleButtonAssist.SwitchTrackOnBackground="DarkGreen"
+                            materialDesign:ToggleButtonAssist.SwitchTrackOffBackground="Red" Grid.Column="1"/>
                         <Label Grid.Column="1" Content="Debug" HorizontalAlignment="Left" Margin="50,0,0,66" VerticalAlignment="Bottom"/>
-
                     </Grid>
                 </TabItem>
             </TabControl>
@@ -232,7 +238,7 @@ Grid.Column="1" Margin="204,-22,10,406" IsChecked="{Binding IsEnabled, Mode=TwoW
         <Image Grid.Column="1" HorizontalAlignment="Center" Height="43" Margin="0,10,0,0" VerticalAlignment="Top" Width="384" Source="/Media/sharpoverlaylogo.png"/>
         <Button x:Name="updateButton" Grid.Column="1" Content="CLICK TO UPDATE!" HorizontalAlignment="Left" Margin="415,450,0,0" VerticalAlignment="Top" Background="LightGreen" Visibility="Hidden" Click="updateButton_Click"/>
         <TextBlock Grid.Column="1" HorizontalAlignment="Left" Margin="26,84,0,0" TextWrapping="Wrap" VerticalAlignment="Top">
-            Welcome to SharpOverlay! Please leave any bugs or feature requests 
+            Welcome to SharpOverlay! Please leave any bugs or feature requests
             <Hyperlink
                 NavigateUri="https://github.com/TiberiuC39/SharpOverlay/issues"
                 RequestNavigate="Hyperlink_RequestNavigate">

@@ -133,6 +133,8 @@ namespace SharpOverlay.Models
 
         private SolidColorBrush? _clutchColor;
 
+        private SolidColorBrush? _steeringColor;
+
         private SolidColorBrush? _ABSColor;
 
         public SolidColorBrush? BackgroundColor
@@ -174,6 +176,16 @@ namespace SharpOverlay.Models
             {
                 _clutchColor = value;
                 OnPropertyChanged(nameof(ClutchColor));
+            }
+        }
+
+        public SolidColorBrush? SteeringColor
+        {
+            get => _steeringColor;
+            set
+            {
+                _steeringColor = value;
+                OnPropertyChanged(nameof(SteeringColor));
             }
         }
 
@@ -244,11 +256,35 @@ namespace SharpOverlay.Models
             }
         }
 
+        private bool _showPercentageSteering;
+        public bool ShowPercentageSteering
+        {
+            get => _showPercentageSteering;
+            set
+            {
+                _showPercentageSteering = value;
+                OnPropertyChanged(nameof(ShowPercentageSteering));
+            }
+        }
+
+        private bool _showSteering;
+
+        public bool ShowSteering
+        {
+            get => _showSteering;
+            set
+            {
+                _showSteering = value;
+                OnPropertyChanged(nameof(ShowSteering));
+            }
+        }
+
         public InputGraphSettings()
         {
             ThrottleColor = new SolidColorBrush(Colors.Green);
             BrakeColor = new SolidColorBrush(Colors.Red);
             ClutchColor = new SolidColorBrush(Colors.Blue);
+            SteeringColor = new SolidColorBrush(Colors.Yellow);
             UseRawValues = true;
             ShowClutch = true;
             ShowPercentageThrottle = true;
