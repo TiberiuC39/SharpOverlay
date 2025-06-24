@@ -8,6 +8,7 @@ namespace SharpOverlay.Services.FuelServices
         public double Consumption { get; set; }
         public int LapCount { get; set; }
         public TimeSpan LapTime { get; set; }
+        public TimeSpan PitStopTime { get; set; }
         public int CarId { get; set; }
     }
 }

@@ -1,13 +1,12 @@
-﻿using SharpOverlay.Models;
+﻿using Dark.Net;
+using SharpOverlay.Models;
 using SharpOverlay.Services;
-using iRacingSdkWrapper;
 using System;
-using System.Windows;
-using Window = System.Windows.Window;
-using Dark.Net;
 using System.Threading.Tasks;
+using System.Windows;
 using Velopack;
 using Velopack.Sources;
+using Window = System.Windows.Window;
 
 namespace SharpOverlay
 {
@@ -33,7 +32,7 @@ namespace SharpOverlay
 
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            //await CheckForUpdate();
+            await CheckForUpdate();
         }
         
         private async Task CheckForUpdate()

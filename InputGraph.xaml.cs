@@ -20,6 +20,8 @@ namespace SharpOverlay
         private DataStreamer throttleStreamer;
         private DataStreamer brakeStreamer;
         private DataStreamer clutchStreamer;
+        private DataStreamer steeringStreamer;
+
         private Input input = new Input();
 
         private bool absActive;
@@ -45,6 +47,8 @@ namespace SharpOverlay
             HookStreamer(ref throttleStreamer, _settings.ThrottleColor, true);
             HookStreamer(ref brakeStreamer, _settings.BrakeColor, true);
             HookStreamer(ref clutchStreamer, _settings.ClutchColor, _settings.ShowClutch);
+            HookStreamer(ref steeringStreamer, _settings.SteeringColor, _settings.ShowSteering);
+
 
             PlotSetup();
             SetColorPercentageLabels();
@@ -67,6 +71,7 @@ namespace SharpOverlay
             SetStreamerColorAndWidth(ref throttleStreamer, _settings.ThrottleColor);
             SetStreamerColorAndWidth(ref brakeStreamer, _settings.BrakeColor);
             SetStreamerColorAndWidth(ref clutchStreamer, _settings.ClutchColor);
+            SetStreamerColorAndWidth(ref steeringStreamer, _settings.SteeringColor);
 
             //InputPlot.Plot.DataBackground.Color = TransformColor(App.appSettings.InputGraphSettings.BackgroundColor);
             InputPlot.Plot.FigureBackground.Color = TransformColor(_settings.BackgroundColor);
@@ -81,6 +86,15 @@ namespace SharpOverlay
                 clutchStreamer.IsVisible = false;
             }
 
+            if (_settings.ShowSteering)
+            {
+                steeringStreamer.IsVisible = true;
+            }
+            else if (!_settings.ShowSteering)
+            {
+                steeringStreamer.IsVisible = false;
+            }
+
             SetColorPercentageLabels();
         }
 
@@ -91,7 +105,6 @@ namespace SharpOverlay
                 input.Brake = telemetryInfo.BrakeRaw.Value * 100;
                 input.Throttle = telemetryInfo.ThrottleRaw.Value * 100;
                 input.Clutch = (1 - telemetryInfo.ClutchRaw.Value) * 100;
-
             }
             else
             {
@@ -99,6 +112,8 @@ namespace SharpOverlay
                 input.Throttle = telemetryInfo.Throttle.Value * 100;
                 input.Clutch = (1 - telemetryInfo.Clutch.Value) * 100;
             }
+
+            input.Steering = telemetryInfo.SteeringWheelAngle.Value * 10 + 50;
 
             if (BrakePercentage.IsVisible)
                 BrakePercentage.Content = $"Brake: {Math.Round(input.Brake, 0)} %";
@@ -114,9 +129,15 @@ namespace SharpOverlay
         {
             throttleStreamer.Add(input.Throttle);
             brakeStreamer.Add(input.Brake);
+
             if (_settings.ShowClutch)
             {
                 clutchStreamer.Add(input.Clutch);
+            }
+
+            if (_settings.ShowSteering)
+            {
+                steeringStreamer.Add(input.Steering);
             }
         }
 
@@ -204,6 +225,9 @@ namespace SharpOverlay
 
             ClutchPercentage.Visibility = _settings.ShowPercentageClutch ? Visibility.Visible : Visibility.Hidden;
             ClutchPercentage.Foreground = _settings.ClutchColor;
+
+            SteeringPercentage.Visibility = _settings.ShowPercentageSteering ? Visibility.Visible : Visibility.Hidden;
+            SteeringPercentage.Foreground = _settings.SteeringColor;
         }
     }
 }

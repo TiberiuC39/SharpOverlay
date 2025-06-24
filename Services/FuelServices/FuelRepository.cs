@@ -55,6 +55,7 @@ namespace SharpOverlay.Services.FuelServices
                 entry.LapCount = newData.LapCount;
                 entry.LapTime = newData.LapTime.TotalSeconds;
                 entry.Consumption = newData.Consumption;
+                entry.PitStopTime = newData.PitStopTime.TotalSeconds;
             }
             else
             {
@@ -62,7 +63,8 @@ namespace SharpOverlay.Services.FuelServices
                 {
                     Consumption = newData.Consumption,
                     LapCount = newData.LapCount,
-                    LapTime = newData.LapTime.TotalSeconds
+                    LapTime = newData.LapTime.TotalSeconds,
+                    PitStopTime = newData.PitStopTime.TotalSeconds,
                 };
 
                 trackRaceHistory.ByCarId.TryAdd(newData.CarId, newModel);
@@ -88,7 +90,7 @@ namespace SharpOverlay.Services.FuelServices
 
         public void Save()
         {
-            string filePath = "../../../" + _fileName;
+            string filePath = "../" + _fileName;
 
             if (_repository.ByTrack.Count > 0)
             {

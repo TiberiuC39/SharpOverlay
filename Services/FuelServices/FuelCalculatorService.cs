@@ -77,6 +77,7 @@ namespace SharpOverlay.Services.FuelServices
                 int trackId = _sessionParser.TrackId;
                 int carID = _sessionParser.CarId;
 
+                var pitStopTime = _pitTimeTracker.GetAvgPitStopTime();
 
                 var newData = new AddFuelHistoryDTO()
                 {
@@ -84,11 +85,11 @@ namespace SharpOverlay.Services.FuelServices
                     Consumption = fuelConsump,
                     LapCount = lapCount,
                     TrackId = trackId,
-                    LapTime = lapTime
+                    LapTime = lapTime,
+                    PitStopTime = pitStopTime,
                 };
 
                 _repository.AddOrUpdate(newData);
-
                 _repository.Save();
             }
 
@@ -202,18 +203,18 @@ namespace SharpOverlay.Services.FuelServices
         {
             var trackSurface = simulationOutput.TrackSurface;
 
-            if (trackSurface == TrackSurfaces.AproachingPits && simulationOutput.PlayerTrackDistPct > 0)
+            if (trackSurface == TrackSurfaces.AproachingPits && simulationOutput.PlayerTrackDistPct < 0.5)
             {
                 trackSurface = TrackSurfaces.OnTrack; // EXITING PITS GETS REPORTED AS APPROACHING PITS ?????????????????????????
             }
             _pitManager.SetPitRoadStatus(simulationOutput.IsOnPitRoad, trackSurface);
             _pitManager.SetPitServiceStatus(simulationOutput.IsReceivingService);
 
-            if (simulationOutput.TrackSurface == TrackSurfaces.AproachingPits && !_pitTimeTracker.IsTrackingTime)
+            if (trackSurface == TrackSurfaces.AproachingPits && !_pitTimeTracker.IsTrackingTime)
             {
                 _pitTimeTracker.Start(simulationOutput.SessionTimeRemaining);
             }
-            else if (_pitTimeTracker.IsTrackingTime && _sessionParser.Sectors[1].StartPct - simulationOutput.PlayerTrackDistPct < 0.005)
+            else if (_pitTimeTracker.IsTrackingTime && _sessionParser.Sectors[1].StartPct - simulationOutput.PlayerTrackDistPct < 0)
             {
                 _pitTimeTracker.Stop(simulationOutput.SessionTimeRemaining);
             }
@@ -262,16 +263,17 @@ namespace SharpOverlay.Services.FuelServices
             {
                 _isRaceStart = false;
             }
-            else if (_pitManager.HasResetToPits(simulationOutput.EnterExitResetButton))
+            else if (_pitManager.HasFinishedService())
             {
-                currentLap.StartingFuel = simulationOutput.FuelLevel;
+                int lastLapnumber = _lapTracker.GetPlayerLaps().Last().Number;
 
-                if (_sessionParser.EventType != "Test" && simulationOutput.CurrentLapNumber > currentLap.Number)
-                {
-                    currentLap.Number++;
-                }
+                _lapTracker.StartNewLap(++lastLapnumber, simulationOutput.FuelLevel);
+
+                currentLap = _lapTracker.GetCurrentLap()!;
 
                 _strategyList.ForEach(s => s.UpdateRefuel(currentLap.StartingFuel, _lapsRemainingInRace));
+
+                _pitManager.ResetFinishedServiceStatus();
             }
             else if (_pitManager.HasBegunService())
             {
@@ -284,17 +286,16 @@ namespace SharpOverlay.Services.FuelServices
 
                 _pitManager.ResetBegunServiceStatus();
             }
-            else if (_pitManager.HasFinishedService())
+            else if (_pitManager.HasResetToPits(simulationOutput.EnterExitResetButton))
             {
-                int lastLapnumber = _lapTracker.GetPlayerLaps().Last().Number;
+                currentLap.StartingFuel = simulationOutput.FuelLevel;
 
-                _lapTracker.StartNewLap(++lastLapnumber, simulationOutput.FuelLevel);
-
-                currentLap = _lapTracker.GetCurrentLap()!;
+                if (_sessionParser.EventType != "Test" && simulationOutput.CurrentLapNumber > currentLap.Number)
+                {
+                    currentLap.Number++;
+                }
 
                 _strategyList.ForEach(s => s.UpdateRefuel(currentLap.StartingFuel, _lapsRemainingInRace));
-
-                _pitManager.ResetFinishedServiceStatus();
             }
             else if (IsCrossingFinishLine(simulationOutput.CurrentLapNumber, currentLap.Number)
                 && simulationOutput.SessionState != SessionStates.ParadeLaps)
