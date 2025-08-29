@@ -21,11 +21,9 @@ namespace SharpOverlay
         private DataStreamer brakeStreamer;
         private DataStreamer clutchStreamer;
         private DataStreamer steeringStreamer;
+        private DataStreamer absStreamer;
 
         private Input input = new Input();
-
-        private bool absActive;
-        private ScottPlot.Color currentBgColor;
 
         private readonly InputGraphSettings _settings = App.appSettings.InputGraphSettings;
         private readonly SimReader _simReader = new SimReader(DefaultTickRates.InputGraph);
@@ -48,7 +46,7 @@ namespace SharpOverlay
             HookStreamer(ref brakeStreamer, _settings.BrakeColor, true);
             HookStreamer(ref clutchStreamer, _settings.ClutchColor, _settings.ShowClutch);
             HookStreamer(ref steeringStreamer, _settings.SteeringColor, _settings.ShowSteering);
-
+            HookStreamer(ref absStreamer, _settings.SteeringColor, true);
 
             PlotSetup();
             SetColorPercentageLabels();
@@ -72,6 +70,7 @@ namespace SharpOverlay
             SetStreamerColorAndWidth(ref brakeStreamer, _settings.BrakeColor);
             SetStreamerColorAndWidth(ref clutchStreamer, _settings.ClutchColor);
             SetStreamerColorAndWidth(ref steeringStreamer, _settings.SteeringColor);
+            SetStreamerColorAndWidth(ref absStreamer, _settings.ABSColor);
 
             //InputPlot.Plot.DataBackground.Color = TransformColor(App.appSettings.InputGraphSettings.BackgroundColor);
             InputPlot.Plot.FigureBackground.Color = TransformColor(_settings.BackgroundColor);
@@ -114,21 +113,35 @@ namespace SharpOverlay
             }
 
             input.Steering = telemetryInfo.SteeringWheelAngle.Value * 10 + 50;
+            input.ABS = telemetryInfo.BrakeABSactive.Value ? input.Brake : 0;
 
             if (BrakePercentage.IsVisible)
-                BrakePercentage.Content = $"Brake: {Math.Round(input.Brake, 0)} %";
+            {
+                BrakePercentage.Content = $"B: {Math.Round(input.Brake, 0)} %";
+            }
 
             if (ThrottlePercentage.IsVisible)
-                ThrottlePercentage.Content = $"Throttle: {Math.Round(input.Throttle, 0)} %";
+            {
+                ThrottlePercentage.Content = $"T: {Math.Round(input.Throttle, 0)} %";
+            }
 
             if (ClutchPercentage.IsVisible)
-                ClutchPercentage.Content = $"Clutch: {Math.Round(input.Clutch, 0)} %";
+            {
+                ClutchPercentage.Content = $"C: {Math.Round(input.ABS, 0)} %";
+            }
         }
 
         private void AddInputsToStreamers(Input input)
         {
             throttleStreamer.Add(input.Throttle);
             brakeStreamer.Add(input.Brake);
+            if (input.ABS != 0) 
+
+            absStreamer.Add(input.ABS);
+            else
+            {
+                absStreamer.Add(double.NaN);
+            }
 
             if (_settings.ShowClutch)
             {
@@ -146,12 +159,6 @@ namespace SharpOverlay
             UpdateInputs(e.TelemetryInfo);
             AddInputsToStreamers(input);
             InputPlot.Refresh();
-
-            absActive = e.TelemetryInfo.BrakeABSactive.Value;
-            if (_settings.ShowABS)
-            {
-                ABSFlash();
-            }
         }
 
         private void Window_MouseDown(object? sender, MouseButtonEventArgs e)
@@ -199,20 +206,6 @@ namespace SharpOverlay
         private ScottPlot.Color TransformColor(SolidColorBrush color)
         {
             return new ScottPlot.Color(color.Color.R, color.Color.G, color.Color.B, color.Color.A);
-        }
-
-        private void ABSFlash()
-        {
-            if (absActive && currentBgColor == TransformColor(_settings.BackgroundColor))
-            {
-                InputPlot.Plot.FigureBackground.Color = TransformColor(_settings.ABSColor);
-                currentBgColor = InputPlot.Plot.DataBackground.Color;
-            }
-            else if(currentBgColor != TransformColor(_settings.BackgroundColor))
-            {
-                InputPlot.Plot.FigureBackground.Color = TransformColor(_settings.BackgroundColor);
-                currentBgColor = TransformColor(_settings.BackgroundColor);
-            }
         }
 
         private void SetColorPercentageLabels()

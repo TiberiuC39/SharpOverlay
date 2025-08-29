@@ -6,5 +6,6 @@
         public float Brake { get; set; }
         public float Clutch { get; set; }
         public float Steering { get; set; }
+        public float ABS { get; set; }
     }
 }

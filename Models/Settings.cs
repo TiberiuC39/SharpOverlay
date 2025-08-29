@@ -284,12 +284,13 @@ namespace SharpOverlay.Models
             ThrottleColor = new SolidColorBrush(Colors.Green);
             BrakeColor = new SolidColorBrush(Colors.Red);
             ClutchColor = new SolidColorBrush(Colors.Blue);
-            SteeringColor = new SolidColorBrush(Colors.Yellow);
+            SteeringColor = new SolidColorBrush(Colors.Gray);
+            ABSColor = new SolidColorBrush(Colors.Yellow);
             UseRawValues = true;
-            ShowClutch = true;
-            ShowPercentageThrottle = true;
-            ShowPercentageBrake = true;
-            ShowPercentageClutch = true;
+            ShowClutch = false;
+            ShowPercentageThrottle = false;
+            ShowPercentageBrake = false;
+            ShowPercentageClutch = false;
         }
     }
 

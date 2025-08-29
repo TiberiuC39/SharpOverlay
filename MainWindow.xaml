@@ -49,11 +49,13 @@
                         <Slider x:Name="barSpotter_barWidth" Maximum="100"
                             Minimum="1"
                             Value="{Binding BarWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                            Grid.ColumnSpan="1" Margin="142,127,198,232"
+                            Grid.ColumnSpan="1" Margin="138,128,88,352"
                             TickFrequency="1.0"
                             Style="{StaticResource MaterialDesignDiscreteSlider}"
                             FontSize="10" Panel.ZIndex="1"
-                            IsEnabled="{Binding IsEnabled, Mode=OneWay}"/>
+                            IsEnabled="{Binding IsEnabled, Mode=OneWay}" RenderTransformOrigin="0.5,0.5">
+
+                        </Slider>
                         <Label x:Name="barColorLabel" Content="Bar Color" HorizontalAlignment="Left" Margin="10,16,0,0" VerticalAlignment="Top" Height="40" Width="132"/>
                         <colorpicker:PortableColorPicker SmallChange="5" Style="{StaticResource DefaultColorPickerStyle}"
                                                     FontSize="12"
@@ -93,7 +95,7 @@
                     </Grid>
                 </TabItem>
                 <TabItem Header="Input Graph">
-                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,10,0,10">
                         <Grid DataContext="{Binding InputGraphSettings}">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
@@ -147,11 +149,11 @@
                             <Label Content="Line Width" HorizontalAlignment="Left" Margin="10,227,0,0" VerticalAlignment="Top"/>
                             <Slider x:Name="inputGraph_lineWidthSlider" Maximum="10"
                                 Minimum="1"
-                                Value="{Binding LineWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="146,236,50,0" VerticalAlignment="Top"
+                                Value="{Binding LineWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="146,236,204,0" VerticalAlignment="Top"
                                 TickFrequency="1.0"
                                 Style="{StaticResource MaterialDesignDiscreteSlider}"
                                 FontSize="10" Panel.ZIndex="1"
-                                IsEnabled="{Binding IsEnabled, Mode=OneWay}"/>
+                                IsEnabled="{Binding IsEnabled, Mode=OneWay}" Grid.ColumnSpan="2"/>
                             <Label Content="Show Clutch" HorizontalAlignment="Left" Margin="10,266,0,0" VerticalAlignment="Top"/>
                             <CheckBox Content="" HorizontalAlignment="Left" Margin="186,270,0,0" VerticalAlignment="Top" IsChecked="{Binding ShowClutch, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsEnabled, Mode=OneWay}"/>
                             <Label Content="Show Steering" HorizontalAlignment="Left" Margin="10,300,0,0" VerticalAlignment="Top"/>
@@ -167,7 +169,7 @@
                                                         Width="40" Height="40" HorizontalAlignment="Left" VerticalAlignment="Top"/>
                             <Label Content="ABS Flash" HorizontalAlignment="Left" Margin="10,368,0,0" VerticalAlignment="Top"/>
                             <Label Content="Show ABS" HorizontalAlignment="Left" Margin="10,408,0,0" VerticalAlignment="Top"/>
-                            <CheckBox Content="" HorizontalAlignment="Left" Margin="16,412,0,0" VerticalAlignment="Top" IsChecked="{Binding ShowABS, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsEnabled, Mode=OneWay}"/>
+                            <CheckBox Content="" HorizontalAlignment="Left" Margin="139,410,0,0" VerticalAlignment="Top" IsChecked="{Binding ShowABS, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsEnabled, Mode=OneWay}"/>
                             <Label Content="Show Throttle %" HorizontalAlignment="Left" Margin="10,448,0,0" VerticalAlignment="Top"/>
                             <CheckBox Content="" HorizontalAlignment="Left" Margin="200,452,0,0" VerticalAlignment="Top" IsChecked="{Binding ShowPercentageThrottle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsEnabled, Mode=OneWay}"/>
                             <Label Content="Show Brake %" HorizontalAlignment="Left" Margin="10,482,0,0" VerticalAlignment="Top"/>
@@ -246,7 +248,7 @@
             </Hyperlink>
 
         </TextBlock>
-        <TextBlock Grid.Column="1" HorizontalAlignment="Left" Margin="26,105,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="340"><Run Text="Changelog:"/><LineBreak/><Run Text="v0.3.0 (Special thanks to @BatMicho)"/><LineBreak/><Run Text="- Added fuel calculator overlay"/><LineBreak/><Run Text="- Overlays will only appear when you are on track"/><LineBreak/><Run Text="- Bar spotter should be more reliable"/></TextBlock>
+        <TextBlock Grid.Column="1" HorizontalAlignment="Left" Margin="26,105,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="340"><Run Text="Changelog:"/><LineBreak/><Run Text="v0.3.2"/><LineBreak/><Run Text="- Replaced ABS Flash with brake trace changing color"/><LineBreak/><Run Text="- Added Pedal input values to input graph (pedal overlay will come in a later update)"/><LineBreak/><Run Text="- Added steering trace to input graph"/></TextBlock>
     </Grid>
 
 </Window>
