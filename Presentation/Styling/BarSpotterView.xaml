@@ -1,0 +1,58 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:colorpicker="clr-namespace:ColorPicker;assembly=ColorPicker"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
+
+    <Style TargetType="Label" BasedOn="{StaticResource MaterialDesignLabel}">
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="Margin" Value="0, 5, 10, 5" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+
+    <Style TargetType="ToggleButton" BasedOn="{StaticResource MaterialDesignSwitchToggleButton}">
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="Grid.ColumnSpan" Value="2" />
+        <Setter Property="Margin" Value="0, 5" />
+        <Setter Property="materialDesign:ToggleButtonAssist.SwitchTrackOnBackground">
+            <Setter.Value>
+                <SolidColorBrush Color="Green" />
+            </Setter.Value>
+        </Setter>
+        <Setter Property="materialDesign:ToggleButtonAssist.SwitchTrackOffBackground">
+            <Setter.Value>
+                <SolidColorBrush Color="Red" />
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="TextBox" BasedOn="{StaticResource MaterialDesignTextBox}">
+        <!-- <Setter Property="materialDesign:HintAssist.Hint" Value="Set Value" /> -->
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="Width" Value="40" />
+        <Setter Property="Margin" Value="10, 0" />
+    </Style>
+
+    <Style TargetType="Slider" BasedOn="{StaticResource MaterialDesignSlider}">
+        <Setter Property="Width" Value="300" />
+        <Setter Property="Margin" Value="10, 0, 0, 0" />
+        <Setter Property="TickPlacement" Value="None" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="HorizontalAlignment" Value="Right" />
+        <Setter Property="IsSnapToTickEnabled" Value="True" />
+    </Style>
+
+    <Style TargetType="{x:Type colorpicker:PortableColorPicker}">
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="Width" Value="40" />
+        <Setter Property="Height" Value="40" />
+        <Setter Property="Grid.ColumnSpan" Value="2" />
+    </Style>
+
+    <Style TargetType="{x:Type Grid}">
+        <Setter Property="Background" Value="Transparent" />
+    </Style>
+
+</ResourceDictionary>

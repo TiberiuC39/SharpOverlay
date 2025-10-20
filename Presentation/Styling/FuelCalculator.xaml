@@ -1,0 +1,30 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:colorpicker="clr-namespace:ColorPicker;assembly=ColorPicker"
+    >
+
+    <Style x:Key="LabelStyle" TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="Foreground" Value="{StaticResource AccentYellowBrush}" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+
+    <Style x:Key="TextBlockStyle" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource AccentYellowBrush}" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+    </Style>
+
+    <Style x:Key="RefuelRequiredTextBlockStyle" TargetType="TextBlock">
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="Foreground" Value="{StaticResource GreenBrush}" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding DoesRequireRefueling}" Value="true">
+                <Setter Property="Foreground" Value="{StaticResource RedBrush}" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+</ResourceDictionary>
