@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0-windows10.0.26100.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="YamlDotNet" Version="16.1.0" />
+        <Reference Include="iRacingSdkWrapper">
+            <HintPath>Dependencies\iRacingSdkWrapper.dll</HintPath>
+        </Reference>
+        <Reference Include="iRSDKSharp">
+            <HintPath>Dependencies\iRSDKSharp.dll</HintPath>
+        </Reference>
+    </ItemGroup>
+
+</Project>

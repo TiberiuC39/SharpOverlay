@@ -1,0 +1,143 @@
+﻿<Window x:Class="Presentation.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="clr-namespace:Presentation"
+    mc:Ignorable="d"
+    Title="SharpOverlay"
+    Height="720" Width="1280"
+    Icon="/Media/sharpoverlayicon.png"
+    Loaded="Window_Loaded"
+    Style="{StaticResource MainWindowBaseStyle}">
+
+    <WindowChrome.WindowChrome>
+        <WindowChrome
+            CornerRadius="12"
+            CaptionHeight="0"
+            ResizeBorderThickness="8"
+            GlassFrameThickness="0"
+            UseAeroCaptionButtons="False"
+        />
+    </WindowChrome.WindowChrome>
+
+    <Border Style="{StaticResource OuterBorderStyle}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="48" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="48" />
+            </Grid.RowDefinitions>
+
+            <Border Grid.Row="0">
+                <Grid MouseDown="TitleBar_MouseDown">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Style="{StaticResource TitleBarLogoStackPanelStyle}">
+                        <Image Style="{StaticResource TitleBarLogoImageStyle}" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1"
+                        Style="{StaticResource WindowControlsStackPanelStyle}">
+                        <Button Click="Minimize_Click"
+                            Style="{StaticResource WindowControlButtonStyle}"
+                            VerticalContentAlignment="Bottom">
+                            <materialDesign:PackIcon Kind="WindowMinimize" Width="18" Height="18" />
+                        </Button>
+
+                        <Button x:Name="MaxRestoreButton" Click="MaximizeRestore_Click"
+                            Style="{StaticResource WindowControlButtonStyle}">
+                            <materialDesign:PackIcon x:Name="MaxRestoreIcon" Kind="WindowMaximize"
+                                Width="18" Height="18" />
+                        </Button>
+
+                        <Button Click="Close_Click" Style="{StaticResource CloseButtonStyle}">
+                            <materialDesign:PackIcon Kind="WindowClose" Width="18" Height="18" />
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <Border Grid.Row="1" Style="{StaticResource TabBarBorderStyle}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0" Style="{StaticResource NavButtonStackPanelStyle}">
+                        <Button Content="General"
+                            Style="{StaticResource NavButtonStyle}"
+                            Command="{Binding NavigateCommand}"
+                            CommandParameter="General" />
+                        <Button Content="Bar Spotter"
+                            Style="{StaticResource NavButtonStyle}"
+                            Command="{Binding NavigateCommand}"
+                            CommandParameter="BarSpotter" />
+                        <Button Content="Fuel Calculator"
+                            Style="{StaticResource NavButtonStyle}"
+                            Command="{Binding NavigateCommand}"
+                            CommandParameter="FuelCalculator" />
+                        <Button Content="Input Graph"
+                            Style="{StaticResource NavButtonStyle}"
+                            Command="{Binding NavigateCommand}"
+                            CommandParameter="InputGraph" />
+                        <Button Content="Wind"
+                            Style="{StaticResource NavButtonStyle}"
+                            Command="{Binding NavigateCommand}"
+                            CommandParameter="Wind" />
+                    </StackPanel>
+
+                    <Border Grid.Row="1" Style="{StaticResource MainContentBorderStyle}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="3*" />
+                                <ColumnDefinition Width="2*" />
+                            </Grid.ColumnDefinitions>
+
+                            <ContentControl Grid.Column="0" Content="{Binding CurrentView}" />
+
+                            <Grid Grid.Column="1">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="4*" />
+                                </Grid.RowDefinitions>
+                                <Image Grid.Row="0"
+                                    Style="{StaticResource RightSideLogoImageStyle}" />
+                                <TextBlock Grid.Row="1"
+                                    Style="{StaticResource WelcomeTextBlockStyle}"> Welcome to <LineBreak />
+                                    SharpOverlay! Please leave any bugs or feature requests <Hyperlink
+                                        NavigateUri="https://github.com/TiberiuC39/SharpOverlay/issues"
+                                        RequestNavigate="Hyperlink_RequestNavigate">
+                                        here
+                                    </Hyperlink>
+                                </TextBlock>
+                                <TextBlock Grid.Row="2"
+                                    Style="{StaticResource ChangelogTextBlockStyle}">
+                                    <Run Text="Changelog:" />
+                                    <LineBreak />
+                                    <Run Text="v0.3.0 (Special thanks to @BatMicho)" />
+                                    <LineBreak />
+                                    <Run Text="- Added fuel calculator overlay" />
+                                    <LineBreak />
+                                    <Run Text="- Overlays will only appear when you are on track" />
+                                    <LineBreak />
+                                    <Run Text="- Bar spotter should be more reliable" />
+                                </TextBlock>
+                            </Grid>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Border>
+            <Button Grid.Row="2" x:Name="updateButton" Grid.Column="1" Content="CLICK TO UPDATE!"
+                Click="UpdateButton_Click"
+                Visibility="Hidden"
+                Style="{StaticResource UpdateButton}" />
+        </Grid>
+    </Border>
+</Window>

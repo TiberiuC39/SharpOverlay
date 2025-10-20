@@ -1,0 +1,12 @@
+﻿namespace Core.Services.FuelCalculator
+{
+    public class AddFuelHistoryDTO
+    {
+        public int TrackId { get; set; }
+        public double Consumption { get; set; }
+        public int LapCount { get; set; }
+        public TimeSpan LapTime { get; set; }
+        public TimeSpan PitStopTime { get; set; }
+        public int CarId { get; set; }
+    }
+}
