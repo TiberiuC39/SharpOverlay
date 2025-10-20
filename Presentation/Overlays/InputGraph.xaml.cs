@@ -111,7 +111,7 @@ namespace Presentation.Overlays
             }
 
             input.Steering = telemetryOutput.SteeringWheelAngle * 10 + 50;
-            input.ABS = telemetryInfo.BrakeABSactive.Value ? input.Brake : 0;
+            input.ABS = telemetryOutput.BrakeABSactive ? input.Brake : 0;
 
             if (BrakePercentage.IsVisible)
             {
