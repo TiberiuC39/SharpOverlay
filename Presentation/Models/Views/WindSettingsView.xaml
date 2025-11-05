@@ -25,6 +25,7 @@
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Row="0" Grid.Column="0"
+            Style="{StaticResource TextBlockStyle}"
             Text="Active"
         />
 
@@ -33,7 +34,7 @@
             IsChecked="{Binding IsEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
         />
 
-        <Label Grid.Row="1" Grid.Column="0" Content="Positioning Mode" />
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="Positioning Mode" Style="{StaticResource TextBlockStyle}"/>
         <ToggleButton x:Name="WindTestToggleButton"
             Grid.Row="1"
             Grid.Column="1"

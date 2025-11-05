@@ -39,9 +39,10 @@ namespace Presentation.Services
                 .Property(p => p.InputGraphSettings.ShowPercentageClutch, false)
                 .Property(p => p.WindSettings.IsEnabled, false)
                 .Property(p => p.WindSettings.UseMph, false)
-              
+
                 .Property(p => p.FuelSettings.IsEnabled, false)
-               
+                .Property(p => p.FuelSettings.BackgroundColor, new SolidColorBrush())
+
                 .Property(p => p.GeneralSettings.UseHardwareAcceleration, false)
                 .PersistOn("PropertyChanged", p => p.GeneralSettings)
 
@@ -49,7 +50,7 @@ namespace Presentation.Services
                 .PersistOn("PropertyChanged", p => p.InputGraphSettings)
                 .PersistOn("PropertyChanged", p => p.WindSettings)
                 .PersistOn("PropertyChanged", p => p.FuelSettings);
-                
+
         }
     }
 }

@@ -28,9 +28,12 @@ namespace Tests.Fuel
 
             // Assert
             Assert.That(currentLap, Is.Not.Null);
-            Assert.That(currentLap!.Number, Is.EqualTo(lapNumber));
-            Assert.That(currentLap.StartingFuel, Is.EqualTo(startingFuel));
-            Assert.That(_lapTracker.GetPlayerLaps(), Is.Empty);
+            Assert.Multiple(() =>
+            {
+                Assert.That(currentLap!.Number, Is.EqualTo(lapNumber));
+                Assert.That(currentLap.StartingFuel, Is.EqualTo(startingFuel));
+                Assert.That(_lapTracker.GetPlayerLaps(), Is.Empty);
+            });
         }
 
         [Test]
@@ -55,13 +58,16 @@ namespace Tests.Fuel
             // Assert completed lap list
             Assert.That(completedLaps.Count, Is.EqualTo(1));
             Lap completedLap = completedLaps.First();
-            Assert.That(completedLap.Number, Is.EqualTo(lapNumber));
-            Assert.That(completedLap.EndingFuel, Is.EqualTo(endFuel));
-            Assert.That(completedLap.Time, Is.EqualTo(lapTime));
-            Assert.That(completedLap.FuelUsed, Is.EqualTo(expectedFuelUsed).Within(1e-6));
+            Assert.Multiple(() =>
+            {
+                Assert.That(completedLap.Number, Is.EqualTo(lapNumber));
+                Assert.That(completedLap.EndingFuel, Is.EqualTo(endFuel));
+                Assert.That(completedLap.Time, Is.EqualTo(lapTime));
+                Assert.That(completedLap.FuelUsed, Is.EqualTo(expectedFuelUsed).Within(1e-6));
 
-            // Assert current lap state: it remains pointing to the last completed lap until a reset or new lap start
-            Assert.That(currentLapAfter, Is.EqualTo(completedLap));
+                // Assert current lap state: it remains pointing to the last completed lap until a reset or new lap start
+                Assert.That(currentLapAfter, Is.EqualTo(completedLap));
+            });
         }
 
         [Test]
@@ -103,17 +109,23 @@ namespace Tests.Fuel
             _lapTracker.StartNewLap(1, 50.0);
             _lapTracker.CompleteCurrentLap(45.0, TimeSpan.FromSeconds(100));
 
-            // Assert 1 completed lap
-            Assert.That(_lapTracker.GetPlayerLaps().Count, Is.EqualTo(1));
-            Assert.That(_lapTracker.GetCompletedLapsCount(), Is.EqualTo(0)); // 1 - 1 = 0
+            Assert.Multiple(() =>
+            {
+                // Assert 1 completed lap
+                Assert.That(_lapTracker.GetPlayerLaps().Count, Is.EqualTo(1));
+                Assert.That(_lapTracker.GetCompletedLapsCount(), Is.EqualTo(0)); // 1 - 1 = 0
+            });
 
             // 2 laps completed
             _lapTracker.StartNewLap(2, 45.0);
             _lapTracker.CompleteCurrentLap(40.0, TimeSpan.FromSeconds(101));
 
-            // Assert 2 completed laps
-            Assert.That(_lapTracker.GetPlayerLaps().Count, Is.EqualTo(2));
-            Assert.That(_lapTracker.GetCompletedLapsCount(), Is.EqualTo(1)); // 2 - 1 = 1
+            Assert.Multiple(() =>
+            {
+                // Assert 2 completed laps
+                Assert.That(_lapTracker.GetPlayerLaps().Count, Is.EqualTo(2));
+                Assert.That(_lapTracker.GetCompletedLapsCount(), Is.EqualTo(1)); // 2 - 1 = 1
+            });
         }
 
         [Test]
@@ -124,15 +136,21 @@ namespace Tests.Fuel
             _lapTracker.CompleteCurrentLap(45.0, TimeSpan.FromSeconds(100));
             _lapTracker.StartNewLap(2, 45.0); // Current lap is not completed
 
-            Assert.That(_lapTracker.GetPlayerLaps(), Is.Not.Empty);
-            Assert.That(_lapTracker.GetCurrentLap(), Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(_lapTracker.GetPlayerLaps(), Is.Not.Empty);
+                Assert.That(_lapTracker.GetCurrentLap(), Is.Not.Null);
+            });
 
             // Act
             _lapTracker.Clear();
 
-            // Assert
-            Assert.That(_lapTracker.GetPlayerLaps(), Is.Empty);
-            Assert.That(_lapTracker.GetCurrentLap(), Is.Null);
+            Assert.Multiple(() =>
+            {
+                // Assert
+                Assert.That(_lapTracker.GetPlayerLaps(), Is.Empty);
+                Assert.That(_lapTracker.GetCurrentLap(), Is.Null);
+            });
         }
 
         [Test]
@@ -154,16 +172,19 @@ namespace Tests.Fuel
             // Assert completed lap
             Assert.That(completedLaps.Count, Is.EqualTo(1));
             Lap completedLap = completedLaps.First();
-            Assert.That(completedLap.Number, Is.EqualTo(lapNumber));
-            Assert.That(completedLap.StartingFuel, Is.EqualTo(fuelModelEntry.Consumption));
-            Assert.That(completedLap.EndingFuel, Is.EqualTo(expectedEndingFuel));
-            Assert.That(completedLap.Time, Is.EqualTo(TimeSpan.FromSeconds(fuelModelEntry.LapTime)));
+            Assert.Multiple(() =>
+            {
+                Assert.That(completedLap.Number, Is.EqualTo(lapNumber));
+                Assert.That(completedLap.StartingFuel, Is.EqualTo(fuelModelEntry.Consumption));
+                Assert.That(completedLap.EndingFuel, Is.EqualTo(expectedEndingFuel));
+                Assert.That(completedLap.Time, Is.EqualTo(TimeSpan.FromSeconds(fuelModelEntry.LapTime)));
 
-            // Assert fuel usage calculation: Start - End = Consumption - 0
-            Assert.That(completedLap.FuelUsed, Is.EqualTo(fuelModelEntry.Consumption).Within(1e-6));
+                // Assert fuel usage calculation: Start - End = Consumption - 0
+                Assert.That(completedLap.FuelUsed, Is.EqualTo(fuelModelEntry.Consumption).Within(1e-6));
 
-            // Assert lap count according to the implementation's logic (Count - 1)
-            Assert.That(_lapTracker.GetCompletedLapsCount(), Is.EqualTo(0));
+                // Assert lap count according to the implementation's logic (Count - 1)
+                Assert.That(_lapTracker.GetCompletedLapsCount(), Is.EqualTo(0));
+            });
         }
 
         [Test]
@@ -171,25 +192,37 @@ namespace Tests.Fuel
         {
             // 1. Start Lap 1
             _lapTracker.StartNewLap(1, 60.0);
-            Assert.That(_lapTracker.GetCurrentLap()!.Number, Is.EqualTo(1));
-            Assert.That(_lapTracker.GetCompletedLapsCount(), Is.EqualTo(-1));
+            Assert.Multiple(() =>
+            {
+                Assert.That(_lapTracker.GetCurrentLap()!.Number, Is.EqualTo(1));
+                Assert.That(_lapTracker.GetCompletedLapsCount(), Is.EqualTo(-1));
+            });
 
             // 2. Complete Lap 1
             _lapTracker.CompleteCurrentLap(55.0, TimeSpan.FromSeconds(100));
-            Assert.That(_lapTracker.GetPlayerLaps().Count, Is.EqualTo(1));
-            Assert.That(_lapTracker.GetCompletedLapsCount(), Is.EqualTo(0));
-            Assert.That(_lapTracker.GetPlayerLaps().First().FuelUsed, Is.EqualTo(5.0));
+            Assert.Multiple(() =>
+            {
+                Assert.That(_lapTracker.GetPlayerLaps().Count, Is.EqualTo(1));
+                Assert.That(_lapTracker.GetCompletedLapsCount(), Is.EqualTo(0));
+                Assert.That(_lapTracker.GetPlayerLaps().First().FuelUsed, Is.EqualTo(5.0));
+            });
 
             // 3. Start Lap 2
             _lapTracker.StartNewLap(2, 55.0);
-            Assert.That(_lapTracker.GetCurrentLap()!.Number, Is.EqualTo(2));
-            Assert.That(_lapTracker.GetCompletedLapsCount(), Is.EqualTo(0));
+            Assert.Multiple(() =>
+            {
+                Assert.That(_lapTracker.GetCurrentLap()!.Number, Is.EqualTo(2));
+                Assert.That(_lapTracker.GetCompletedLapsCount(), Is.EqualTo(0));
+            });
 
             // 4. Complete Lap 2
             _lapTracker.CompleteCurrentLap(50.0, TimeSpan.FromSeconds(101));
-            Assert.That(_lapTracker.GetPlayerLaps().Count, Is.EqualTo(2));
-            Assert.That(_lapTracker.GetCompletedLapsCount(), Is.EqualTo(1));
-            Assert.That(_lapTracker.GetPlayerLaps().Last().FuelUsed, Is.EqualTo(5.0));
+            Assert.Multiple(() =>
+            {
+                Assert.That(_lapTracker.GetPlayerLaps().Count, Is.EqualTo(2));
+                Assert.That(_lapTracker.GetCompletedLapsCount(), Is.EqualTo(1));
+                Assert.That(_lapTracker.GetPlayerLaps().Last().FuelUsed, Is.EqualTo(5.0));
+            });
         }
 
     }

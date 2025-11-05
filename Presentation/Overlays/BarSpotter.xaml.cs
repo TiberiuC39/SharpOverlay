@@ -34,9 +34,22 @@ namespace Presentation.Overlays
 
             _windowStateService = new WindowStateService(_service.SimReader, _settings);
             _windowStateService.WindowStateChanged += OnWindowStateChange;
+            _windowStateService.Initialize();
 
             barSpotterWindow.SizeChanged += Window_SetBarEqualToWindow;
+        }
 
+        protected override void OnClosed(EventArgs e)
+        {
+            _service.OnBarUpdated -= OnBarUpdate;
+            _service.Dispose();
+
+            _windowStateService.WindowStateChanged -= OnWindowStateChange;
+            _windowStateService.Dispose();
+
+            barSpotterWindow.SizeChanged -= Window_SetBarEqualToWindow;
+
+            base.OnClosed(e);
         }
 
         private void OnConnect(object? sender, EventArgs e)
@@ -46,11 +59,11 @@ namespace Presentation.Overlays
 
         private void OnWindowStateChange(object? sender, WindowStateEventArgs e)
         {
-            if (e.IsInTestMode && e.IsEnabled)
+            if (e.IsInTestMode)
             {
                 HandleTestMode();
             }
-            else if (e.IsOpen && e.IsEnabled)
+            else if (e.IsOpen)
             {
                 Show();
             }
@@ -95,7 +108,7 @@ namespace Presentation.Overlays
                 }
                 else if (spotter == Spotter.CarLeft)
                 {
-                    var pixelOffset = PixelOffset(e.Offset);
+                    var pixelOffset = PixelOffset(e.OffsetPct);
 
                     RenderLeftBar(pixelOffset);
 
@@ -104,7 +117,7 @@ namespace Presentation.Overlays
                 }
                 else if (spotter == Spotter.CarRight)
                 {
-                    var pixelOffset = PixelOffset(e.Offset);
+                    var pixelOffset = PixelOffset(e.OffsetPct);
 
                     RenderRightBar(pixelOffset);
                     rightCanvas.Visibility = Visibility.Visible;
@@ -138,9 +151,9 @@ namespace Presentation.Overlays
             rightCanvas.Visibility = Visibility.Hidden;
         }
 
-        private double PixelOffset(double offset)
+        private double PixelOffset(double offsetPct)
         {
-            var pixelOffset = grid.ActualHeight * -offset;
+            var pixelOffset = grid.ActualHeight * -offsetPct;
             return pixelOffset;
         }
 

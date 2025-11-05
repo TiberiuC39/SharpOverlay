@@ -1,4 +1,5 @@
 ﻿using iRacingSdkWrapper;
+using iRacingSdkWrapper.JsonModels;
 
 namespace Core.Models
 {
@@ -6,6 +7,11 @@ namespace Core.Models
     {
         public Driver()
         {
+        }
+
+        public Driver(Racer d)
+        {
+            CarIdx = d.CarIdx;
         }
 
         /// <summary>
@@ -46,10 +52,5 @@ namespace Core.Models
         /// The relative distance between you and this driver (in percentage).
         /// </summary>
         public float RelativeLapDistancePct { get; set; }
-
-        /// <summary>
-        /// The current lap number of this driver.
-        /// </summary>
-        public int CurrentLap { get; set; }
     }
 }

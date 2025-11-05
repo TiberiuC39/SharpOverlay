@@ -16,10 +16,13 @@ namespace Tests.Fuel
         [Test]
         public void InitialState_ShouldBeCorrect()
         {
-            // Assert
-            Assert.That(_tracker.IsTrackingTime, Is.False);
-            Assert.That(_tracker.GetPitDuration(), Is.EqualTo(TimeSpan.Zero));
-            Assert.That(_tracker.GetAvgPitStopTime(), Is.EqualTo(TimeSpan.Zero));
+            Assert.Multiple(() =>
+            {
+                // Assert
+                Assert.That(_tracker.IsTrackingTime, Is.False);
+                Assert.That(_tracker.GetPitDuration(), Is.EqualTo(TimeSpan.Zero));
+                Assert.That(_tracker.GetAvgPitStopTime(), Is.EqualTo(TimeSpan.Zero));
+            });
         }
 
         [Test]
@@ -50,10 +53,13 @@ namespace Tests.Fuel
             // Act
             _tracker.Stop(endTime);
 
-            // Assert
-            Assert.That(_tracker.IsTrackingTime, Is.False);
-            Assert.That(_tracker.GetPitDuration(), Is.EqualTo(expectedDuration));
-            Assert.That(_tracker.GetAvgPitStopTime(), Is.EqualTo(expectedDuration));
+            Assert.Multiple(() =>
+            {
+                // Assert
+                Assert.That(_tracker.IsTrackingTime, Is.False);
+                Assert.That(_tracker.GetPitDuration(), Is.EqualTo(expectedDuration));
+                Assert.That(_tracker.GetAvgPitStopTime(), Is.EqualTo(expectedDuration));
+            });
         }
 
         [Test]
@@ -65,9 +71,12 @@ namespace Tests.Fuel
             // Act
             _tracker.Stop(endTime);
 
-            // Assert
-            Assert.That(_tracker.IsTrackingTime, Is.False);
-            Assert.That(_tracker.GetPitDuration(), Is.EqualTo(TimeSpan.Zero));
+            Assert.Multiple(() =>
+            {
+                // Assert
+                Assert.That(_tracker.IsTrackingTime, Is.False);
+                Assert.That(_tracker.GetPitDuration(), Is.EqualTo(TimeSpan.Zero));
+            });
         }
 
         [Test]
@@ -81,10 +90,13 @@ namespace Tests.Fuel
             // Act
             _tracker.Stop(endTime);
 
-            // Assert
-            Assert.That(_tracker.IsTrackingTime, Is.False);
-            Assert.That(_tracker.GetPitDuration(), Is.EqualTo(TimeSpan.Zero));
-            Assert.That(_tracker.GetAvgPitStopTime(), Is.EqualTo(TimeSpan.Zero));
+            Assert.Multiple(() =>
+            {
+                // Assert
+                Assert.That(_tracker.IsTrackingTime, Is.False);
+                Assert.That(_tracker.GetPitDuration(), Is.EqualTo(TimeSpan.Zero));
+                Assert.That(_tracker.GetAvgPitStopTime(), Is.EqualTo(TimeSpan.Zero));
+            });
         }
 
         [Test]
@@ -98,10 +110,13 @@ namespace Tests.Fuel
             // Pit Stop 2: 70 seconds
             _tracker.Start(TimeSpan.FromSeconds(200));
             _tracker.Stop(TimeSpan.FromSeconds(130));
-            Assert.That(_tracker.GetPitDuration(), Is.EqualTo(TimeSpan.FromSeconds(70)));
+            Assert.Multiple(() =>
+            {
+                Assert.That(_tracker.GetPitDuration(), Is.EqualTo(TimeSpan.FromSeconds(70)));
 
-            // Assert average: (50 + 70) / 2 = 60 seconds
-            Assert.That(_tracker.GetAvgPitStopTime(), Is.EqualTo(TimeSpan.FromSeconds(60)));
+                // Assert average: (50 + 70) / 2 = 60 seconds
+                Assert.That(_tracker.GetAvgPitStopTime(), Is.EqualTo(TimeSpan.FromSeconds(60)));
+            });
         }
 
         [Test]
@@ -166,9 +181,12 @@ namespace Tests.Fuel
             // Start another one that's not completed
             _tracker.Start(TimeSpan.FromSeconds(200));
 
-            // Assert before reset
-            Assert.That(_tracker.IsTrackingTime, Is.True);
-            Assert.That(_tracker.GetAvgPitStopTime(), Is.Not.EqualTo(TimeSpan.Zero));
+            Assert.Multiple(() =>
+            {
+                // Assert before reset
+                Assert.That(_tracker.IsTrackingTime, Is.True);
+                Assert.That(_tracker.GetAvgPitStopTime(), Is.Not.EqualTo(TimeSpan.Zero));
+            });
             // _timeAtPitStart is non-zero (200s)
 
             // Act
@@ -179,9 +197,12 @@ namespace Tests.Fuel
             // _timeAtPitStart should be zero, which we infer by checking a subsequent Stop call
             _tracker.Stop(TimeSpan.FromSeconds(150)); // This Stop should do nothing to _pitDuration
 
-            Assert.That(_tracker.GetPitDuration(), Is.EqualTo(TimeSpan.FromSeconds(50))); // Should hold the last completed duration
-                                                                                          // Crucially, the history is NOT cleared by Reset()
-            Assert.That(_tracker.GetAvgPitStopTime(), Is.EqualTo(TimeSpan.FromSeconds(50)));
+            Assert.Multiple(() =>
+            {
+                Assert.That(_tracker.GetPitDuration(), Is.EqualTo(TimeSpan.FromSeconds(50))); // Should hold the last completed duration
+                                                                                              // Crucially, the history is NOT cleared by Reset()
+                Assert.That(_tracker.GetAvgPitStopTime(), Is.EqualTo(TimeSpan.FromSeconds(50)));
+            });
         }
     }
 }

@@ -33,19 +33,20 @@
             </Grid.RowDefinitions>
 
             <TextBlock Grid.Row="0" Grid.Column="0"
+                Style="{StaticResource TextBlockStyle}"
                 Text="Active" />
             <ToggleButton x:Name="InputGraphToggleButton"
                 Grid.Row="0" Grid.Column="1"
                 IsChecked="{Binding IsEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
             />
 
-            <Label Grid.Row="1" Grid.Column="0" Content="Positioning Mode" />
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="Positioning Mode" Style="{StaticResource TextBlockStyle}"/>
             <ToggleButton x:Name="InputGraphTestToggleButton"
                 Grid.Row="1"
                 Grid.Column="1"
                 IsChecked="{Binding IsInTestMode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-            <Label Grid.Row="2" Grid.Column="0" Content="Background Color" />
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="Background Color" Style="{StaticResource TextBlockStyle}"/>
             <colorpicker:PortableColorPicker Grid.Row="2" Grid.Column="1"
                 SmallChange="5"
                 UseHintColor="True" HintColor="Transparent"
@@ -53,14 +54,14 @@
                 ShowFractionalPart="False"
                 ShowAlpha="True" />
 
-            <Label Grid.Row="3" Grid.Column="0" Content="Throttle Color" />
+            <TextBlock Grid.Row="3" Grid.Column="0" Text="Throttle Color" Style="{StaticResource TextBlockStyle}"/>
             <colorpicker:PortableColorPicker Grid.Row="3" Grid.Column="1"
                 SmallChange="5"
                 UseHintColor="True" HintColor="Transparent"
                 SelectedColor="{Binding ThrottleColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BrushToColorConverter}}"
                 ShowFractionalPart="False" />
 
-            <Label Grid.Row="4" Grid.Column="0" Content="Brake Color" />
+            <TextBlock Grid.Row="4" Grid.Column="0" Text="Brake Color" Style="{StaticResource TextBlockStyle}"/>
             <colorpicker:PortableColorPicker Grid.Row="4" Grid.Column="1"
                 SmallChange="5"
                 UseHintColor="True" HintColor="Transparent"
@@ -68,7 +69,7 @@
                 ShowFractionalPart="False"
                 ShowAlpha="True" />
 
-            <Label Grid.Row="5" Grid.Column="0" Content="Clutch Color" />
+            <TextBlock Grid.Row="5" Grid.Column="0" Text="Clutch Color" Style="{StaticResource TextBlockStyle}"/>
             <colorpicker:PortableColorPicker Grid.Row="5" Grid.Column="1"
                 SmallChange="5"
                 UseHintColor="True" HintColor="Transparent"
@@ -76,7 +77,7 @@
                 ShowFractionalPart="False"
                 ShowAlpha="True" />
 
-            <Label Grid.Row="6" Grid.Column="0" Content="Steering Color" />
+            <TextBlock Grid.Row="6" Grid.Column="0" Text="Steering Color" Style="{StaticResource TextBlockStyle}"/>
             <colorpicker:PortableColorPicker Grid.Row="6" Grid.Column="1"
                 SmallChange="5"
                 FontSize="12"
@@ -85,7 +86,7 @@
                 ShowFractionalPart="False"
                 ShowAlpha="True" />
 
-            <Label Grid.Row="7" Grid.Column="0" Content="Line Width" />
+            <TextBlock Grid.Row="7" Grid.Column="0" Text="Line Width" Style="{StaticResource TextBlockStyle}"/>
             <StackPanel Grid.Row="7" Grid.Column="1" Grid.ColumnSpan="3" Orientation="Horizontal"
                 VerticalAlignment="Center" Margin="5,0">
                 <TextBox
@@ -102,32 +103,32 @@
                     IsEnabled="{Binding IsEnabled, Mode=OneWay}" />
             </StackPanel>
 
-            <Label Grid.Row="8" Grid.Column="0" Content="Show Clutch" />
+            <TextBlock Grid.Row="8" Grid.Column="0" Text="Show Clutch" Style="{StaticResource TextBlockStyle}"/>
             <CheckBox Grid.Row="8" Grid.Column="1"
                 Content=""
                 IsChecked="{Binding ShowClutch, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 IsEnabled="{Binding IsEnabled, Mode=OneWay}" />
 
-            <Label Grid.Row="9" Grid.Column="0" Content="Show Steering" />
+            <TextBlock Grid.Row="9" Grid.Column="0" Text="Show Steering" Style="{StaticResource TextBlockStyle}"/>
             <CheckBox Grid.Row="9" Grid.Column="1"
                 Content=""
                 IsChecked="{Binding ShowSteering, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 IsEnabled="{Binding IsEnabled, Mode=OneWay}" />
 
-            <Label Grid.Row="10" Grid.Column="0" Content="Raw Values" />
+            <TextBlock Grid.Row="10" Grid.Column="0" Text="Raw Values" Style="{StaticResource TextBlockStyle}"/>
             <CheckBox Grid.Row="10" Grid.Column="1"
                 Content=""
                 IsChecked="{Binding UseRawValues, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 IsEnabled="{Binding IsEnabled, Mode=OneWay}" />
 
-            <Label Grid.Row="11" Grid.Column="0" Content="Show ABS" />
+            <TextBlock Grid.Row="11" Grid.Column="0" Text="Show ABS" Style="{StaticResource TextBlockStyle}"/>
             <CheckBox Grid.Row="11" Grid.Column="1"
                 Content=""
                 IsChecked="{Binding ShowABS, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 IsEnabled="{Binding IsEnabled, Mode=OneWay}" />
 
-            <Label Grid.Row="12" Grid.Column="0" Content="ABS Flash" />
-            <Label Grid.Row="13" Grid.Column="0" Content="ABS Color" />
+            <TextBlock Grid.Row="12" Grid.Column="0" Text="ABS Flash" Style="{StaticResource TextBlockStyle}"/>
+            <TextBlock Grid.Row="13" Grid.Column="0" Text="ABS Color" Style="{StaticResource TextBlockStyle}"/>
             <colorpicker:PortableColorPicker Grid.Row="13" Grid.Column="1"
                 SmallChange="5"
                 UseHintColor="True" HintColor="Transparent"
@@ -135,19 +136,19 @@
                 ShowFractionalPart="False"
                 ShowAlpha="True" />
 
-            <Label Grid.Row="14" Grid.Column="0" Content="Show Throttle %" />
+            <TextBlock Grid.Row="14" Grid.Column="0" Text="Show Throttle %" Style="{StaticResource TextBlockStyle}"/>
             <CheckBox Grid.Row="14" Grid.Column="1"
                 Content=""
                 IsChecked="{Binding ShowPercentageThrottle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 IsEnabled="{Binding IsEnabled, Mode=OneWay}" />
 
-            <Label Grid.Row="15" Grid.Column="0" Content="Show Brake %" />
+            <TextBlock Grid.Row="15" Grid.Column="0" Text="Show Brake %" Style="{StaticResource TextBlockStyle}"/>
             <CheckBox Grid.Row="15" Grid.Column="1"
                 Content=""
                 IsChecked="{Binding ShowPercentageBrake, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 IsEnabled="{Binding IsEnabled, Mode=OneWay}" />
 
-            <Label Grid.Row="16" Grid.Column="0" Content="Show Clutch %" />
+            <TextBlock Grid.Row="16" Grid.Column="0" Text="Show Clutch %" Style="{StaticResource TextBlockStyle}"/>
             <CheckBox Grid.Row="16" Grid.Column="1"
                 Content=""
                 IsChecked="{Binding ShowPercentageClutch, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"

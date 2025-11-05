@@ -1,5 +1,4 @@
 ﻿using Core.Models;
-using iRacingSdkWrapper;
 using iRacingSdkWrapper.Bitfields;
 
 namespace Core.Utilities.Telemetries

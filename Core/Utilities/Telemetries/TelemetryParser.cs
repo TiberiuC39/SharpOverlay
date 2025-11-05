@@ -1,5 +1,4 @@
 using Core.Models;
-using iRacingSdkWrapper;
 using iRacingSdkWrapper.Bitfields;
 
 namespace Core.Utilities.Telemetries
@@ -66,7 +65,7 @@ namespace Core.Utilities.Telemetries
 
         public void ParseCarIdxOnTrack(TelemetryOutputDTO telemetry)
         {
-            CarIdxPctOnTrack = telemetry.CarIdxLapDistPct;
+            CarIdxPctOnTrack = telemetry.CarIdxTrackDistPct;
         }
 
 
@@ -138,7 +137,7 @@ namespace Core.Utilities.Telemetries
 
         public void ParsePlayerPctOnTrack(TelemetryOutputDTO telemetry)
         {
-            PlayerPctOnTrack = telemetry.CarIdxLapDistPct[PlayerCarIdx];
+            PlayerPctOnTrack = telemetry.CarIdxTrackDistPct[PlayerCarIdx];
         }
 
         public void ParseCarIdxLastPitLap(TelemetryOutputDTO telemetry, int paceCarIdx)

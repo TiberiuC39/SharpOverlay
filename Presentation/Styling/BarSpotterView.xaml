@@ -3,13 +3,6 @@
     xmlns:colorpicker="clr-namespace:ColorPicker;assembly=ColorPicker"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
 
-    <Style TargetType="Label" BasedOn="{StaticResource MaterialDesignLabel}">
-        <Setter Property="VerticalAlignment" Value="Center" />
-        <Setter Property="HorizontalAlignment" Value="Center" />
-        <Setter Property="Margin" Value="0, 5, 10, 5" />
-        <Setter Property="FontWeight" Value="SemiBold" />
-    </Style>
-
     <Style TargetType="ToggleButton" BasedOn="{StaticResource MaterialDesignSwitchToggleButton}">
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="HorizontalAlignment" Value="Center" />
@@ -28,7 +21,7 @@
     </Style>
 
     <Style TargetType="TextBox" BasedOn="{StaticResource MaterialDesignTextBox}">
-        <!-- <Setter Property="materialDesign:HintAssist.Hint" Value="Set Value" /> -->
+        <Setter Property="materialDesign:HintAssist.Hint" Value="Set Value" />
         <Setter Property="HorizontalAlignment" Value="Left" />
         <Setter Property="Width" Value="40" />
         <Setter Property="Margin" Value="10, 0" />

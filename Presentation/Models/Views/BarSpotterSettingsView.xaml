@@ -29,17 +29,17 @@
             <RowDefinition Height="50" />
         </Grid.RowDefinitions>
 
-        <Label Grid.Row="0" Grid.Column="0" Content="Active" />
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="Active" Style="{StaticResource TextBlockStyle}"/>
         <ToggleButton x:Name="BarSpotterIsActiveButton"
             Grid.Row="0" Grid.Column="1"
             IsChecked="{Binding IsEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-        <Label Grid.Row="1" Grid.Column="0" Content="Positioning Mode" />
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="Positioning Mode" Style="{StaticResource TextBlockStyle}"/>
         <ToggleButton x:Name="TestModeToggle" Grid.Row="1" Grid.Column="1"
             ToolTip="Toggle to render the bars and position them"
             IsChecked="{Binding IsInTestMode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-        <Label Grid.Row="2" Grid.Column="0" Content="Bar Width" />
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="Bar Width" Style="{StaticResource TextBlockStyle}"/>
         <StackPanel Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" Orientation="Horizontal"
             VerticalAlignment="Center" Margin="5,0">
             <TextBox
@@ -57,7 +57,7 @@
             />
         </StackPanel>
 
-        <Label Grid.Row="3" Grid.Column="0" Content="Bar Length" />
+        <TextBlock Grid.Row="3" Grid.Column="0" Text="Bar Length" Style="{StaticResource TextBlockStyle}"/>
         <StackPanel Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="3" Orientation="Horizontal"
             VerticalAlignment="Center" Margin="5,0">
             <TextBox
@@ -75,14 +75,14 @@
             />
         </StackPanel>
 
-        <Label Grid.Row="4" Grid.Column="0" x:Name="BarColor" Content="Bar Color" />
+        <TextBlock Grid.Row="4" Grid.Column="0" x:Name="BarColor" Text="Bar Color" Style="{StaticResource TextBlockStyle}"/>
         <colorpicker:PortableColorPicker Grid.Row="4" Grid.Column="1" SmallChange="5"
             UseHintColor="True" HintColor="Transparent"
             SelectedColor="{Binding BarColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BrushToColorConverter}}"
             ShowFractionalPart="False"
             ShowAlpha="True" />
 
-        <Label Grid.Row="5" Grid.Column="0" x:Name="ThreeWideColor" Content="3 Wide Bar Color" />
+        <TextBlock Grid.Row="5" Grid.Column="0" x:Name="ThreeWideColor" Text="3 Wide Bar Color" Style="{StaticResource TextBlockStyle}"/>
         <colorpicker:PortableColorPicker Grid.Row="5" Grid.Column="1" SmallChange="5"
             UseHintColor="True" HintColor="Transparent"
             SelectedColor="{Binding ThreeWideBarColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BrushToColorConverter}}"

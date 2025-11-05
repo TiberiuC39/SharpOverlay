@@ -18,7 +18,7 @@ namespace Presentation.Services
         public static void UpdateEnabledStatus()
         {
             Overlays[0].IsEnabled = App.appSettings.InputGraphSettings.IsEnabled;
-            Overlays[0].IsEnabled = App.appSettings.BarSpotterSettings.IsEnabled;
+            Overlays[1].IsEnabled = App.appSettings.BarSpotterSettings.IsEnabled;
             Overlays[2].IsEnabled = App.appSettings.WindSettings.IsEnabled;
             Overlays[3].IsEnabled = App.appSettings.FuelSettings.IsEnabled;
         }

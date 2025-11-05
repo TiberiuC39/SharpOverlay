@@ -11,6 +11,7 @@
     WindowStyle="None" ResizeMode="CanResizeWithGrip" AllowsTransparency="True" Topmost="True"
     MouseDown="Window_MouseDown" Background="{x:Null}"
     d:DataContext="{d:DesignInstance Type=models:BarSpotterSettings}">
+
     <Grid x:Name="grid" ClipToBounds="False">
         <Grid.RowDefinitions>
             <RowDefinition />

@@ -1,44 +1,42 @@
 ﻿using Core.Models;
-using iRacingSdkWrapper;
-using iRacingSdkWrapper.JsonModels;
 using System.Text.Json;
 
 namespace Core.Utilities.Sessions
 {
     public class SessionParser : ISessionParser
     {
-        public List<Session> Sessions { get; private set; } = [];
-        public Dictionary<int, Racer> Drivers { get; private set; } = [];
+        public List<SessionDTO> Sessions { get; private set; } = [];
+        public Dictionary<int, Driver> Drivers { get; private set; } = [];
         public StartType StartType { get; private set; }
         public string EventType { get; private set; }
         public SessionType SessionType { get; private set; }
         public int SessionLaps { get; private set; }
         public int PaceCarIdx { get; private set; }
         public bool IsMultiClassRace { get; private set; }
-        public List<Sector> Sectors { get; private set; }
+        public List<SectorDTO> Sectors { get; private set; }
         public int TrackId { get; private set; }
         public int CarId { get; private set; }
 
         public bool IsSetupChanged { get; private set; }
 
-        public void ParseSectors(SessionInfo sessionInfo)
+        public void ParseSectors(SessionOutputDTO sessionInfo)
         {
             Sectors = sessionInfo.Sectors;
         }
 
-        public void ParseDrivers(SessionInfo sessionInfo)
+        public void ParseDrivers(SessionOutputDTO sessionInfo)
         {
             var drivers = sessionInfo.Drivers.ToDictionary(d => d.CarIdx, d => d);
 
             Drivers = drivers;
         }
 
-        public void ParsePaceCarIdx(SessionInfo sessionInfo)
+        public void ParsePaceCarIdx(SessionOutputDTO sessionInfo)
         {
             PaceCarIdx = sessionInfo.Player.PaceCarIdx;
         }
 
-        public void ParseSessions(SessionInfo sessionInfo)
+        public void ParseSessions(SessionOutputDTO sessionInfo)
         {
             //SaveSessionInfoToJsonString(sessionInfo);
 
@@ -68,7 +66,7 @@ namespace Core.Utilities.Sessions
             return TimeSpan.FromSeconds(-1);
         }
 
-        public void ParseStartType(SessionInfo sessionInfo)
+        public void ParseStartType(SessionOutputDTO sessionInfo)
         {
             int standingStartValue = sessionInfo.WeekendInfo.WeekendOptions.StandingStart;
 
@@ -86,7 +84,7 @@ namespace Core.Utilities.Sessions
             }
         }
 
-        public void ParseCurrentSessionType(SessionInfo sessionInfo, int currentSessionNumber = default)
+        public void ParseCurrentSessionType(SessionOutputDTO sessionInfo, int currentSessionNumber = default)
         {
             string session = sessionInfo.Sessions[currentSessionNumber].SessionType;
 
@@ -96,7 +94,7 @@ namespace Core.Utilities.Sessions
             }
         }
 
-        public void ParseLapsInSession(SessionInfo sessionInfo, int currentSessionNumber = default)
+        public void ParseLapsInSession(SessionOutputDTO sessionInfo, int currentSessionNumber = default)
         {
             var currentSession = sessionInfo.Sessions[currentSessionNumber];
 
@@ -114,7 +112,7 @@ namespace Core.Utilities.Sessions
             }
         }
 
-        private void SaveSessionInfoToJsonString(SessionInfo sessionInfo)
+        private void SaveSessionInfoToJsonString(SessionOutputDTO sessionInfo)
         {
             var jsonString = JsonSerializer.Serialize(sessionInfo, new JsonSerializerOptions()
             {
@@ -133,27 +131,27 @@ namespace Core.Utilities.Sessions
             StartType = StartType.Unknown;
         }
 
-        public void ParseRaceType(SessionInfo sessionInfo)
+        public void ParseRaceType(SessionOutputDTO sessionInfo)
         {
             IsMultiClassRace = sessionInfo.WeekendInfo.NumCarClasses > 1;
         }
 
-        public void ParseTrackId(SessionInfo sessionInfo)
+        public void ParseTrackId(SessionOutputDTO sessionInfo)
         {
             TrackId = sessionInfo.WeekendInfo.TrackID;
         }
 
-        public void ParseCarId(SessionInfo sessionInfo)
+        public void ParseCarId(SessionOutputDTO sessionInfo)
         {
             var driver = sessionInfo.Drivers.FirstOrDefault(d => d.CarIdx == sessionInfo.Player.DriverCarIdx);
 
             if (driver != null)
             {
-                CarId = driver.CarID;
+                CarId = driver.CarIdx;
             }
         }
 
-        public void ParseEventType(SessionInfo sessionInfo)
+        public void ParseEventType(SessionOutputDTO sessionInfo)
         {
             EventType = sessionInfo.WeekendInfo.EventType;
         }

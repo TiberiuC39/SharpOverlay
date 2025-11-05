@@ -14,7 +14,6 @@
     FontSize="15"
     SizeChanged="Window_SizeChanged"
 >
-
     <WindowChrome.WindowChrome>
         <WindowChrome
             CornerRadius="12"
@@ -26,6 +25,7 @@
     </WindowChrome.WindowChrome>
 
     <Border Style="{StaticResource OuterBorderStyle}"
+        Background="{StaticResource BackgroundAccentBrush}"
         MouseLeftButtonDown="Window_MouseDown">
         <Grid>
             <Grid.RowDefinitions>
@@ -55,7 +55,7 @@
             <Label Grid.Row="1" Grid.Column="1" Content="AVG"
                 Style="{StaticResource LabelStyle}" />
             <Label Grid.Row="1" Grid.Column="2" Content="REFUEL"
-                Style="{StaticResource LabelStyle}" />
+                Style="{StaticResource LabelStyle}" VerticalContentAlignment="Center" Padding="0,0,0,0" />
             <Label Grid.Row="1" Grid.Column="3" Content="LAPS FUEL"
                 Style="{StaticResource LabelStyle}" />
 
@@ -68,7 +68,7 @@
             <TextBlock Grid.Row="2" Grid.Column="2"
                 Text="{Binding RefuelAmount, StringFormat={}{0:F2}}"
                 Style="{StaticResource RefuelRequiredTextBlockStyle}"
-                DataContext="{Binding Strategies[0]}" />
+                DataContext="{Binding Strategies[0]}"/>
             <TextBlock Grid.Row="2" Grid.Column="3"
                 Text="{Binding LapsOfFuelRemaining, StringFormat={}{0:F2}}"
                 Style="{StaticResource TextBlockStyle}" DataContext="{Binding Strategies[0]}" />

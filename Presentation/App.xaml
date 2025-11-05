@@ -18,7 +18,7 @@
                 <ResourceDictionary Source="Styling/Theme.xaml" />
                 <ResourceDictionary Source="Styling/Buttons.xaml" />
                 <ResourceDictionary Source="Styling/BarSpotterView.xaml" />
-                <ResourceDictionary Source="Styling/FuelCalculator.xaml" />
+                <ResourceDictionary Source="Styling/FuelCalculatorStyle.xaml" />
                 <ResourceDictionary Source="Styling/MainWindow.xaml" />
                 <ResourceDictionary Source="Models/Views/SettingsView.xaml" />
             </ResourceDictionary.MergedDictionaries>

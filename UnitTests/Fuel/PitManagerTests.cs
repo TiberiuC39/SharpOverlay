@@ -28,19 +28,28 @@ namespace Tests.Fuel
             // Set up a state that looks like the car is on pit road and has done a service
             _pitManager.SetPitRoadStatus(!isOnPitRoad, TrackSurfaces.AproachingPits); // Sets _hasEnteredPits to true
 
-            Assert.That(_pitManager.HasEnteredPits(), Is.True); // Note: SetPitRoadStatus resets this upon exit
-            Assert.That(_pitManager.IsOnPitRoad(), Is.False);
+            Assert.Multiple(() =>
+            {
+                Assert.That(_pitManager.HasEnteredPits(), Is.True); // Note: SetPitRoadStatus resets this upon exit
+                Assert.That(_pitManager.IsOnPitRoad(), Is.False);
+            });
 
             _pitManager.SetPitRoadStatus(isOnPitRoad, TrackSurfaces.AproachingPits); // Sets _hasEnteredPits to true
-            Assert.That(_pitManager.IsOnPitRoad(), Is.True);
-            Assert.That(_pitManager.HasEnteredPits(), Is.True); // Note: SetPitRoadStatus resets this upon exit
+            Assert.Multiple(() =>
+            {
+                Assert.That(_pitManager.IsOnPitRoad(), Is.True);
+                Assert.That(_pitManager.HasEnteredPits(), Is.True); // Note: SetPitRoadStatus resets this upon exit
+            });
 
             _pitManager.SetPitServiceStatus(isReceivingService); // Begins service
             Assert.That(_pitManager.HasBegunService(), Is.True);
 
             _pitManager.SetPitServiceStatus(!isReceivingService); // Completes service
-            Assert.That(_pitManager.HasBegunService(), Is.False);
-            Assert.That(_pitManager.HasFinishedService(), Is.True);
+            Assert.Multiple(() =>
+            {
+                Assert.That(_pitManager.HasBegunService(), Is.False);
+                Assert.That(_pitManager.HasFinishedService(), Is.True);
+            });
 
             _pitManager.SetPitRoadStatus(!isOnPitRoad, TrackSurfaces.OnTrack); // Trigger exit, sets _isComingOutOfPits = true
             Assert.That(_pitManager.HasEnteredPits(), Is.False); // Note: SetPitRoadStatus resets this upon exit
@@ -155,20 +164,26 @@ namespace Tests.Fuel
             _pitManager.SetPitRoadStatus(true, TrackSurfaces.OffTrack); // _isOnPitRoad = true
             _pitManager.HasResetToPits = true; // Set to a test value
 
-            // Assert before exit
-            Assert.That(_pitManager.IsOnPitRoad(), Is.True);
-            Assert.That(_pitManager.HasEnteredPits(), Is.True);
-            Assert.That(_pitManager.IsComingOutOfPits(), Is.False);
-            Assert.That(_pitManager.HasResetToPits, Is.True);
+            Assert.Multiple(() =>
+            {
+                // Assert before exit
+                Assert.That(_pitManager.IsOnPitRoad(), Is.True);
+                Assert.That(_pitManager.HasEnteredPits(), Is.True);
+                Assert.That(_pitManager.IsComingOutOfPits(), Is.False);
+                Assert.That(_pitManager.HasResetToPits, Is.True);
+            });
 
             // Act: Car is now off pit road
             _pitManager.SetPitRoadStatus(false, surface);
 
-            // Assert after exit
-            Assert.That(_pitManager.IsOnPitRoad(), Is.False);
-            Assert.That(_pitManager.HasEnteredPits(), Is.False);
-            Assert.That(_pitManager.IsComingOutOfPits(), Is.True);
-            Assert.That(_pitManager.HasResetToPits, Is.False);
+            Assert.Multiple(() =>
+            {
+                // Assert after exit
+                Assert.That(_pitManager.IsOnPitRoad(), Is.False);
+                Assert.That(_pitManager.HasEnteredPits(), Is.False);
+                Assert.That(_pitManager.IsComingOutOfPits(), Is.True);
+                Assert.That(_pitManager.HasResetToPits, Is.False);
+            });
         }
 
         [Test]
@@ -180,18 +195,24 @@ namespace Tests.Fuel
             _pitManager.SetPitRoadStatus(false, TrackSurfaces.AproachingPits); // _hasEnteredPits = true
             _pitManager.SetPitRoadStatus(true, TrackSurfaces.AproachingPits); // _isOnPitRoad = true
 
-            // Assert before exit
-            Assert.That(_pitManager.IsOnPitRoad(), Is.True);
-            Assert.That(_pitManager.HasEnteredPits(), Is.True);
+            Assert.Multiple(() =>
+            {
+                // Assert before exit
+                Assert.That(_pitManager.IsOnPitRoad(), Is.True);
+                Assert.That(_pitManager.HasEnteredPits(), Is.True);
+            });
 
             // Act: Car is now off pit road, but surface is one of the exceptions.
             _pitManager.SetPitRoadStatus(false, surface);
 
-            // Assert: The condition `(trackSurface != InPitStall || trackSurface != AproachingPits)` is TRUE for both cases, 
-            // leading to the pit exit logic being executed. The flag `_isOnPitRoad` will be false because it was passed as false.
-            Assert.That(_pitManager.IsOnPitRoad(), Is.False);
-            Assert.That(_pitManager.HasEnteredPits(), Is.False);
-            Assert.That(_pitManager.IsComingOutOfPits(), Is.True);
+            Assert.Multiple(() =>
+            {
+                // Assert: The condition `(trackSurface != InPitStall || trackSurface != AproachingPits)` is TRUE for both cases, 
+                // leading to the pit exit logic being executed. The flag `_isOnPitRoad` will be false because it was passed as false.
+                Assert.That(_pitManager.IsOnPitRoad(), Is.False);
+                Assert.That(_pitManager.HasEnteredPits(), Is.False);
+                Assert.That(_pitManager.IsComingOutOfPits(), Is.True);
+            });
         }
 
         [Test]

@@ -1,30 +1,43 @@
-using System.Diagnostics;
+using Core.Events;
 using Core.Services;
-using Core.Services.FuelCalculator;
 
-namespace Tests;
-
-[TestFixture]
-public class TelemetryReadTests
+namespace Tests
 {
-    private SimReader _reader;
-
-    [SetUp]
-    public void Setup()
+    [TestFixture]
+    public class TelemetryReadTests
     {
-    }
+        private ISimReader _reader;
 
-    [Test]
-    public void Test1()
-    {
-        string filePath = "../../../../../mx5 mx52016_nurburgring gpnochicane 2025-10-18 14-42-02.ibt";
-        // _reader = new SimReader(filePath);
-        // var service = new FuelCalculatorService(_reader);
-        // service.FuelUpdated += TestUpdate;
-        //
-        // while (_reader.ReadNextFrame()) {}
+        [SetUp]
+        public void Setup()
+        {
+        }
 
+        [TearDown]
+        public void TearDown()
+        {
+            _reader.Dispose();
+        }
 
-        Assert.Pass();
+        [Test]
+        public void Test1()
+        {
+            const string filePath = "../../../../../mx5 mx52016_nurburgring gpnochicane 2025-10-18 14-42-02.ibt";
+            _reader = new SimReader(filePath);
+            // var service = new FuelCalculatorService(_reader);
+            // service.FuelUpdated += TestUpdate;
+
+            // while (_reader.ReadNextFrame())
+            // {
+            //     var sessionInfo = _reader.GetSessionInfo();
+            // }
+
+            Assert.Pass();
+        }
+
+        private void TestUpdate(object? sender, FuelEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

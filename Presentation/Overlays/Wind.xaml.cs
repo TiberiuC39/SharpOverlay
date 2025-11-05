@@ -16,7 +16,7 @@ namespace Presentation.Overlays
     /// </summary>
     public partial class Wind : Window
     {
-        private readonly SimReader _simReader = new SimReader(DefaultTickRates.Wind);
+        private readonly ISimReader _simReader = new SimReader(DefaultTickRates.Wind);
         private readonly WindowStateService _windowStateService;
         private WindSettings _settings = App.appSettings.WindSettings;
 
@@ -34,19 +34,33 @@ namespace Presentation.Overlays
             Services.JotService.tracker.Track(this);
 
             _windowStateService = new WindowStateService(_simReader, _settings);
+            _windowStateService.WindowStateChanged += OnWindowStateChanged;
+            _windowStateService.Initialize();
 
             _simReader.OnTelemetryUpdated += Wrapper_TelemetryUpdated;
 
             _settings.PropertyChanged += settings_TestMode;
-            _windowStateService.WindowStateChanged += OnWindowStateChanged;
 
             WindSpeedLabel.Foreground = new SolidColorBrush(StartColor);
             WindDirIcon.Foreground = new SolidColorBrush(StartColor);
         }
 
+        protected override void OnClosed(EventArgs e)
+        {
+            _windowStateService.WindowStateChanged -= OnWindowStateChanged;
+            _windowStateService.Dispose();
+
+            _simReader.OnTelemetryUpdated -= Wrapper_TelemetryUpdated;
+            _simReader.Dispose();
+
+            _settings.PropertyChanged -= settings_TestMode;
+
+            base.OnClosed(e);
+        }
+
         private void OnWindowStateChanged(object? sender, WindowStateEventArgs e)
         {
-            if ((e.IsOpen || e.IsInTestMode) && e.IsEnabled)
+            if ((e.IsOpen || e.IsInTestMode))
             {
                 Show();
             }

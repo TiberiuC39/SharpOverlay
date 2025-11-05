@@ -36,6 +36,7 @@
     <SolidColorBrush x:Key="GreenBrush" Color="{StaticResource Green}" />
     <SolidColorBrush x:Key="RedBrush" Color="{StaticResource Red}" />
 
+    <SolidColorBrush x:Key="GreenOkBrush" Color="{StaticResource Green}" />
     <SolidColorBrush x:Key="AccentYellowBrush" Color="{StaticResource AccentYellow}" />
     <SolidColorBrush x:Key="OverlayPanelBrush" Color="{StaticResource OverlayPanel}" />
     <SolidColorBrush x:Key="SliderTrackBrush" Color="{StaticResource SliderTrack}" />
@@ -51,10 +52,4 @@
         Direction="270"
         ShadowDepth="4" />
 
-    <Style TargetType="{x:Type TextBlock}">
-        <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}" />
-        <Setter Property="HorizontalAlignment" Value="Center" />
-        <Setter Property="TextWrapping" Value="Wrap" />
-        <Setter Property="VerticalAlignment" Value="Center" />
-    </Style>
 </ResourceDictionary>

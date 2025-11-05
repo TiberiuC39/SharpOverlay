@@ -98,9 +98,12 @@ namespace Tests.Fuel
             int resultZeroTime = _calculator.CalculateLapsRemaining(0.5f, TimeSpan.Zero, TimeSpan.FromSeconds(60));
             int resultNegativeTime = _calculator.CalculateLapsRemaining(0.5f, TimeSpan.FromSeconds(-1), TimeSpan.FromSeconds(60));
 
-            // Assert
-            Assert.That(resultZeroTime, Is.EqualTo(0));
-            Assert.That(resultNegativeTime, Is.EqualTo(0));
+            Assert.Multiple(() =>
+            {
+                // Assert
+                Assert.That(resultZeroTime, Is.EqualTo(0));
+                Assert.That(resultNegativeTime, Is.EqualTo(0));
+            });
         }
 
         [Test]
@@ -110,9 +113,12 @@ namespace Tests.Fuel
             int resultZeroLapTime = _calculator.CalculateLapsRemaining(0.5f, TimeSpan.FromSeconds(120), TimeSpan.Zero);
             int resultNegativeLapTime = _calculator.CalculateLapsRemaining(0.5f, TimeSpan.FromSeconds(120), TimeSpan.FromSeconds(-1));
 
-            // Assert
-            Assert.That(resultZeroLapTime, Is.EqualTo(0));
-            Assert.That(resultNegativeLapTime, Is.EqualTo(0));
+            Assert.Multiple(() =>
+            {
+                // Assert
+                Assert.That(resultZeroLapTime, Is.EqualTo(0));
+                Assert.That(resultNegativeLapTime, Is.EqualTo(0));
+            });
         }
 
         [Test]

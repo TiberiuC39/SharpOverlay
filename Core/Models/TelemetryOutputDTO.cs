@@ -40,7 +40,6 @@ namespace Core.Models
             SteeringWheelAngle = telemetry.SteeringWheelAngle.Value;
             CarIdxPosition = telemetry.CarIdxPosition.Value;
             CarIdxClass = telemetry.CarIdxClass.Value;
-            CarIdxLapDistPct = telemetry.CarIdxLapDistPct.Value;
             PlayerCarIdx = telemetry.PlayerCarIdx.Value;
             SessionNum = telemetry.SessionNum.Value;
             IsReplayPlaying = telemetry.IsReplayPlaying.Value;
@@ -51,8 +50,8 @@ namespace Core.Models
         public bool IsOnPitRoad { get; }
         public bool IsReceivingService { get; }
         public TrackSurfaces TrackSurface { get; }
-        public float PlayerTrackDistPct { get; }
-        public float[] CarIdxTrackDistPct { get; }
+        public float PlayerTrackDistPct { get; set; }
+        public float[] CarIdxTrackDistPct { get; set;}
         public int EnterExitResetButton { get; }
         public SessionStates SessionState { get; }
         public TimeSpan LastLapTime { get; }
@@ -61,7 +60,7 @@ namespace Core.Models
         public int[] CarIdxLapCompleted { get; }
         public bool IsOnTrack { get; }
         public SessionFlags SessionFlag { get; }
-        public Enums.Spotter CarLeftRight { get; }
+        public Enums.Spotter CarLeftRight { get; set;}
         public float BrakeRaw { get; set; }
         public float ThrottleRaw { get; set; }
         public float ClutchRaw { get; set; }
@@ -75,7 +74,6 @@ namespace Core.Models
         public float YawNorth { get; set; }
         public int[] CarIdxPosition { get; }
         public int[] CarIdxClass { get; }
-        public float[] CarIdxLapDistPct { get; }
         public int PlayerCarIdx { get; }
         public int SessionNum { get; }
         public bool IsReplayPlaying { get; internal set; }

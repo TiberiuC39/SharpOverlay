@@ -42,18 +42,21 @@ namespace Tests.Fuel
         public void Clear_ShouldResetAllValuesToZero()
         {
             // Arrange: Perform a calculation to set internal state
-            var laps = TestUtils.Laps.GenerateSeed(5, 50.0);
+            var laps = TestUtils.Fuel.GenerateSeed(5, 50.0);
             _strategy.Calculate(laps, 5);
 
             // Act
             _strategy.Clear();
             StrategyViewModel view = _strategy.GetView();
 
-            // Assert
-            Assert.That(view.FuelConsumption, Is.EqualTo(0.0));
-            Assert.That(view.RefuelAmount, Is.EqualTo(0.0));
-            Assert.That(view.LapsOfFuelRemaining, Is.EqualTo(0.0));
-            Assert.That(_strategy.RequiresRefueling(), Is.False);
+            Assert.Multiple(() =>
+            {
+                // Assert
+                Assert.That(view.FuelConsumption, Is.EqualTo(0.0));
+                Assert.That(view.RefuelAmount, Is.EqualTo(0.0));
+                Assert.That(view.LapsOfFuelRemaining, Is.EqualTo(0.0));
+                Assert.That(_strategy.RequiresRefueling(), Is.False);
+            });
         }
 
         // --- GetAverageFuelConsumption Tests ---
@@ -62,7 +65,7 @@ namespace Tests.Fuel
         public void GetAverageFuelConsumption_ShouldReturnLastLapFuelUsed()
         {
             // Arrange
-            var laps = TestUtils.Laps.GenerateSeed(3);
+            var laps = TestUtils.Fuel.GenerateSeed(3);
             laps[0].FuelUsed = 10.0;
             laps[1].FuelUsed = 5.0;
             laps[2].FuelUsed = 4.5; // Only the last lap's consumption matters
@@ -79,7 +82,7 @@ namespace Tests.Fuel
         [Test]
         public void GetAverageFuelConsumption_ShouldReturnZeroForNoLaps()
         {
-            var laps = TestUtils.Laps.GenerateSeed(0);
+            var laps = TestUtils.Fuel.GenerateSeed(0);
 
             // Act
             _strategy.Calculate(laps, 1);
@@ -99,18 +102,21 @@ namespace Tests.Fuel
             const double consumption = 5.0;
             const double startFuel = 50.0;
             const int lapsRemaining = 5; // Fuel required: 5 * 5.0 = 25.0
-            var laps = TestUtils.Laps.GenerateSeed(lapCount, consumption, startFuel);
+            var laps = TestUtils.Fuel.GenerateSeed(lapCount, consumption, startFuel);
 
             // Act
             _strategy.Calculate(laps, lapsRemaining);
             StrategyViewModel view = _strategy.GetView();
 
-            // Assert
-            Assert.That(view.FuelConsumption, Is.EqualTo(consumption));
-            // Check Refuel amount to account for engine shut off
-            Assert.That(view.RefuelAmount, Is.EqualTo(FuelCutOff));
-            // Check LapsOfFuelRemaining (50.0 current / 5.0 consumption = 10.0 laps)
-            Assert.That(view.LapsOfFuelRemaining, Is.LessThan(lapsRemaining));
+            Assert.Multiple(() =>
+            {
+                // Assert
+                Assert.That(view.FuelConsumption, Is.EqualTo(consumption));
+                // Check Refuel amount to account for engine shut off
+                Assert.That(view.RefuelAmount, Is.EqualTo(FuelCutOff));
+                // Check LapsOfFuelRemaining (50.0 current / 5.0 consumption = 10.0 laps)
+                Assert.That(view.LapsOfFuelRemaining, Is.LessThan(lapsRemaining));
+            });
         }
 
         [Test]
@@ -123,10 +129,13 @@ namespace Tests.Fuel
             _strategy.Calculate(new List<Lap>(), lapsRemaining);
             StrategyViewModel view = _strategy.GetView();
 
-            // Assert
-            Assert.That(view.FuelConsumption, Is.EqualTo(0.0));
-            Assert.That(view.RefuelAmount, Is.EqualTo(0.0));
-            Assert.That(view.LapsOfFuelRemaining, Is.EqualTo(0.0));
+            Assert.Multiple(() =>
+            {
+                // Assert
+                Assert.That(view.FuelConsumption, Is.EqualTo(0.0));
+                Assert.That(view.RefuelAmount, Is.EqualTo(0.0));
+                Assert.That(view.LapsOfFuelRemaining, Is.EqualTo(0.0));
+            });
         }
 
         // --- UpdateRefuel Tests ---
@@ -141,15 +150,18 @@ namespace Tests.Fuel
             const double expectedRefuel = (startingFuel - consumption - (lapsRemaining * consumption)) * -1 + FuelCutOff; // 15.0 required
 
             // Set consumption
-            var laps = TestUtils.Laps.GenerateSeed(1, consumption, startingFuel);
+            var laps = TestUtils.Fuel.GenerateSeed(1, consumption, startingFuel);
             _strategy.Calculate(laps, lapsRemaining);
 
             // Act
             StrategyViewModel view = _strategy.GetView();
 
-            // Assert
-            Assert.That(view.RefuelAmount, Is.EqualTo(expectedRefuel));
-            Assert.That(_strategy.RequiresRefueling(), Is.True);
+            Assert.Multiple(() =>
+            {
+                // Assert
+                Assert.That(view.RefuelAmount, Is.EqualTo(expectedRefuel));
+                Assert.That(_strategy.RequiresRefueling(), Is.True);
+            });
         }
 
         [Test]
@@ -162,15 +174,18 @@ namespace Tests.Fuel
             const double consumption = 5.0; // Fuel required: 25.0
 
             // Set consumption
-            _strategy.Calculate(TestUtils.Laps.GenerateSeed(1, consumption, startingFuel), 0);
+            _strategy.Calculate(TestUtils.Fuel.GenerateSeed(1, consumption, startingFuel), 0);
 
             // Act
             _strategy.UpdateRefuel(currentFuel, lapsRemaining);
             StrategyViewModel view = _strategy.GetView();
 
-            // Assert
-            Assert.That(view.RefuelAmount, Is.LessThan(0));
-            Assert.That(_strategy.RequiresRefueling(), Is.False);
+            Assert.Multiple(() =>
+            {
+                // Assert
+                Assert.That(view.RefuelAmount, Is.LessThan(0));
+                Assert.That(_strategy.RequiresRefueling(), Is.False);
+            });
         }
 
         [Test]
@@ -185,16 +200,19 @@ namespace Tests.Fuel
             const double expectedRefuel = 0.5;
 
             // Set consumption
-            var laps = TestUtils.Laps.GenerateSeed(1, consumption, startingFuel);
+            var laps = TestUtils.Fuel.GenerateSeed(1, consumption, startingFuel);
             _strategy.Calculate(laps, lapsRemaining);
 
             // Act
             // _strategy.UpdateRefuel(currentFuel, lapsRemaining);
             StrategyViewModel view = _strategy.GetView();
 
-            // Assert
-            Assert.That(view.RefuelAmount, Is.EqualTo(expectedRefuel));
-            Assert.That(_strategy.RequiresRefueling(), Is.True);
+            Assert.Multiple(() =>
+            {
+                // Assert
+                Assert.That(view.RefuelAmount, Is.EqualTo(expectedRefuel));
+                Assert.That(_strategy.RequiresRefueling(), Is.True);
+            });
         }
 
         [Test]
@@ -208,7 +226,7 @@ namespace Tests.Fuel
             // RefuelRequired should be 0.
 
             // Set consumption
-            _strategy.Calculate(TestUtils.Laps.GenerateSeed(1, consumption, currentFuel), 0);
+            _strategy.Calculate(TestUtils.Fuel.GenerateSeed(1, consumption, currentFuel), 0);
 
             // Act
             _strategy.UpdateRefuel(currentFuel, lapsRemaining);
@@ -226,16 +244,19 @@ namespace Tests.Fuel
             const double consumption = 5.0;
 
             // Set consumption
-            _strategy.Calculate(TestUtils.Laps.GenerateSeed(1, consumption, currentFuel), 0);
+            _strategy.Calculate(TestUtils.Fuel.GenerateSeed(1, consumption, currentFuel), 0);
 
             // Act
             _strategy.UpdateRefuel(currentFuel, 0);
             StrategyViewModel view = _strategy.GetView();
 
-            // Assert
-            Assert.That(view.RefuelAmount, Is.EqualTo(0.0));
-            // FuelAtEnd and LapsOfFuelRemaining should still be calculated in this case
-            Assert.That(view.LapsOfFuelRemaining, Is.LessThan(10.0));
+            Assert.Multiple(() =>
+            {
+                // Assert
+                Assert.That(view.RefuelAmount, Is.EqualTo(0.0));
+                // FuelAtEnd and LapsOfFuelRemaining should still be calculated in this case
+                Assert.That(view.LapsOfFuelRemaining, Is.LessThan(10.0));
+            });
         }
 
         [Test]
@@ -247,15 +268,18 @@ namespace Tests.Fuel
             const double consumption = 0.0;
 
             // Set consumption
-            _strategy.Calculate(TestUtils.Laps.GenerateSeed(1, consumption, currentFuel), 0);
+            _strategy.Calculate(TestUtils.Fuel.GenerateSeed(1, consumption, currentFuel), 0);
 
             // Act
             _strategy.UpdateRefuel(currentFuel, lapsRemaining);
             StrategyViewModel view = _strategy.GetView();
 
-            // Assert
-            Assert.That(view.RefuelAmount, Is.EqualTo(0.0));
-            Assert.That(view.LapsOfFuelRemaining, Is.EqualTo(0.0));
+            Assert.Multiple(() =>
+            {
+                // Assert
+                Assert.That(view.RefuelAmount, Is.EqualTo(0.0));
+                Assert.That(view.LapsOfFuelRemaining, Is.EqualTo(0.0));
+            });
         }
 
         // --- UpdateLapsOfFuelRemaining Tests ---
@@ -268,7 +292,7 @@ namespace Tests.Fuel
             const double consumption = 5.0; // 50 / 5 = 10 less than laps due to fuel cut off
 
             // Set consumption
-            _strategy.Calculate(TestUtils.Laps.GenerateSeed(1, consumption, currentFuel), 0);
+            _strategy.Calculate(TestUtils.Fuel.GenerateSeed(1, consumption, currentFuel), 0);
 
             // Act
             _strategy.UpdateLapsOfFuelRemaining(currentFuel);
@@ -286,7 +310,7 @@ namespace Tests.Fuel
             const double consumption = 0.0;
 
             // Set consumption
-            _strategy.Calculate(TestUtils.Laps.GenerateSeed(1, consumption, currentFuel), 0);
+            _strategy.Calculate(TestUtils.Fuel.GenerateSeed(1, consumption, currentFuel), 0);
 
             // Act
             _strategy.UpdateLapsOfFuelRemaining(currentFuel);
@@ -303,7 +327,7 @@ namespace Tests.Fuel
             const double currentFuel = 10.0;
             const int lapsRemaining = 5;
             const double consumption = 5.0;
-            _strategy.Calculate(TestUtils.Laps.GenerateSeed(1, consumption, currentFuel), 0);
+            _strategy.Calculate(TestUtils.Fuel.GenerateSeed(1, consumption, currentFuel), 0);
             _strategy.UpdateRefuel(currentFuel, lapsRemaining);
 
             // Assert 1

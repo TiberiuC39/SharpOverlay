@@ -1,6 +1,5 @@
 using Core.Models;
 using Core.Services.FuelCalculator.LapServices;
-using iRacingSdkWrapper.JsonModels;
 
 namespace Tests.Fuel
 {
@@ -19,7 +18,7 @@ namespace Tests.Fuel
         public void Clear_ShouldClearDriversLaps()
         {
             // Arrange
-            var drivers = new Dictionary<int, Racer> { { 1, new Racer() } };
+            var drivers = new Dictionary<int, Driver> { { 1, new Driver() } };
             var lastLapTimes = new Dictionary<int, TimeSpan> { { 1, TimeSpan.FromSeconds(60) } };
             var carIdxLapsCompleted = new int[] { 0, 1 }; // Index 0 is unused, index 1 has 1 lap
 
@@ -40,7 +39,7 @@ namespace Tests.Fuel
         public void CollectAllDriversLaps_ShouldInitializeDriverIfMissing()
         {
             // Arrange
-            var drivers = new Dictionary<int, Racer> { { 10, new Racer() } };
+            var drivers = new Dictionary<int, Driver> { { 10, new Driver() } };
             var lastLapTimes = new Dictionary<int, TimeSpan> { { 10, TimeSpan.FromSeconds(70) } };
             var carIdxLapsCompleted = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }; // Size 11 to cover index 10
 
@@ -61,7 +60,7 @@ namespace Tests.Fuel
         {
             // Arrange
             int carIdx = 5;
-            var drivers = new Dictionary<int, Racer> { { carIdx, new Racer() } };
+            var drivers = new Dictionary<int, Driver> { { carIdx, new Driver() } };
             var lastLapTime = TimeSpan.FromSeconds(65.5);
             var lastLapTimes = new Dictionary<int, TimeSpan> { { carIdx, lastLapTime } };
             var carIdxLapsCompleted = new int[carIdx + 1];
@@ -101,7 +100,7 @@ namespace Tests.Fuel
         {
             // Arrange
             int carIdx = 2;
-            var drivers = new Dictionary<int, Racer> { { carIdx, new Racer() } };
+            var drivers = new Dictionary<int, Driver> { { carIdx, new Driver() } };
             var lastLapTimes = new Dictionary<int, TimeSpan> { { carIdx, TimeSpan.FromSeconds(60) } };
             var carIdxLapsCompleted = new int[carIdx + 1];
             carIdxLapsCompleted[carIdx] = 1; // 1 lap completed
@@ -120,7 +119,7 @@ namespace Tests.Fuel
         public void CollectAllDriversLaps_ShouldHandleMultipleDrivers()
         {
             // Arrange
-            var drivers = new Dictionary<int, Racer> { { 1, new Racer() }, { 3, new Racer() } };
+            var drivers = new Dictionary<int, Driver> { { 1, new Driver() }, { 3, new Driver() } };
             var lastLapTimes = new Dictionary<int, TimeSpan> {
                 { 1, TimeSpan.FromSeconds(58) },
                 { 3, TimeSpan.FromSeconds(62) }
@@ -183,7 +182,7 @@ namespace Tests.Fuel
 
             // Arrange
             int carIdx = 7;
-            var drivers = new Dictionary<int, Racer> { { carIdx, new Racer() } };
+            var drivers = new Dictionary<int, Driver> { { carIdx, new Driver() } };
             var lastLapTimes = new Dictionary<int, TimeSpan> { { carIdx, TimeSpan.FromSeconds(60) } };
             var carIdxLapsCompleted = new int[carIdx + 1];
             carIdxLapsCompleted[carIdx] = 1;
@@ -212,7 +211,7 @@ namespace Tests.Fuel
             TimeSpan lap2 = TimeSpan.FromSeconds(62.0);
             TimeSpan expectedAverage = TimeSpan.FromSeconds(61.0);
 
-            var drivers = new Dictionary<int, Racer> { { carIdx, new Racer() } };
+            var drivers = new Dictionary<int, Driver> { { carIdx, new Driver() } };
             var lastLapTimes = new Dictionary<int, TimeSpan> { { carIdx, lap1 } };
             var carIdxLapsCompleted = new int[] { 0, 1 };
             _lapAnalyzer.CollectAllDriversLaps(drivers, lastLapTimes, carIdxLapsCompleted);
@@ -238,7 +237,7 @@ namespace Tests.Fuel
 
             // Use a temporary LapAnalyzer to manually populate state (normally discouraged, but for specific state testing of a pure method)
             // Since GetDriversLaps exposes the internal dictionary, we can modify it after initialization
-            var drivers = new Dictionary<int, Racer> { { carIdx, new Racer() } };
+            var drivers = new Dictionary<int, Driver> { { carIdx, new Driver() } };
             var lastLapTimes = new Dictionary<int, TimeSpan> { { carIdx, validLap } };
             var carIdxLapsCompleted = new int[] { 0, 1 };
             _lapAnalyzer.CollectAllDriversLaps(drivers, lastLapTimes, carIdxLapsCompleted); // Adds the valid lap
@@ -263,7 +262,7 @@ namespace Tests.Fuel
             // Arrange
             int carIdx = 1;
             // The driver is initialized by CollectAllDriversLaps, but has no laps recorded
-            var drivers = new Dictionary<int, Racer> { { carIdx, new Racer() } };
+            var drivers = new Dictionary<int, Driver> { { carIdx, new Driver() } };
             var lastLapTimes = new Dictionary<int, TimeSpan> { { carIdx, TimeSpan.FromSeconds(60) } };
             var carIdxLapsCompleted = new int[] { 0, 0 }; // 0 laps completed
 

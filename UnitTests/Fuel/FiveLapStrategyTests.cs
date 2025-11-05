@@ -117,12 +117,15 @@ namespace Tests.Fuel
             _strategy.Calculate(laps, lapsRemaining);
             StrategyViewModel view = _strategy.GetView();
 
-            // Assert
-            Assert.That(view.FuelConsumption, Is.EqualTo(avgConsumption));
-            Assert.That(view.RefuelAmount, Is.EqualTo(refuelRequired));
-            // Laps remaining: 55 / 6.0 = 11.666...
-            Assert.That(view.LapsOfFuelRemaining, Is.LessThan(9.166666666666667).Within(1e-9));
-            Assert.That(_strategy.RequiresRefueling(), Is.True);
+            Assert.Multiple(() =>
+            {
+                // Assert
+                Assert.That(view.FuelConsumption, Is.EqualTo(avgConsumption));
+                Assert.That(view.RefuelAmount, Is.EqualTo(refuelRequired));
+                // Laps remaining: 55 / 6.0 = 11.666...
+                Assert.That(view.LapsOfFuelRemaining, Is.LessThan(9.166666666666667).Within(1e-9));
+                Assert.That(_strategy.RequiresRefueling(), Is.True);
+            });
         }
     }
 }

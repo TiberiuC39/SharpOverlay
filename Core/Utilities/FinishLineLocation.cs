@@ -1,4 +1,4 @@
-﻿namespace Core.Utilities.Enums
+﻿namespace Core.Utilities
 {
     public enum FinishLineLocation
     {

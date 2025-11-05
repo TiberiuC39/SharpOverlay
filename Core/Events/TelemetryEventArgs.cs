@@ -1,14 +1,20 @@
 using Core.Models;
 using iRacingSdkWrapper;
 
-namespace Core.Events;
-
-public class TelemetryEventArgs : EventArgs
+namespace Core.Events
 {
-    public readonly TelemetryOutputDTO TelemetryOutput;
-
-    public TelemetryEventArgs(TelemetryInfo telemetryInfo)
+    public class TelemetryEventArgs : EventArgs
     {
-        TelemetryOutput = new TelemetryOutputDTO(telemetryInfo);
+        public TelemetryOutputDTO TelemetryOutput;
+
+        public TelemetryEventArgs(TelemetryInfo telemetryInfo)
+        {
+            TelemetryOutput = new TelemetryOutputDTO(telemetryInfo);
+        }
+
+        public TelemetryEventArgs()
+        {
+            TelemetryOutput = new TelemetryOutputDTO();
+        }
     }
 }

@@ -7,13 +7,13 @@ namespace Presentation.Events
         public WindowStateEventArgs(TrackedWindowState windowState)
         {
             IsOpen = windowState.IsOpen;
-            IsEnabled = windowState.IsEnabled;
+            // IsEnabled = windowState.IsEnabled;
             IsInTestMode = windowState.IsInTestMode;
             IsInDebugMode = windowState.IsInDebugMode;
         }
 
         public bool IsOpen { get; }
-        public bool IsEnabled { get; }
+        // public bool IsEnabled { get; }
         public bool IsInTestMode { get; }
         public bool IsInDebugMode { get; }
     }

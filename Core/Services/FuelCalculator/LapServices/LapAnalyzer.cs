@@ -1,5 +1,4 @@
 ﻿using Core.Models;
-using iRacingSdkWrapper.JsonModels;
 
 namespace Core.Services.FuelCalculator.LapServices
 {
@@ -12,7 +11,7 @@ namespace Core.Services.FuelCalculator.LapServices
             _driversLaps.Clear();
         }
 
-        public void CollectAllDriversLaps(Dictionary<int, Racer> drivers, Dictionary<int, TimeSpan> lastLapTimes, int[] carIdxLapsCompleted)
+        public void CollectAllDriversLaps(Dictionary<int, Driver> drivers, Dictionary<int, TimeSpan> lastLapTimes, int[] carIdxLapsCompleted)
         {
             foreach ((int idx, _) in drivers)
             {

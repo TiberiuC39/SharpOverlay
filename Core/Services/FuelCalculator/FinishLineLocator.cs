@@ -1,4 +1,4 @@
-﻿using Core.Utilities.Enums;
+﻿using Core.Utilities;
 
 namespace Core.Services.FuelCalculator
 {

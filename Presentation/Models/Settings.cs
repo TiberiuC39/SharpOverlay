@@ -4,7 +4,14 @@ using Colors = System.Windows.Media.Colors;
 
 namespace Presentation.Models
 {
-    public abstract class BaseSettings : INotifyPropertyChanged
+    public interface IBaseSettings : INotifyPropertyChanged
+    {
+        bool IsEnabled { get; set; }
+        bool IsOpen { get; set; }
+        bool IsInTestMode { get; set; }
+    }
+
+    public abstract class BaseSettings : IBaseSettings
     {
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -20,8 +27,13 @@ namespace Presentation.Models
             get => _isEnabled;
             set
             {
+                bool prevState = _isEnabled;
                 _isEnabled = value;
-                OnPropertyChange(nameof(IsEnabled));
+                if (prevState != value)
+                {
+                    MainWindow.HandleOverlayStatus();
+                }
+                // OnPropertyChange(nameof(IsEnabled));
             }
         }
 
@@ -70,7 +82,7 @@ namespace Presentation.Models
 
         private SolidColorBrush? _threeWideBarColor;
 
-        
+
         public double BarWidth
         {
             get => _barWidth;
@@ -323,6 +335,18 @@ namespace Presentation.Models
 
     public class FuelSettings : BaseSettings
     {
+        private SolidColorBrush? _backgroundColor;
+
+        public SolidColorBrush? BackgroundColor
+
+        {
+            get => _backgroundColor;
+            set
+            {
+                _backgroundColor = value;
+                OnPropertyChange(nameof(BackgroundColor));
+            }
+        }
     }
 
     public class GeneralSettings : INotifyPropertyChanged

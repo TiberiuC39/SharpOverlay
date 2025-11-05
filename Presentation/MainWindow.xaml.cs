@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Diagnostics;
+using System.Windows;
 using System.Windows.Input;
 using System.Windows.Navigation;
 using Dark.Net;
@@ -8,119 +9,109 @@ using Presentation.Services;
 using Velopack;
 using Velopack.Sources;
 
-namespace Presentation;
-
-/// <summary>
-/// Interaction logic for MainWindow.xaml
-/// </summary>
-public partial class MainWindow : Window
+namespace Presentation
 {
-    public UpdateManager mgr = new UpdateManager(new GithubSource("https://github.com/tiberiuc39/sharpoverlay", null, false));
-
-    public MainWindow()
+    /// <summary>
+    /// Interaction logic for MainWindow.xaml
+    /// </summary>
+    public partial class MainWindow : Window
     {
-        InitializeComponent();
-        this.DataContext = new SettingsViewModel();
+        public UpdateManager mgr = new UpdateManager(new GithubSource("https://github.com/tiberiuc39/sharpoverlay", null, false));
 
-        Services.JotService.tracker.Track(App.appSettings);
-        Services.JotService.tracker.PersistAll();
-        DarkNet.Instance.SetWindowThemeWpf(this, Dark.Net.Theme.Auto);
-        InitializeComponent();
-        HandleOverlayStatus();
-        if (App.appSettings.IsUpdate)
+        public MainWindow()
         {
-            updateButton.Visibility = Visibility.Visible;
+            InitializeComponent();
+            this.DataContext = new SettingsViewModel();
+
+            JotService.tracker.Track(App.appSettings);
+            JotService.tracker.PersistAll();
+            DarkNet.Instance.SetWindowThemeWpf(this, Theme.Auto);
+            InitializeComponent();
+            HandleOverlayStatus();
+            if (App.appSettings.IsUpdate)
+            {
+                updateButton.Visibility = Visibility.Visible;
+            }
         }
-    }
 
-    private async Task CheckForUpdate()
-    {
-        if (mgr.IsInstalled)
+        private async Task CheckForUpdate()
         {
-            // check for new version
+            if (mgr.IsInstalled)
+            {
+                // check for new version
+                var newVersion = await mgr.CheckForUpdatesAsync();
+                if (newVersion == null)
+                    return; // no update available
+
+                updateButton.Visibility = Visibility.Visible;
+            }
+        }
+
+        private async Task UpdateApp()
+        {
             var newVersion = await mgr.CheckForUpdatesAsync();
-            if (newVersion == null)
-                return; // no update available
+            await mgr.DownloadUpdatesAsync(newVersion!);
 
-            updateButton.Visibility = Visibility.Visible;
+            // install new version and restart app
+            mgr.ApplyUpdatesAndRestart(newVersion!);
         }
-    }
 
-    private async Task UpdateApp()
-    {
-        var newVersion = await mgr.CheckForUpdatesAsync();
-        await mgr.DownloadUpdatesAsync(newVersion!);
-
-        // install new version and restart app
-        mgr.ApplyUpdatesAndRestart(newVersion!);
-    }
-
-    private async void Window_Loaded(object sender, RoutedEventArgs e)
-    {
-        await CheckForUpdate();
-    }
-
-    private async void UpdateButton_Click(object sender, RoutedEventArgs e)
-    {
-        await UpdateApp();
-    }
-
-    public static void HandleOverlayStatus()
-    {
-        OverlaysService.UpdateEnabledStatus();
-        foreach (Overlay o in OverlaysService.Overlays)
+        private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            if (o.IsEnabled && !o.IsOpen)
-            {
-                o.Window = (Window?)Activator.CreateInstance(o.Type);
-                var showMethod = o.Window?.GetType().GetMethod("Show");
-                showMethod?.Invoke(o.Window, null);
-                o.IsOpen = true;
+            await CheckForUpdate();
+        }
 
-                o.Window!.Visibility = Visibility.Hidden;
-            }
-            else if (!o.IsEnabled && o.IsOpen)
+        private async void UpdateButton_Click(object sender, RoutedEventArgs e)
+        {
+            await UpdateApp();
+        }
+
+        public static void HandleOverlayStatus()
+        {
+            OverlaysService.UpdateEnabledStatus();
+            foreach (Overlay o in OverlaysService.Overlays)
             {
-                var closeMethod = o.Window?.GetType().GetMethod("Close");
-                closeMethod?.Invoke(o.Window, null);
-                o.Window = null;
-                o.IsOpen = false;
+                if (o.IsEnabled && o.Window is null)
+                {
+                    o.Window = (Window)Activator.CreateInstance(o.Type)!;
+                }
+                else if (!o.IsEnabled && o.Window is not null)
+                {
+                    o.Window.Close();
+                    o.Window = null;
+                }
             }
         }
-    }
 
-    private void Window_Toggle(object sender, RoutedEventArgs e)
-    {
-        HandleOverlayStatus();
-    }
+        // Minimizes the window when the minimize button is clicked
+        private void Minimize_Click(object sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
 
-    // Minimizes the window when the minimize button is clicked
-    private void Minimize_Click(object sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
+        // Closes the application when the close button is clicked
+        private void Close_Click(object sender, RoutedEventArgs e) => Close();
 
-    // Closes the application when the close button is clicked
-    private void Close_Click(object sender, RoutedEventArgs e) => Close();
-
-    // Makes the window draggable when clicking and holding on the custom title bar
-    private void TitleBar_MouseDown(object sender, MouseButtonEventArgs e)
-    {
-        if (e.ChangedButton == MouseButton.Left)
-            DragMove();
-    }
-
-    private void MaximizeRestore_Click(object sender, RoutedEventArgs e)
-    {
-        if (WindowState == WindowState.Normal)
-            WindowState = WindowState.Maximized;
-        else if (WindowState == WindowState.Maximized)
-            WindowState = WindowState.Normal;
-    }
-
-    private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
-    {
-        var sInfo = new System.Diagnostics.ProcessStartInfo(e.Uri.ToString())
+        // Makes the window draggable when clicking and holding on the custom title bar
+        private void TitleBar_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            UseShellExecute = true,
-        };
-        System.Diagnostics.Process.Start(sInfo);
+            if (e.ChangedButton == MouseButton.Left)
+                DragMove();
+        }
+
+        private void MaximizeRestore_Click(object sender, RoutedEventArgs e)
+        {
+            if (WindowState == WindowState.Normal)
+                WindowState = WindowState.Maximized;
+            else if (WindowState == WindowState.Maximized)
+                WindowState = WindowState.Normal;
+        }
+
+        private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
+        {
+            var sInfo = new ProcessStartInfo(e.Uri.ToString())
+            {
+                UseShellExecute = true,
+            };
+
+            Process.Start(sInfo);
+        }
     }
 }

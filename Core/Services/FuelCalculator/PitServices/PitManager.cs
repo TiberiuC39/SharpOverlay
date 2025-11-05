@@ -5,6 +5,7 @@ namespace Core.Services.FuelCalculator.PitServices
     public class PitManager : IClear
     {
         private bool _hasBegunService;
+        private bool _isReceivingService;
         private bool _hasCompletedService;
         private bool _hasEnteredPits;
         private bool _isOnPitRoad;
@@ -13,6 +14,7 @@ namespace Core.Services.FuelCalculator.PitServices
         public void Clear()
         {
             _hasBegunService = false;
+            _isReceivingService = false;
             _hasCompletedService = false;
             _hasEnteredPits = false;
             _isOnPitRoad = false;
@@ -32,7 +34,7 @@ namespace Core.Services.FuelCalculator.PitServices
             => _hasEnteredPits;
 
         public bool IsResettingToPits(int enterExitResetButton)
-            => enterExitResetButton == 1 && !_hasEnteredPits && !_hasCompletedService;
+            => enterExitResetButton == 1 && !_hasEnteredPits && !_hasCompletedService && !_hasBegunService;
 
         public void SetPitRoadStatus(bool isOnPitRoad, TrackSurfaces trackSurface)
         {
@@ -55,14 +57,16 @@ namespace Core.Services.FuelCalculator.PitServices
 
         public void SetPitServiceStatus(bool isReceivingPitService)
         {
-            if (isReceivingPitService && !_hasBegunService)
+            if (isReceivingPitService && !_isReceivingService)
             {
+                _isReceivingService = true;
                 _hasBegunService = true;
                 _hasCompletedService = false;
             }
-            else if (!isReceivingPitService && _hasBegunService)
+            else if (!isReceivingPitService && _isReceivingService)
             {
                 _hasBegunService = false;
+                _isReceivingService = false;
                 _hasCompletedService = true;
             }
         }

@@ -9,41 +9,6 @@
         d:DataContext="{d:DesignInstance Type=models:FuelViewModel}"
         Title="Fuel Calculator Debug" Height="600" Width="300">
     
-    <Window.Resources>
-    <Style x:Key="LabelStyle" TargetType="Label">
-        <Setter Property="VerticalAlignment" Value="Center"/>
-        <Setter Property="HorizontalAlignment" Value="Center"/>
-        <Setter Property="Margin" Value="5,0,5,0"/>
-        <Setter Property="Foreground" Value="#f5bd3b"/>
-        <Setter Property="FontWeight" Value="Bold"/>
-        <Setter Property="Height" Value="25"/>
-        <Setter Property="Opacity" Value="1"/>
-    </Style>
-
-    <Style x:Key="TextBlockStyle" TargetType="TextBlock">
-        <Setter Property="VerticalAlignment" Value="Center"/>
-        <Setter Property="HorizontalAlignment" Value="Center"/>
-        <Setter Property="Margin" Value="5,0,5,0"/>
-        <Setter Property="Padding" Value="5"/>
-        <Setter Property="Height" Value="25"/>
-        <Setter Property="Opacity" Value="1"/>
-    </Style>
-
-    <Style x:Key="RefuelRequiredTextBlockStyle" TargetType="TextBlock">
-        <Setter Property="VerticalAlignment" Value="Center"/>
-        <Setter Property="HorizontalAlignment" Value="Center"/>
-        <Setter Property="Margin" Value="5,0,5,0"/>
-        <Setter Property="Padding" Value="5"/>
-        <Setter Property="Foreground" Value="Green"/>
-        <Setter Property="Opacity" Value="1"/>
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding DoesRequireRefueling}" Value="true">
-                <Setter Property="Foreground" Value="Red"/>
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-    </Window.Resources>
-
     <Grid>
         <StackPanel>
             <Label Content="Current Lap Information" Style="{StaticResource LabelStyle}"/>

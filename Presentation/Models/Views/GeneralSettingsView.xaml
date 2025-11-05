@@ -25,9 +25,9 @@
             <RowDefinition Height="50" />
         </Grid.RowDefinitions>
 
-        <Label Grid.Row="0" Grid.ColumnSpan="4" Content="Restart SharpOverlay to apply general settings." />
-        <Label Grid.Row="1" Grid.Column="0" Content="Use hardware acceleration" />
-        <ToggleButton Grid.Row="1" Grid.Column="1"
+        <Label Grid.Row="0" Grid.ColumnSpan="4" Content="Restart SharpOverlay to apply general settings." Style="{StaticResource LabelStyle}"/>
+        <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="Use hardware acceleration" Style="{StaticResource TextBlockStyle}"/>
+        <ToggleButton Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="1"
             IsChecked="{Binding UseHardwareAcceleration, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
         />
     </Grid>

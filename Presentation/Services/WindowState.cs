@@ -1,42 +1,39 @@
 ﻿using System.ComponentModel;
+using System.Diagnostics;
 using Presentation.Models;
 
 namespace Presentation.Services
 {
     public class TrackedWindowState
     {
-        public TrackedWindowState(BaseSettings settings)
+        public TrackedWindowState(IBaseSettings settings)
         {
             UpdateIsOpen(settings.IsOpen);
-            UpdateIsEnabled(settings.IsEnabled);
             UpdateIsInTestMode(settings.IsInTestMode);
             UpdateIsInDebugMode(false);
         }
 
         public bool IsOpen { get; private set; }
-        public bool IsEnabled { get; private set; }
         public bool IsInTestMode { get; private set; }
         public bool IsInDebugMode { get; private set; }
 
         public bool RequiresChange { get; private set; }
 
-        public void Update(bool isCarOnTrack)
+        public bool Update(bool isCarOnTrack)
         {
             if (!IsInTestMode)
             {
                 UpdateIsOpen(isCarOnTrack);
             }
+
+            return RequiresChange;
         }
 
-        public void Update(PropertyChangedEventArgs eventArgs)
+        public bool Update(PropertyChangedEventArgs eventArgs)
         {
             string propertyName = eventArgs.PropertyName!;
 
-            if (propertyName == nameof(IsEnabled))
-            {
-                UpdateIsEnabled(!IsEnabled);
-            }
-            else if (propertyName == nameof(IsOpen))
+            if (propertyName == nameof(IsOpen))
             {
                 UpdateIsOpen(!IsOpen);
             }
@@ -48,6 +45,8 @@ namespace Presentation.Services
             {
                 UpdateIsInDebugMode(!IsInDebugMode);
             }
+
+            return RequiresChange;
         }
 
         public void CompleteChange()
@@ -60,15 +59,7 @@ namespace Presentation.Services
             if (IsOpen == !isOpen)
             {
                 IsOpen = isOpen;
-                RaiseChange();
-            }
-        }
-
-        private void UpdateIsEnabled(bool isEnabled)
-        {
-            if (IsEnabled == !isEnabled)
-            {
-                IsEnabled = isEnabled;
+                Debug.WriteLine("Raising is Open");
                 RaiseChange();
             }
         }
@@ -78,6 +69,7 @@ namespace Presentation.Services
             if (IsInTestMode == !isInTestMode)
             {
                 IsInTestMode = isInTestMode;
+                Debug.WriteLine("Raising is Test Mode");
                 RaiseChange();
             }
         }
@@ -87,6 +79,7 @@ namespace Presentation.Services
             if (IsInDebugMode == !isInDebugMode)
             {
                 IsInDebugMode = isInDebugMode;
+                Debug.WriteLine("Raising is Debug Mode");
                 RaiseChange();
             }
         }

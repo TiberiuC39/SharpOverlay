@@ -27,10 +27,11 @@ namespace Presentation.Overlays
         public FuelCalculatorWindow()
         {
             _fuelService = new FuelCalculatorService();
-            _windowStateService = new WindowStateService(_fuelService.SimReader, _settings);
-
             _fuelService.FuelUpdated += OnFuelUpdate;
+
+            _windowStateService = new WindowStateService(_fuelService.SimReader, _settings);
             _windowStateService.WindowStateChanged += OnWindowStateChange;
+            _windowStateService.Initialize();
 
             JotService.tracker.Track(this);
 
@@ -47,9 +48,20 @@ namespace Presentation.Overlays
             };
         }
 
+        protected override void OnClosed(EventArgs e)
+        {
+            _windowStateService.WindowStateChanged -= OnWindowStateChange;
+            _windowStateService.Dispose();
+
+            _fuelService.FuelUpdated -= OnFuelUpdate;
+            _fuelService.Dispose();
+
+            base.OnClosed(e);
+        }
+
         private void OnWindowStateChange(object? sender, WindowStateEventArgs e)
         {
-            if ((e.IsOpen || e.IsInTestMode) && e.IsEnabled)
+            if (e.IsOpen || e.IsInTestMode)
             {
                 Show();
             }
@@ -60,7 +72,11 @@ namespace Presentation.Overlays
 
             if (e.IsInDebugMode)
             {
-                _fuelDebugWindow = new FuelDebugWindow(_fuelService);
+                if (_fuelDebugWindow is null)
+                {
+                    _fuelDebugWindow = new FuelDebugWindow(_fuelService);
+                }
+
                 _fuelDebugWindow.Show();
             }
             else if (_fuelDebugWindow is not null && !e.IsInDebugMode)
@@ -94,7 +110,8 @@ namespace Presentation.Overlays
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            if (FontSize / e.NewSize.Height != 0.125) {
+            if (FontSize / e.NewSize.Height != 0.125)
+            {
                 FontSize = e.NewSize.Height * 0.125;
             }
         }

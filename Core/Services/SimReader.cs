@@ -1,12 +1,14 @@
 ﻿using Core.Events;
+using Core.Models;
 using Core.Utilities;
 using iRacingSdkWrapper;
 
 namespace Core.Services
 {
-    public class SimReader
+    public class SimReader : ISimReader 
     {
         private readonly SdkWrapper _sdkWrapper;
+        private bool _disposed;
 
         public int DriverId => _sdkWrapper.DriverId;
 
@@ -34,7 +36,8 @@ namespace Core.Services
             _sdkWrapper.SessionUpdated += ExecuteOnSession;
         }
 
-        public bool ReadNextFrame() {
+        public bool ReadNextFrame()
+        {
             return _sdkWrapper.ProcessTelemetryFrame();
         }
 
@@ -43,20 +46,20 @@ namespace Core.Services
             _sdkWrapper.TelemetryUpdateFrequency = newTickRate;
         }
 
-        public SessionInfo GetSessionInfo()
+        public SessionOutputDTO GetSessionInfo()
         {
-            return _sdkWrapper.GetSessionInfoWithoutEvent();
+            return new SessionOutputDTO(_sdkWrapper.GetSessionInfoWithoutEvent());
         }
 
-        public TelemetryInfo GetTelemetryInfo()
+        public TelemetryOutputDTO GetTelemetryInfo()
         {
-            return _sdkWrapper.GetTelemetryInfoWithoutEvent();
+            return new TelemetryOutputDTO(_sdkWrapper.GetTelemetryInfoWithoutEvent());
         }
 
         public event EventHandler? OnConnected;
         public event EventHandler? OnDisconnected;
         public event EventHandler<TelemetryEventArgs>? OnTelemetryUpdated;
-        public event EventHandler<SdkWrapper.SessionUpdatedEventArgs>? OnSessionUpdated;
+        public event EventHandler<SessionEventArgs>? OnSessionUpdated;
 
         protected virtual void ExecuteOnConnected(object? sender, EventArgs args)
         {
@@ -76,7 +79,36 @@ namespace Core.Services
 
         protected virtual void ExecuteOnSession(object? sender, SdkWrapper.SessionUpdatedEventArgs e)
         {
-            OnSessionUpdated?.Invoke(this, e);
+            var eventArgs = new SessionEventArgs(e.SessionInfo);
+            OnSessionUpdated?.Invoke(this, eventArgs);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed) return;
+
+            if (disposing)
+            {
+                _sdkWrapper.Stop();
+
+                if (_sdkWrapper != null)
+                {
+                    _sdkWrapper.Connected -= ExecuteOnConnected;
+                    _sdkWrapper.Disconnected -= ExecuteOnDisconnected;
+                    _sdkWrapper.TelemetryUpdated -= ExecuteOnTelemetry;
+                    _sdkWrapper.SessionUpdated -= ExecuteOnSession;
+                }
+            }
+
+            // No unmanaged resources to free.
+
+            _disposed = true;
         }
     }
 }

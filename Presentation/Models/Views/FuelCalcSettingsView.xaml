@@ -25,23 +25,23 @@
             <RowDefinition Height="50" />
         </Grid.RowDefinitions>
 
-        <Label Grid.Column="0" Content="Active" />
+        <TextBlock Grid.Column="0" Text="Active" Style="{StaticResource TextBlockStyle}"/>
         <ToggleButton x:Name="FuelCalculatorToggleButton"
             Grid.Column="1"
             IsChecked="{Binding IsEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-        <Label Grid.Row="1" Grid.Column="0" Content="Positioning Mode" />
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="Positioning Mode" Style="{StaticResource TextBlockStyle}"/>
         <ToggleButton x:Name="FuelCalcTestToggleButton"
             Grid.Row="1"
             Grid.Column="1"
             IsChecked="{Binding IsInTestMode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-        <Label Grid.Row="2" Grid.Column="0" Content="Debug" />
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="Debug" Style="{StaticResource TextBlockStyle}"/>
         <ToggleButton x:Name="FuelDebugModeToggle" Grid.Row="2" Grid.Column="1"
             ToolTip="Toggle to render the debug fuel View"
             IsChecked="{Binding IsInDebugMode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-        <Label Grid.Row="3" Grid.Column="0" Content="Background Color - WIP" />
+        <TextBlock Grid.Row="3" Grid.Column="0" Text="Background Color - WIP" Style="{StaticResource TextBlockStyle}"/>
         <colorpicker:PortableColorPicker Grid.Row="3" Grid.Column="1"
             SmallChange="5"
             UseHintColor="True" HintColor="Transparent"

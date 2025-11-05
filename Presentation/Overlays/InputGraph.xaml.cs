@@ -26,7 +26,7 @@ namespace Presentation.Overlays
         private Input input = new Input();
 
         private readonly InputGraphSettings _settings = App.appSettings.InputGraphSettings;
-        private readonly SimReader _simReader = new SimReader();
+        private readonly ISimReader _simReader = new SimReader();
         private readonly WindowStateService _windowStateService;
 
         public InputGraph()
@@ -35,9 +35,11 @@ namespace Presentation.Overlays
             Services.JotService.tracker.Track(this);
 
             _windowStateService = new WindowStateService(_simReader, _settings);
+            _windowStateService.WindowStateChanged += OnWindowStateChange;
+            _windowStateService.Initialize();
 
             _simReader.OnTelemetryUpdated += IracingWrapper_TelemetryUpdated;
-            _windowStateService.WindowStateChanged += OnWindowStateChange;
+
             _settings.PropertyChanged += Graph_HandleSettingUpdated;
 
             HookStreamer(ref throttleStreamer, _settings.ThrottleColor, true);
@@ -50,9 +52,22 @@ namespace Presentation.Overlays
             SetColorPercentageLabels();
         }
 
+        protected override void OnClosed(EventArgs e)
+        {
+            _settings.PropertyChanged -= Graph_HandleSettingUpdated;
+
+            _windowStateService.WindowStateChanged -= OnWindowStateChange;
+            _windowStateService.Dispose();
+
+            _simReader.OnTelemetryUpdated -= IracingWrapper_TelemetryUpdated;
+            _simReader.Dispose();
+
+            base.OnClosed(e);
+        }
+
         private void OnWindowStateChange(object? sender, WindowStateEventArgs e)
         {
-            if ((e.IsOpen || e.IsInTestMode) && e.IsEnabled)
+            if (e.IsOpen || e.IsInTestMode)
             {
                 Show();
             }

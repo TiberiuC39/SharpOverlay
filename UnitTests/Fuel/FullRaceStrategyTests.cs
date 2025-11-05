@@ -31,8 +31,8 @@ namespace Tests.Fuel
         public void GetAverageFuelConsumption_ShouldUseBaseImplementation_WhenOneLapOrFewer()
         {
             // Arrange
-            var zeroLaps = TestUtils.Laps.GenerateSeed();
-            var oneLap = TestUtils.Laps.GenerateSeed(1, 10, 50);
+            var zeroLaps = TestUtils.Fuel.GenerateSeed();
+            var oneLap = TestUtils.Fuel.GenerateSeed(1, 10, 50);
 
             // Case 1: Zero laps
             _strategy.Calculate(zeroLaps, 1);
@@ -93,12 +93,15 @@ namespace Tests.Fuel
             _strategy.Calculate(laps, lapsRemaining);
             StrategyViewModel view = _strategy.GetView();
 
-            // Assert
-            Assert.That(view.FuelConsumption, Is.EqualTo(avgConsumption));
-            Assert.That(view.RefuelAmount, Is.EqualTo(FuelCutOff));
-            // Laps remaining: 70.0 / 5.0 = 14.0
-            Assert.That(view.LapsOfFuelRemaining, Is.LessThan(10.0).Within(1e-9));
-            Assert.That(_strategy.RequiresRefueling(), Is.True); // Fuel Cut Off
+            Assert.Multiple(() =>
+            {
+                // Assert
+                Assert.That(view.FuelConsumption, Is.EqualTo(avgConsumption));
+                Assert.That(view.RefuelAmount, Is.EqualTo(FuelCutOff));
+                // Laps remaining: 70.0 / 5.0 = 14.0
+                Assert.That(view.LapsOfFuelRemaining, Is.LessThan(10.0).Within(1e-9));
+                Assert.That(_strategy.RequiresRefueling(), Is.True); // Fuel Cut Off
+            });
         }
     }
 }
