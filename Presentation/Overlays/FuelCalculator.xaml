@@ -24,7 +24,7 @@
         />
     </WindowChrome.WindowChrome>
 
-    <Border Style="{StaticResource OuterBorderStyle}"
+    <Border 
         Background="{StaticResource BackgroundAccentBrush}"
         MouseLeftButtonDown="Window_MouseDown">
         <Grid>

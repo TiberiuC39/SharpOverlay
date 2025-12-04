@@ -5,10 +5,11 @@ using iRacingSdkWrapper;
 
 namespace Core.Services
 {
-    public class SimReader : ISimReader 
+    public class SimReader : ISimReader
     {
         private readonly SdkWrapper _sdkWrapper;
         private bool _disposed;
+        private int _currentSessionNumber = -1;
 
         public int DriverId => _sdkWrapper.DriverId;
 
@@ -60,6 +61,7 @@ namespace Core.Services
         public event EventHandler? OnDisconnected;
         public event EventHandler<TelemetryEventArgs>? OnTelemetryUpdated;
         public event EventHandler<SessionEventArgs>? OnSessionUpdated;
+        public event EventHandler? OnSessionChanged;
 
         protected virtual void ExecuteOnConnected(object? sender, EventArgs args)
         {
@@ -68,11 +70,18 @@ namespace Core.Services
 
         protected virtual void ExecuteOnDisconnected(object? sender, EventArgs args)
         {
+            _currentSessionNumber = -1;
             OnDisconnected?.Invoke(this, args);
         }
 
         protected virtual void ExecuteOnTelemetry(object? sender, SdkWrapper.TelemetryUpdatedEventArgs e)
         {
+            if (_currentSessionNumber != e.TelemetryInfo.SessionNum.Value)
+            {
+                _currentSessionNumber = e.TelemetryInfo.SessionNum.Value;
+                OnSessionChanged?.Invoke(this, EventArgs.Empty);
+            }
+
             var eventArgs = new TelemetryEventArgs(e.TelemetryInfo);
             OnTelemetryUpdated?.Invoke(this, eventArgs);
         }

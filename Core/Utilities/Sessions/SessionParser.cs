@@ -7,6 +7,7 @@ namespace Core.Utilities.Sessions
     {
         public List<SessionDTO> Sessions { get; private set; } = [];
         public Dictionary<int, Driver> Drivers { get; private set; } = [];
+        public Dictionary<int, TimeSpan> DriversLastLapTimes { get; private set; } = [];
         public StartType StartType { get; private set; }
         public string EventType { get; private set; }
         public SessionType SessionType { get; private set; }
@@ -18,6 +19,7 @@ namespace Core.Utilities.Sessions
         public int CarId { get; private set; }
 
         public bool IsSetupChanged { get; private set; }
+
 
         public void ParseSectors(SessionOutputDTO sessionInfo)
         {
@@ -154,6 +156,11 @@ namespace Core.Utilities.Sessions
         public void ParseEventType(SessionOutputDTO sessionInfo)
         {
             EventType = sessionInfo.WeekendInfo.EventType;
+        }
+
+        public void ParseDriversLastLapTimes(SessionOutputDTO sessionInfo, int sessionNumber)
+        {
+            DriversLastLapTimes = sessionInfo.Sessions[sessionNumber].ResultsPositions.ToDictionary(k => k.CarIdx, v => TimeSpan.FromSeconds(v.LastTime));
         }
     }
 }

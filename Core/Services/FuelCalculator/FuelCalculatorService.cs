@@ -6,7 +6,6 @@ using Core.Services.FuelCalculator.Strategies;
 using Core.Utilities.Sessions;
 using Core.Utilities.Telemetries;
 using iRacingSdkWrapper;
-using iRacingSdkWrapper.Bitfields;
 using SharpOverlay.Strategies;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -64,6 +63,7 @@ namespace Core.Services.FuelCalculator
             SimReader.OnDisconnected += ExecuteOnDisconnected;
             SimReader.OnTelemetryUpdated += ExecuteOnTelemetryEvent;
             SimReader.OnSessionUpdated += ExecuteOnSessionEvent;
+            SimReader.OnSessionChanged += OnSessionChange;
         }
 
         private void ExecuteOnDisconnected(object? sender, EventArgs args)
@@ -148,6 +148,7 @@ namespace Core.Services.FuelCalculator
             if (IsSessionStateValid(telemetryOutput.SessionState))
             {
                 var driversDict = _sessionParser.Drivers;
+                // var driversLastLapTime = _sessionParser.DriversLastLapTimes;
                 var driversLastLapTime = TelemetryParser.GetDriversLastLapTime(_sessionParser.PaceCarIdx, telemetryOutput.CarIdxLastLapTime);
                 var lapsCompletedByCarIdx = telemetryOutput.CarIdxLapCompleted;
 
@@ -155,20 +156,25 @@ namespace Core.Services.FuelCalculator
 
                 RunFuelCalculations(telemetryOutput);
             }
-            else if (IsSessionStateInvalid(telemetryOutput.SessionState))
-            {
-                Clear();
-            }
             else if (!telemetryOutput.IsOnTrack
                 && telemetryOutput.IsReplayPlaying
                 && _lapTracker.GetCurrentLap() is not null)
             {
                 _lapTracker.ResetCurrentLap();
             }
+            else
+            {
+                Clear();
+            }
 
             _strategyList.ForEach(s => s.UpdateLapsOfFuelRemaining(telemetryOutput.FuelLevel));
 
             FuelUpdated(this, new FuelEventArgs(GetViewModel(telemetryOutput)));
+        }
+
+        private void OnSessionChange(object? sender, EventArgs args)
+        {
+            Clear();
         }
 
         private bool IsSessionStateValid(SessionStates sessionState)
@@ -177,14 +183,6 @@ namespace Core.Services.FuelCalculator
                             || sessionState == SessionStates.GetInCar
                             || sessionState == SessionStates.ParadeLaps
                             || sessionState == SessionStates.Checkered;
-        }
-
-        private bool IsSessionStateInvalid(SessionStates sessionState)
-        {
-            return _telemetryParser.HasSwitchedSessions
-                            || sessionState == SessionStates.CoolDown
-                            || sessionState == SessionStates.Invalid
-                            || sessionState == SessionStates.Warmup;
         }
 
         private void ExecuteOnSessionEvent(object? sender, SessionEventArgs eventArgs)
@@ -205,6 +203,8 @@ namespace Core.Services.FuelCalculator
 
             _sessionParser.ParseCarId(sessionInfo);
             _sessionParser.ParseTrackId(sessionInfo);
+
+            _sessionParser.ParseDriversLastLapTimes(sessionInfo, _telemetryParser.CurrentSessionNumber);
         }
 
         private void RunFuelCalculations(TelemetryOutputDTO telemetryOutput)
@@ -278,8 +278,8 @@ namespace Core.Services.FuelCalculator
                     _isRaceStart = true;
                 }
             }                                                                // WARN:
-            else if (_isRaceStart && telemetryOutput.CurrentLapNumber == 2) // Simulator flickers quickly to lap 2 in Race
-                                                                            // after the going through start finish line on lap 0 to 1
+            else if (_isRaceStart && telemetryOutput.CurrentLapNumber == 2)  // Simulator flickers quickly to lap 2 in Race
+                                                                             // after the going through start finish line on lap 0 to 1
             {
                 _isRaceStart = false;
             }
@@ -292,8 +292,10 @@ namespace Core.Services.FuelCalculator
                     lapNumber++;
                 }
 
+                _pitTimeTracker.StopService(telemetryOutput.SessionTimeRemaining);
                 _lapTracker.StartNewLap(lapNumber, telemetryOutput.FuelLevel);
                 Debug.WriteLine($"Starting new lap after service {lapNumber}");
+                Debug.WriteLine($"Service was {_pitTimeTracker.GetServiceDuration().TotalSeconds} seconds.");
 
                 currentLap = _lapTracker.GetCurrentLap()!;
                 currentLap.IsOutLap = true;
@@ -306,10 +308,12 @@ namespace Core.Services.FuelCalculator
             else if (_pitManager.HasBegunService())
             {
                 Debug.WriteLine($"Beginning Service!");
-                if (telemetryOutput.SessionFlag != SessionFlags.Repair)
-                {
-                    _lapTracker.CompleteCurrentLap(telemetryOutput.FuelLevel, telemetryOutput.LastLapTime);
-                }
+                // if (telemetryOutput.SessionFlag != SessionFlags.Repair)
+                // {
+                // }
+
+                _lapTracker.CompleteCurrentLap(telemetryOutput.FuelLevel, telemetryOutput.LastLapTime);
+                _pitTimeTracker.StartService(telemetryOutput.SessionTimeRemaining);
 
                 CalculateFuelAndLapData(telemetryOutput);
 
@@ -333,12 +337,16 @@ namespace Core.Services.FuelCalculator
                 {
                     if (currentLap.Number != 0)
                     {
-                        Debug.WriteLine($"Completing lap :{currentLap.Number} not on pit road.");
+                        // Debug.WriteLine($"Crossing finish line!");
+                        // Debug.WriteLine($"Completing lap :{currentLap.Number}.");
                         _lapTracker.CompleteCurrentLap(telemetryOutput.FuelLevel, telemetryOutput.LastLapTime);
+
+                        // Debug.WriteLine($"Last lap time from session: {_sessionParser.DriversLastLapTimes[telemetryOutput.PlayerCarIdx]}");
+                        // Debug.WriteLine($"Last lap time from telemetry: {telemetryOutput.LastLapTime}");
                     }
 
                     _lapTracker.StartNewLap(telemetryOutput.CurrentLapNumber, telemetryOutput.FuelLevel);
-                        Debug.WriteLine($"Starting new lap :{telemetryOutput.CurrentLapNumber} {_pitManager.IsOnPitRoad()} on pit road.");
+                    Debug.WriteLine($"Starting new lap :{telemetryOutput.CurrentLapNumber}.");
                 }
                 else if (_pitManager.HasResetToPits)
                 {

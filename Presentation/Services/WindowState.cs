@@ -33,11 +33,11 @@ namespace Presentation.Services
         {
             string propertyName = eventArgs.PropertyName!;
 
-            if (propertyName == nameof(IsOpen))
-            {
-                UpdateIsOpen(!IsOpen);
-            }
-            else if (propertyName == nameof(IsInTestMode))
+            // if (propertyName == nameof(IsOpen))
+            // {
+            //     UpdateIsOpen(!IsOpen);
+            // }
+            if (propertyName == nameof(IsInTestMode))
             {
                 UpdateIsInTestMode(!IsInTestMode);
             }

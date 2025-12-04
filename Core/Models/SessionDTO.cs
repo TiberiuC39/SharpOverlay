@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using iRacingSdkWrapper.JsonModels;
 
 namespace Core.Models
@@ -27,9 +28,9 @@ namespace Core.Models
 
         public int SessionEnforceTireCompoundChange { get; set; }
 
-        public List<DriverPositionDTO> ResultsPositions { get; set; } = new List<DriverPositionDTO>();
+        public List<DriverPositionDTO> ResultsPositions { get; set; } = [];
 
-        public List<FastestLapDTO> ResultsFastestLap { get; set; } = new List<FastestLapDTO>();
+        public List<FastestLapDTO> ResultsFastestLap { get; set; } = [];
 
         public double ResultsAverageLapTime { get; set; }
 
@@ -60,8 +61,8 @@ namespace Core.Models
             SessionSkipped = s.SessionSkipped;
             SessionRunGroupsUsed = s.SessionRunGroupsUsed;
             SessionEnforceTireCompoundChange = s.SessionEnforceTireCompoundChange;
-            ResultsPositions = s.ResultsPositions is not null ? s.ResultsPositions.Select(p => new DriverPositionDTO(p)).ToList() : new List<DriverPositionDTO>();
-            ResultsFastestLap = s.ResultsFastestLap is not null ? s.ResultsFastestLap.Select(l => new FastestLapDTO(l)).ToList() : new List<FastestLapDTO>();
+            ResultsPositions = s.ResultsPositions is not null ? s.ResultsPositions.Select(p => new DriverPositionDTO(p)).ToList() : [];
+            ResultsFastestLap = s.ResultsFastestLap is not null ? s.ResultsFastestLap.Select(l => new FastestLapDTO(l)).ToList() : [];
             ResultsAverageLapTime = s.ResultsAverageLapTime;
             ResultsNumCautionFlags = s.ResultsNumCautionFlags;
             ResultsNumCautionLaps = s.ResultsNumCautionLaps;

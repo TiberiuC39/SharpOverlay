@@ -88,14 +88,14 @@ namespace Core.Utilities.Telemetries
         {
             int currentSessionNumber = telemetry.SessionNum;
 
-            if (CurrentSessionNumber != currentSessionNumber)
-            {
-                HasSwitchedSessions = true;
-            }
-            else if (HasSwitchedSessions)
-            {
-                HasSwitchedSessions = false;
-            }
+            // if (CurrentSessionNumber != currentSessionNumber)
+            // {
+            //     HasSwitchedSessions = true;
+            // }
+            // else if (HasSwitchedSessions)
+            // {
+            //     HasSwitchedSessions = false;
+            // }
 
             CurrentSessionNumber = currentSessionNumber;
         }

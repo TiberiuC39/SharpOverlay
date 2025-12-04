@@ -3,6 +3,7 @@ using Core.Services.Spotter;
 using Presentation.Events;
 using Presentation.Models;
 using Presentation.Services;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -71,6 +72,8 @@ namespace Presentation.Overlays
             {
                 Hide();
             }
+
+            _settings.IsOpen = e.IsOpen;
         }
 
         private void Window_MouseDown(object? sender, MouseButtonEventArgs e)

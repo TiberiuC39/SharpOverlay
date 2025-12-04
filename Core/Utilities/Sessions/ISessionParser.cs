@@ -5,6 +5,7 @@ namespace Core.Utilities.Sessions
     public interface ISessionParser
     {
         Dictionary<int, Driver> Drivers { get; }
+        Dictionary<int, TimeSpan> DriversLastLapTimes { get;}
         string EventType { get; }
         SessionType SessionType { get; }
         List<SessionDTO> Sessions { get; }
@@ -29,5 +30,6 @@ namespace Core.Utilities.Sessions
         void ParseTrackId(SessionOutputDTO sessionInfo);
         void ParseCarId(SessionOutputDTO sessionInfo);
         void ParseEventType(SessionOutputDTO sessionInfo);
+        void ParseDriversLastLapTimes(SessionOutputDTO sessionInfo, int sessionNumber);
     }
 }

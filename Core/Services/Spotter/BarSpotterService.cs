@@ -1,4 +1,5 @@
-﻿using Core.Events;
+﻿using System.Diagnostics;
+using Core.Events;
 using Core.Models;
 
 namespace Core.Services.Spotter
@@ -6,7 +7,7 @@ namespace Core.Services.Spotter
     public class BarSpotterService : IClear, IDisposable
     {
         private const int _carLengthInM = 5;
-        private const int _outOfFrameOffset = 1;
+        private const int _outOfFrameOffset = 2;
         private readonly Dictionary<int, Driver> _drivers = [];
         private Driver _me = new();
         private double _trackLengthInM;
@@ -18,9 +19,6 @@ namespace Core.Services.Spotter
 
         public BarSpotterService() : this(new SimReader())
         {
-            SimReader.OnTelemetryUpdated += OnTelemetry;
-            SimReader.OnSessionUpdated += OnSession;
-            SimReader.OnDisconnected += OnDisconnect;
         }
 
         public BarSpotterService(ISimReader simReader)
@@ -29,12 +27,20 @@ namespace Core.Services.Spotter
             SimReader.OnTelemetryUpdated += OnTelemetry;
             SimReader.OnSessionUpdated += OnSession;
             SimReader.OnDisconnected += OnDisconnect;
+            SimReader.OnSessionChanged += OnSessionChange;
+        }
+
+        private void OnSessionChange(object? sender, EventArgs e)
+        {
+            Debug.WriteLine("Session changed!");
+            Clear();
         }
 
         public event EventHandler<BarSpotterEventArgs>? OnBarUpdated;
 
         public void OnDisconnect(object? sender, EventArgs e)
         {
+            Debug.WriteLine("Disconnected!");
             Clear();
         }
 
@@ -121,7 +127,7 @@ namespace Core.Services.Spotter
             {
                 closest = new Driver()
                 {
-                    RelativeLapDistancePct = 2
+                    RelativeLapDistancePct = _outOfFrameOffset
                 };
             }
 

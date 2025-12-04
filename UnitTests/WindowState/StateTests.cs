@@ -116,14 +116,12 @@ namespace Tests.WindowState
         }
 
         // --- Update(PropertyChangedEventArgs eventArgs) Tests ---
-
-        [TestCase(nameof(TrackedWindowState.IsOpen), true, ExpectedResult = false, Description = "Flipping IsOpen from True to False.")]
-        [TestCase(nameof(TrackedWindowState.IsOpen), false, ExpectedResult = true, Description = "Flipping IsOpen from False to True.")]
+        [TestCase(nameof(TrackedWindowState.IsInTestMode), true, ExpectedResult = false, Description = "Flipping IsInTestMode from True to False.")]
+        [TestCase(nameof(TrackedWindowState.IsInTestMode), false, ExpectedResult = true, Description = "Flipping IsInTestMode from False to True.")]
         public bool Update_PropertyChangedEventArgs_ChangesState_And_RequiresChange(string propertyName, bool initialValue)
         {
             // Arrange
-            _mockSettings.IsOpen.Returns(initialValue);
-            _mockSettings.IsInTestMode.Returns(false); // Default
+            _mockSettings.IsInTestMode.Returns(initialValue);
             var state = new TrackedWindowState(_mockSettings);
             state.CompleteChange(); // Clear initial state
 
